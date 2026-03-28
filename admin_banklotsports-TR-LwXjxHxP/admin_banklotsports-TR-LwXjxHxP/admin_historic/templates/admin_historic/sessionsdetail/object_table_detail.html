@@ -1,0 +1,258 @@
+{% load humanize %}
+<div class="col-xs-12">
+    <div class="panel panel-default">
+        <div class="panel-head">
+              
+              <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-head">
+                      <p>
+                        Datos de la sesión
+                      </p>
+                    </div>
+                      <div class="panel-body panel-body-border panel-shadow">
+                      <table class='table'>
+
+                        <tbody>
+                        <tr>
+                          <td>
+                            Usuario
+                          </td>
+                          <td> {{ object_session.session.user }}</td>
+                        </tr>
+
+                        <tr>
+                          <td>
+                            Comercializadora
+                          </td>
+                          <td> {{ object_session.session.get_comercializadora }}</td>
+                        </tr>
+
+                        <tr>
+                          <td>
+                            Operación
+                          </td>
+                          <td> {{ object_session.userprocess.name }} </td>
+                        </tr>
+
+                        <tr>
+                          <td>
+                            Tiempo
+                          </td>
+                          <td title="{{ object_session.created_at|naturaltime }}">
+                          <i class="icon-clock"><i>
+                          {{ object_session.created_at }}
+                          </td>
+                        </tr>
+                        
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+              </div>
+            
+        </div>
+    </div>
+</div>
+
+ <div class="col-xs-12">
+                  <div class="panel panel-default">
+                      <div class="panel-head">
+                        
+                        <div class="col-xs-12">
+                          <div class="panel panel-default">
+                              <div class="panel-head">
+                                <p>
+                                  Datos de la operación
+                                </p>
+                              </div>
+                                <div class="panel-body panel-body-border panel-shadow">
+                                <table class='panel-body panel-body-border panel-shadow table'>
+                                  <tbody>
+                                  {% if object_session_refs.object.fields %}
+                                    <tr>
+                                      
+                                      {% if object_session_refs.process = 'create' %}
+                                        <th><h3>Atributos básicos</h3></th>
+                                        <th colspan="2"><strong>Valor</strong></th>
+                                      {% elif object_session_refs.process = 'update' %}
+                                        <th><h3>Atributos básicos</h3></th>
+                                        <th><strong>Valor anterior</strong></th>
+                                        <th><strong>Valor nuevo</strong></th>
+                                      {% elif object_session_refs.process = 'delete' %}
+                                        <th colspan="3"><h3>Atributos básicos</h3></th>
+                                      {% endif %}
+                                    
+                                    </tr>
+                                    {% for obj in object_session_refs.object.fields %}
+                                        <tr>
+                                          <td>
+                                            <strong>
+                                              {% for key,value in obj.items %}
+                                                  {{key}}
+                                              {% endfor %}
+                                            </strong>
+                                          </td>
+                                          {% if object_session_refs.process = 'update' %}
+                                            <td>
+                                              <p class="alert-warning">
+                                              {% for key,value in obj.items %}
+                                                  {{value.0|safe}}
+                                              {% endfor %}
+                                              </p>
+                                            </td>
+                                            <td >
+                                              <p class="alert-success">
+                                              {% for key,value in obj.items %}
+                                                  {{value.1|safe}}
+                                              {% endfor %}
+                                              </p>
+                                            </td>
+                                          {% else %}
+                                            <td colspan="2">
+                                            {% if object_session_refs.process = 'delete' %}
+                                              <p class="alert-danger">
+                                            {% else %}
+                                              <p class="alert-info">
+                                            {% endif %}
+                                              {% for key,value in obj.items %}
+                                                  {{value|safe}} 
+                                              {% endfor %}
+                                              </p>
+                                            </td>
+                                          {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                  {% endif %}
+
+                                  {% if object_session_refs.object.fields_related %}
+
+                                    {% for title,values in object_session_refs.object.fields_related.items %}
+                                    
+                                      {% if object_session_refs.process = 'create' %}
+                                        <th><h3>{{title}}</h3></th>
+                                        <th colspan="2"><strong>Valor</strong></th>
+                                      {% elif object_session_refs.process = 'update' %}
+                                        <th><h3>{{title}}</h3></th>
+                                        <th><strong>Valor anterior</strong></th>
+                                        <th><strong>Valor nuevo</strong></th>
+                                      {% elif object_session_refs.process = 'delete' %}
+                                        <th colspan="3"><h3>{{title}}</h3></th>
+                                      {% endif %}
+                                      
+                                      {% for obj,val in values.items %}
+                                      <tr>
+                                         <th colspan="3">
+                                          <strong>{{ obj }}</strong>
+                                        </th>
+                                      </tr>
+                                        
+                                        {% if object_session_refs.process = 'create' %}
+                                          
+                                          {% if val.items %}
+                                            {% for key,valor in val.items %}
+                                              <tr>
+                                                <td>
+                                                  <p>
+                                                  {{key}}
+                                                  </p>
+                                                </td>
+                                                <td>
+                                                  <p class="alert-info">
+                                                     {{ valor }}
+                                                  </p>
+                                                </td>
+                                              </tr>                                        
+                                            {% endfor %}
+                                          {% else %}
+                                            {% for object_in in val %}
+                                              {% for key_in,valor_in in object_in.items %}
+                                              <tr>
+                                                <td>
+                                                  <p>
+                                                  {{key_in}}
+                                                  </p>
+                                                </td>
+                                                <td>
+                                                  <p class="alert-info">
+                                                     {{valor_in}}
+                                                  </p>
+                                                </td>
+                                              </tr>                                        
+                                            {% endfor %}                                    
+                                          {% endfor %}
+
+
+                                          {% endif %}
+                                        {% else %}
+                                         {% if object_session_refs.process = 'update' %}
+                                          {% for campo in val %}
+                                            {% if campo.items %}
+                                              <tr>
+                                                <td>
+                                                  <p>
+                                                  {% for atributo,cambio in campo.items %}
+                                                      {{atributo}} 
+                                                  {% endfor %}
+                                                  </p>
+                                                </td>
+                                                <td>
+                                                <p class="alert-warning">
+                                                  {% for atributo,cambio in campo.items %}
+                                                    {% if cambio.0 %}
+                                                      {{cambio.0}}
+                                                    {% else %}
+                                                      <br>
+                                                    {% endif %}
+                                                  {% endfor %}
+                                                </p>
+                                                </td>
+                                                <td>
+                                                  <p class="alert-success">
+                                                  {% for atributo,cambio in campo.items %}
+                                                    {% if cambio.1 %}
+                                                      {{cambio.1}}
+                                                    {% else %}
+                                                      <br>
+                                                    {% endif %}
+                                                  {% endfor %}
+                                                  </p>
+                                                </td>                                            
+                                              </tr>
+                                            {% endif %}                                        
+                                          {% endfor %}
+                                         {% endif %}
+
+                                        {% endif %}
+                                      {% endfor %}
+                                    {% endfor %}
+                                  {% endif %}
+
+                            </tbody>
+
+                                </table>
+                              </div>
+                            </div>
+                        </div>
+                        
+                        <div class="panel-footer panel-shadow">
+                                <div class="form-margin">
+                                  <div class="col-xs-12">
+                                    <p>
+                                      <button id="atras" class='btn btn-large btn-success' >Atras </button>
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+
+                      </div>
+            </div>
+</div>
+
+<script>
+
+  $("#atras").click(function(event) {
+      history.back();
+    }); 
+
+</script>

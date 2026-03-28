@@ -1,0 +1,38 @@
+table{
+	font-family: Arial, sans-serif;
+	font-size: 9px;
+	border-collapse: collapse;
+	width: 100%;
+}
+table .trs{
+  font-size: 8px;
+  background-color: #eeeeee;
+  color: #606060;
+}
+table td{
+	border-width: 1px;
+	border-color: #606060;
+	border-style: solid;
+	text-align: center;
+}
+.fecha{
+	font-size: 8px;
+	color: #606060;
+}
+.modalidad{
+	font-size: 8px;
+	font-weight: bold;
+	color: #606060;
+	text-align: center;
+}
+.title{
+	font-weight: bold;
+	color: #000000;
+	padding: 10px;
+}
+.dato{
+	font-weight: bold;
+}
+table .odd {
+    background-color: #eeeeee;
+}

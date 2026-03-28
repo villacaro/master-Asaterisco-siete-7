@@ -1,0 +1,192 @@
+{% load url from future %}
+{% load i18n %}
+              <div class="col-xs-12">
+                  <div class="panel panel-default panel-filters">
+                    
+                      <div class="panel-head">
+                       <a href="{% url 'admin_juego_encuentros_create' %}" class="btn btn-sm btn-primary side left"><i class="icon-squared-plus i-right"></i> Crear nuevo</a>
+                      </div>
+                        <form id="form_deportes" action='' method='get' encoding='utf-8'>
+                              <div class="panel-body panel-filters">
+                                <div class="row">
+                                  
+                                  <div class="col-xs-4">
+                                    <div class="form-margin">
+                                  
+                                      <div class="row form form-group">
+                                        <div class="col-xs-4">
+                                          <div class="form-label">{{ form.deporte.label }}</div>
+                                        </div>
+                                        
+                                        <div class="col-xs-8">
+                                          {{ form.deporte }}
+                                        </div>
+                                      </div>
+
+                                      <div class="row form form-group">
+                                        <div class="col-xs-4">
+                                          <div class="form-label">{{ form.torneo.label }}</div>
+                                        </div>
+                                        
+                                        <div class="col-xs-8">
+                                          {{ form.torneo }}
+                                        </div>
+                                      </div>
+
+                                      <div class="row form form-group">
+                                        <div class="col-xs-4">
+                                          <div class="form-label form-label-right">{{ form.fecha_inicio.label }}</div>
+                                        </div>
+                                        <div class="col-xs-8">
+                                          {{ form.fecha_inicio }}
+                                        </div>
+                                      </div>
+
+                                      <div class="row form form-group">
+                                        <div class="col-xs-4">
+                                          <div class="form-label form-label-right">{{ form.fecha_fin.label }}</div>
+                                        </div>
+                                        <div class="col-xs-8">
+                                          {{ form.fecha_fin }}
+                                        </div>
+                                      </div>
+                                    
+                                    </div>
+                                  </div>
+
+                        
+                                </div>
+                              </div>
+                              
+                                <div class="panel-footer panel-shadow">
+                                      <div class="col-xs-12">
+                                          <p>
+                                          <button id="id_consultar" type="submit" class="btn btn-primary">Buscar</button>
+                                          </p>
+                                      </div>
+                                </div>
+                          </form>
+                      </div>
+                  </div>
+                
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-head">
+                          <div class="panel-head">
+                            <p class="title left">
+                              Encuentros
+                            </p>
+                          </div>
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                            <table class='table table-data'>
+                              <thead>
+                                <tr>
+                                  <th>ID</th>
+                                  <th>Fecha</th>
+                                  <th>Hora</th>
+                                  <th>Partido</th>
+                                  <th>Torneo - Temporada</th>
+                                  <th>Deporte</th>
+                                  <th>Estado</th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for object in object_list %}
+                                  <tr>
+
+                                    <td >{{ object.pk }}</td>
+                                  
+                                    <td >
+                                      <span class="tag tag-nomarginup">
+                                        <span>{{ object.horajuego|date:'d/m/Y' }}</span>
+                                      </span>
+                                    </td>   
+                                    <td >
+                                      <span class="tag tag-nomarginup">
+                                        <span>{{ object.horajuego|date:'h:i a'}}</span>
+                                      </span>
+                                    </td>                            
+                                  
+                                    <td >
+                                      {% for equipo in object.encuentrosdetail_set_order %}
+                                        <span class="tag tag-light-green">
+                                          {{ equipo.equipos_temporadas.equipo }}
+                                        </span> 
+                                        {% if not forloop.last %}
+                                          <span class="tag tag-nomargin">vs.</span>
+                                        {% endif %}
+                                      {% endfor %}
+                                    </td>
+
+                                    <td>
+                                      <span class="tag tag-nomarginup">
+                                        <span class="tag tag-nomarginupb tag-blue">{{ object.jornada.temporadas.torneo.nombre }}</span>
+                                        <span>{{ object.jornada.temporadas.nombre }} - {{ object.jornada.jornada }}</span>
+                                      </span>
+                                    </td>
+
+                                    <td><span class="tag tag-green">{{ object.jornada.temporadas.torneo.deporte }}</span></td>
+                                    
+                                    <td >{{ object.status }}</td>
+
+                                      <td>
+                                        <div class="btn-group btn-group-74">
+                                          <a class="btn btn-xs btn-ico btn-default" href='{% url "admin_juego_encuentros_detail" pk=object.pk %}'>
+                                            <i class="icon-info2"></i>
+                                          </a>
+                                          
+                                          <a class="btn btn-xs btn-ico btn-default" href='{% url "admin_juego_encuentros_update" pk=object.pk %}'>
+                                            <i class="icon-edit2"></i>
+                                          </a>
+                                        
+                                          <a class="btn btn-xs btn-ico btn-default" href='{% url "admin_juego_encuentros_delete" pk=object.pk %}'>
+                                            <i class="icon-delete"></i>
+                                          </a>
+                                          
+                                        </div>           
+                                      </td>
+                                  </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+{% block js %}
+  <script>
+
+   $('#id_fecha_inicio').datetimepicker({
+    format:'Y-m-d',
+    lang:'es',
+    timepicker:false
+    });
+   $("#id_fecha_inicio").on("change",function(){
+    $("#id_fecha_fin").val($("#id_fecha_inicio").val())
+   });
+
+     $('#id_fecha_fin').datetimepicker({
+      format:'Y-m-d',
+      lang:'es',
+      onShow:function( ct ){
+        fecha = $('#id_fecha_inicio').val().split("-")
+        fecha_min = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+        if ( parseInt(fecha[1]) == 12 ){
+          fecha[0] = parseInt( fecha[0] ) + 1
+          fecha[1] = 1
+        }
+        else{
+          fecha[1] = parseInt( fecha[1] ) + 1
+        }
+        fecha_max = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+        this.setOptions({
+          minDate:$('#id_fecha_inicio').val()?fecha_min:false,
+          maxDate:$('#id_fecha_inicio').val()?fecha_max:false
+        })
+        },
+      timepicker:false
+     });
+  </script>
+{% endblock %}

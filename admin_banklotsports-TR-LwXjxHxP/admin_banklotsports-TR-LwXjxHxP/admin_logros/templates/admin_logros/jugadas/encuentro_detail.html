@@ -1,0 +1,55 @@
+{% load url from future %}
+{% load i18n %}
+<div class="col-xs-12">
+                    <div class="panel panel-minimal">
+                        <div class="panel-head">
+                          <div class="title left">
+                            <p>Detalle del encuentro</p>
+                          </div>
+
+                          {% if object.get_url_historic %}
+                            <div class="title right">
+                              <a class='btn btn-success' href='{{object.get_url_historic}}'>
+                                <i class="icon-history"></i>
+                                {% trans "Ver historico" %}
+                              </a>
+                            </div>
+                          {% endif %}
+                          
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                            <table class='table table-panel'>
+                              <thead>
+                                <tr>
+                                  <th>ID</th>
+                                  <th>Fecha y hora</th>
+                                  <th>Partido</th>
+                                  <th>Torneo - Temporada</th>
+                                  <th>Deporte</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                  <tr>
+
+                                    <td class="td-center">{{ object.pk }}</td>
+                                  
+                                    <td>
+                                      {{ object.horajuego|date:'h:i a'}} - {{ object.horajuego|date:'d/m/Y' }}
+                                    </td>                            
+                                  
+                                    <td >
+                                      {% for equipo in object.encuentrosdetail_set_order %}
+                                        <span class="tag tag-blue">{{ equipo.equipos_temporadas.equipo }}</span>
+                                      {% endfor %}
+                                    </td>
+                                    <td>
+                                        {{ object.jornada.temporadas.torneo.nombre }} - {{ object.jornada.temporadas.nombre }}
+                                    </td>
+                                    <td><span class="tag tag-green">{{ object.jornada.temporadas.torneo.deporte }}</span></td>
+
+                                  </tr>
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>

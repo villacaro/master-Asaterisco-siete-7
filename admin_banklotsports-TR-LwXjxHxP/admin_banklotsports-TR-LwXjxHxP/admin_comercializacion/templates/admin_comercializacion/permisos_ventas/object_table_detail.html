@@ -1,0 +1,85 @@
+{% load i18n %}
+{% load humanize %}
+<div class="row detail">
+  <div class="column hd-6 lg-12 no-ppd">
+    <div class="headline">
+      <h5><i class="icon-info2 i-right"></i>Detalle deportes</h5>
+    </div>
+    <div class="panel">
+      <div class="panel-body">
+        <div class="row">
+          <div class="column lg-12">
+            <table class="table">
+              <tbody>
+                {% for deporte in deportes %}
+                <tr>
+                    <td width="250px">
+                      <strong>
+                      {% if deporte.restriccion %}
+                        <span class="tag tag-red">
+                      {% else %}
+                        <span class="tag tag-green">
+                      {% endif %}
+                      {{deporte.nombre}}
+                        </span>
+                      </strong>
+                      </h1>
+                    </td>
+                </tr>
+                <tr>
+                  <td>
+                  <table class="table">
+                    <tbody>
+                    
+                      {% for grupo in deporte.grupos %}
+                      <tr>
+                        <td width="250px">
+                          <strong>
+                        {% if grupo.restriccion %}
+                          <span class="tag tag-red">
+                        {% else %}
+                          <span class="tag tag-green">
+                        {% endif %}
+                          {{grupo.nombre}}
+                          </span>
+                          </strong>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                           <table class="table">
+                            <tbody>
+                              {% for modalidad in grupo.modalidades %}
+                              <tr>
+                                <td width="250px">
+                                {% if modalidad.restriccion %}
+                                  <span class="tag tag-red">
+                                {% else %}
+                                  <span class="tag tag-green">
+                                {% endif %}
+                                  {{modalidad.nombre}}
+                                  </span>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  </td>
+                </tr>
+
+                {% endfor %}
+              
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

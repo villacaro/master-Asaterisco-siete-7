@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-school"></i>Logros</h1>
+                            <p class="subtitle">Asignar</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><i class="icon-school"></i>Logros</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+                      {% include 'admin_logros/jugadas/print_logros_object_table_list_detail.html' %}
+                  </div>
+                </div>
+            </div>
+{% endblock %}

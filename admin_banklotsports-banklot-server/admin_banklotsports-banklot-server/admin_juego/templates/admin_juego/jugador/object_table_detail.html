@@ -1,0 +1,103 @@
+{% load i18n %}
+{% load humanize %}
+<div class="col-xs-12">
+  <div class="panel panel-default">
+    <div class="panel-head">
+          <div class="title left">
+              <p>
+                Datos del Jugador
+              </p>
+            </div>
+
+            {% if object.get_url_historic %}
+            <div class="title right">
+              <a class='btn btn-success' href='{{object.get_url_historic}}'>
+                <i class="icon-history"></i>
+                {% trans "Ver historico" %}
+              </a>
+            </div>
+            {% endif %}                
+    </div>
+    <div class="panel-body panel-body-border panel-shadow">
+    <table class='table'>      
+      <thead>
+            <tr>
+              <th>
+                {% trans "Dato" %}
+              </th>
+              <th>
+                {% trans "Valor" %}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            
+            <tr>
+              <td>
+                Deporte
+              </td>
+              <td><span class="tag tag-green">{{ object.tipo.deporte.nombre }}</span></td>
+            </tr>
+
+            <tr>
+              <td>
+                Tipo de jugador
+              </td>
+              <td><span class="tag tag-green">{{ object.tipo.nombre }}</span></td>
+            </tr>            
+            
+            <tr>
+              <td>
+                Nombre
+              </td>
+              <td>{{ object.nombre }}</td>
+            </tr>
+
+            <tr>
+              <td>
+                Lateralidad
+              </td>
+              <td>{{ object.get_lateralidad_display }}</td>
+            </tr>
+
+            <tr>
+              <td>
+                Referencia
+              </td>
+              <td>{{ object.referencia }}</td>
+            </tr>
+
+            <tr>
+              <td>
+                Foto
+              </td>
+              
+              <td>{% if object.foto %}<img src="{{MEDIA_URL}}{{object.foto}}" width="50" height="50">{% else %}Sin imagen{% endif %}</td>
+
+            </tr>
+
+            <tr>
+              <td>
+                Creado
+              </td>
+              <td title="{{ object.created_at }}">
+                <i class="icon-clock"><i>
+                {{ object.created_at|naturaltime }}
+              </td>
+            </tr>
+            
+            <tr>
+              <td>
+                Actualizado
+              </td>
+              <td title="{{ object.updated_at }}">
+                <i class="icon-clock"><i>
+                {{ object.updated_at|naturaltime }}
+              </td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

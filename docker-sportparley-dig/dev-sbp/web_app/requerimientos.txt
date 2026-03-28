@@ -1,0 +1,17 @@
+django-cors-headers
+django-debug-toolbar
+https://github.com/hmarr/django-debug-toolbar-mongo/archive/master.zip
+django-extensions
+django-redis-cache
+docutils
+gunicorn
+hiredis
+mongoengine
+pillow==2.7.0
+pycrypto
+psycopg2
+https://github.com/omab/python-social-auth/archive/master.zip
+redis
+requests
+rsa
+Werkzeug

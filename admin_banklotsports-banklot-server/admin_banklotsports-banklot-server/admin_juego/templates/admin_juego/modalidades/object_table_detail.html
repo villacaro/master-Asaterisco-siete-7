@@ -1,0 +1,277 @@
+{% load i18n %}
+{% load humanize %}
+                  <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-head">
+                          
+                          <div class="title left">
+                              <p>
+                                Datos de la modalidad
+                              </p>
+                          </div>
+                          
+                              {% if object.get_url_historic %}
+                              <div class="title right">
+                                <a class='btn btn-success' href='{{object.get_url_historic}}'>
+                                  <i class="icon-history"></i>
+                                  {% trans "Ver historico" %}
+                                </a>
+                              </div>
+                              {% endif %}
+
+                            <p class="title right">
+                            Datos del paso 1
+                          </p>
+                          
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                          <table class='table'>
+                            <thead>
+                              <tr>
+                                <th>
+                                  {% trans "Dato" %}
+                                </th>
+                                <th>
+                                  {% trans "Valor" %}
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>    
+                              
+                              <tr>
+                                <td>
+                                  Modalidad
+                                </td>
+                                <td>{{ object.modalidad }}</td>
+                              </tr>
+                              
+                              <tr>
+                                <td>
+                                  Orden
+                                </td>
+                                <td>{{ object.orden }}</td>
+                              </tr>
+
+                              <tr>
+                                <td>
+                                  Descripción
+                                </td>
+                                <td>{{ object.descripcion }}</td>
+                              </tr>
+
+                              <tr>
+                                <td>
+                                  ¿Posee etiqueta de referencia?
+                                </td>
+                                <td>
+                                  {% if object.etiqueta_ref %}
+                                    Si
+                                  {% else %}
+                                    No
+                                  {% endif %}
+                                  </td>
+                              </tr>
+
+                              <tr>
+                                <td>
+                                  ¿Modalidad de apuesta?
+                                </td>
+                                <td>
+                                  {% if object.bet %}
+                                    Si
+                                  {% else %}
+                                    No
+                                  {% endif %}
+                                  </td>
+                              </tr>
+                                       
+                              <tr>
+                                            <td>
+                                              Creado
+                                            </td>
+                                            <td title="{{ object.created_at }}">
+                                              <i class="icon-clock"><i>
+                                              {{ object.created_at|naturaltime }}
+                                            </td>
+                                          </tr>
+                                          
+                                          <tr>
+                                            <td>
+                                              Actualizado
+                                            </td>
+                                            <td title="{{ object.updated_at }}">
+                                              <i class="icon-clock"><i>
+                                              {{ object.updated_at|naturaltime }}
+                                            </td>
+                                          </tr>
+                              
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                  </div>
+
+<div class="col-xs-12">
+  <div class="panel panel-default">
+    <div class="panel-head">
+      <p class="left title">
+        Restricciones de la modalidad
+      </p>
+      <p class="right title">
+          Datos del paso 1
+      </p>
+    </div>
+    <div class="panel-body panel-body-border panel-shadow">
+        <table class='table'>
+        <thead>
+          <tr>
+            <th>
+              Restricciones de combinación
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for restriction in object.restriction.all %}
+          <tr>
+            <td>
+               {{ restriction }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        </table>
+      </div>
+    </div>
+</div>
+
+
+<div class="col-xs-12">
+  <div class="panel panel-default">
+    <div class="panel-head">
+      <p class="left title">
+        Grupos a los que pertenece la modalidad
+      </p>
+      <p class="right title">
+        Datos del paso 2
+      </p>
+    </div>
+    <div class="panel-body panel-body-border panel-shadow">
+        <table class='table'>
+        <thead>
+          <tr>
+            <th>
+              Grupos
+            </th>
+            <th>
+              Deportes por defecto
+            </th>
+            <th>
+              Deportes restringidos
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for grupo in object.modalidades_grupos_set.all %}
+          <tr>
+            <td>
+               {{ grupo.grupo }}
+            </td>
+
+            <td>
+              {% for deporte in grupo.grupo.deporte.all %}
+                <span class="tag tag-blue">
+                                          
+                      {% if deporte.logo %}
+                        <img src="{{MEDIA_URL}}{{deporte.logo}}" height="25" width="25">
+                      {% endif %}
+                      {{ deporte.nombre }}
+
+                </span>
+              {% empty %}
+                No hay deportes por defecto
+              {% endfor %}
+            </td>
+
+            <td>
+              {% for deporte in grupo.deporte_restriccion.all %}
+                <span class="tag tag-red">
+                                          
+                      {% if deporte.logo %}
+                        <img src="{{MEDIA_URL}}{{deporte.logo}}" height="25" width="25">
+                      {% endif %}
+                      {{ deporte.nombre }}
+
+                </span>
+              {% empty %}
+                <span class="tag tag-red">
+                  No hay deportes restringidos
+                </span>
+              {% endfor %}
+            </td>
+
+          </tr>
+          {% endfor %}
+        </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+{% if object.etiqueta_ref %}
+
+<div class="col-xs-12">
+  <div class="panel panel-default">
+    <div class="panel-head">
+      <p class="left title">
+        Rango de la referencias
+      </p>
+      <p class="right title">
+        Datos del paso 3
+      </p>
+    </div>
+    <div class="panel-body panel-body-border panel-shadow">
+        <table class='table'>
+        <thead>
+          <tr>
+            <th>
+              Deporte
+            </th>
+            <th>
+              Minima referencia
+            </th>
+            <th>
+              Maxima referencia
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for grupo in object.modalidades_grupos_set.all %}
+            <tr>
+              <td style="text-align: center" colspan="3">
+                <strong>{{grupo.grupo.nombre}}</strong>
+              </td>
+            </tr>
+            {% for restriction in grupo.modalidad.restriccionesreferencias_set.all %}
+              {%if restriction.grupo == grupo.grupo%}
+                <tr>
+                <td >
+                 {{ restriction.deporte.nombre }}
+                </td>
+                <td width="20%">
+                 {{ restriction.min_ref }}
+                </td>
+                <td width="20%">
+                   {{ restriction.max_ref }}
+                </td>
+                  
+                </tr>
+              {%endif%}
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+        </table>
+      </div>
+    </div>
+</div>
+
+{% endif %}

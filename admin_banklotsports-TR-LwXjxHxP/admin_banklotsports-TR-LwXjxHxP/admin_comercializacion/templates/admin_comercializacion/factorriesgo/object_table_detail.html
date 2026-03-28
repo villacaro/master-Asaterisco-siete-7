@@ -1,0 +1,104 @@
+{% load i18n %}
+{% load humanize %}
+
+                  <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-head">
+                          <div class="title left">
+                                <p>
+                                  Detalle del factor de riesgo
+                                </p>
+                              </div>
+
+                              {% if object.get_url_historic %}
+                              <div class="title right">
+                                <a class='btn btn-success' href='{{object.get_url_historic}}'>
+                                  <i class="icon-history"></i>
+                                  {% trans "Ver historico" %}
+                                </a>
+                              </div>
+                              {% endif %}
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                          <table class='table'>
+                            <thead>
+                              <tr>
+                                <th>
+                                  {% trans "Dato" %}
+                                </th>
+                                <th>
+                                  {% trans "Valor" %}
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                               <tr>
+                                <td>
+                                  ID
+                                </td>
+                                <td>{{ object.pk }}</td>
+                              </tr>
+
+                              <tr>
+                                <td>
+                                  {{ object.get_object.get_verbose_name }}
+                                </td>
+                                <td>{{ object.get_object }}</td>
+                              </tr>
+                              
+                              {% for regla in object.factores %}
+                              <tr>
+                              
+                                <td>
+                                  Reglas {{ forloop.counter }}
+                                </td>
+                                <td></td>
+                              
+                              </tr>
+                              <tr>
+                                
+                                <td></td>
+                              
+                                <td>
+                                  Rango inicial {{ regla.0 }} Bs.
+                                </td>
+                              </tr>
+                              <tr>
+                                <td></td>
+                              
+                                <td>
+                                  Rango final {{ regla.1 }} Bs.
+                                </td>
+                              </tr>
+                              <tr>
+                                <td></td>
+                              
+                                <td>
+                                  Factor aplicado {{ regla.2 }}
+                                </td>
+                              </tr>
+                              {% empty %}
+
+                                <tr>
+                                  <td>No hay reglas definidas</td>
+                                  <td>
+                                  </td>
+                                </tr>
+
+                              {% endfor %}
+
+                              <tr>
+                                <td>
+                                  Actualizado
+                                </td>
+                                <td title="{{ object.updated_at }}">
+                                  <i class="icon-clock"><i>
+                                  {{ object.updated_at|naturaltime }}
+                                </td>
+                              </tr>
+                              
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                  </div>

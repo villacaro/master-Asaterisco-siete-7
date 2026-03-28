@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-whatshot"></i> Factores de riesgo</h1>
+                            <p class="subtitle">
+                              {% if object %}
+                                {% trans "Editar" %}
+                              {% else %}
+                                {% trans "Crear" %}
+                              {% endif %}</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="#"><i class="icon-whatshot"></i> Factores de riesgo</a>
+                                </li>
+                                <li>
+                                  {% if object %}
+                                  <i class="icon-pencil-1"></i> Editar
+                                  {% else %}
+                                  <i class="icon-plus-1"></i> Crear
+                                  {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+                    <form id="form_factores" action='{% url 'admin_comercializacion_factorriesgo_update' pk=object.pk %}' method='post' encoding='utf-8'>{% csrf_token %}
+                      
+                      <div class="col-xs-12">
+                        <div class="panel panel-default">
+                          <div class="panel-head container-margin">
+                           
+                              <div class="title left">
+                                <h3><p>{{ object }}</p></h3>
+                                {{ form.management_form }}
+                              </div>
+                              <div class="title right">
+                                <button type="button" class="btn btn-success icon-plus-circle" onclick="add_form()">
+                                  Añadir otra regla   
+                                </button>
+                              </div>                     
+                              
+                            
+                          </div>
+                          <div class="panel-body panel-body-border panel-shadow">
+                              <table class='table'>
+                              <thead>
+                                <tr>
+                                  <th>
+                                    Rango de Apuesta (Min)
+                                  </th>
+                                  <th>
+                                    Rango de Apuesta (Max)
+                                  </th>
+                                  <th>
+                                    Factor Riesgo
+                                  </th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody id="form">
+
+                                {% for form_row in form %}
+                                  {% with num_form=forloop.counter0 %}
+                                  
+                                    <tr id="form-{{num_form}}">
+                                      <td>
+                                        {{ form_row.rango_inicial }}
+                                        {%  if form_row.rango_inicial.errors %}   
+                                            <div class="alert alert-warning">
+                                              {{ form_row.rango_inicial.errors }}
+                                            </div>
+                                        {% endif %}  
+
+                                      </td>
+                                      <td>
+                                        {{ form_row.rango_final }}
+                                        {%  if form_row.rango_final.errors %}   
+                                            <div class="alert alert-warning">
+                                              {{ form_row.rango_final.errors }}
+                                            </div>
+                                        {% endif %}  
+                                      </td>
+                                      <td>
+                                        {{ form_row.porcentaje }}
+                                        {%  if form_row.porcentaje.errors %}   
+                                            <div class="alert alert-warning">
+                                              {{ form_row.porcentaje.errors }}
+                                            </div>
+                                        {% endif %}
+                                      </td>
+                                      
+                                      <td>
+                                        
+                                          <button type="button" class="btn btn-danger icon-minus" onclick="delete_form('form-{{num_form}}')">
+                                                 
+                                          </button>
+                                          
+                                      </td>
+                                    </tr>
+                                  {% endwith %}
+                                {% endfor %}
+                                
+                              </tbody>
+                              </table>
+
+                            </div>
+                             <div class="panel-footer panel-shadow">
+                              <div class="col-xs-1"></div>
+                              <div class="col-xs-5">
+                                <div class="alert alert-info container-margin">
+                                  <input class='btn' type="checkbox" onchange="HabilitarDesabilitar()">
+                                    Esta configuración afectará todos las comercializadoras de niveles inferiores
+                                  </input>
+                                  <script type="text/javascript">
+                                    activo = false;
+                                    function HabilitarDesabilitar(){
+                                      
+                                      if(activo){
+                                        $("#guardaraccion").attr('disabled','disabled');
+                                        $("#guardaraccion").removeClass("btn-success");
+                                        activo = false;
+                                      }
+                                      else{
+                                        activo = true;
+                                        $("#guardaraccion").removeAttr('disabled');
+                                        $("#guardaraccion").addClass("btn-success");
+                                      }
+                                    }        
+                                  </script>
+                                </div>
+                              </div>
+                              <div class="col-xs-5">
+                                 <div class="container-margin">
+                                    <button id="guardaraccion" disabled class='btn ' type='submit' value="_save" name="_save">
+                                      Guardar
+                                    </button>
+                                </div>
+                              </div>
+                          </div>
+                          </div>
+
+                      </div>
+
+
+
+                      </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+{% endblock %}
+
+{% block js %}
+  <script>
+
+    form_count = $("#id_form-TOTAL_FORMS").val() - 1
+    form = $("#form-" + (form_count) ).html()
+
+
+    function delete_form(form_name){
+        var count_delete = parseInt(form_name.split("-")[1],"10")
+
+        $("#id_form-TOTAL_FORMS").val( form_count )
+        
+        form_count = form_count - 1 
+
+        $("#"+form_name).slideUp( "slow", function() {
+            
+
+            $(this).remove()
+            $( "input" ).each( function( index, element ){
+
+                $(this).attr("value", $(this).val() )
+                
+            });
+
+            var html = $("#form").html()
+
+            for ( var i = count_delete; i <= form_count ; i++ ){
+              
+              var regex = new RegExp("form-" + (i+1) ,"g")
+              html = html.replace( regex , "form-"+( i ))
+
+            }
+
+            $("#form").html( html )
+          
+        })
+
+    }
+
+    function add_form(){
+
+      var regex = new RegExp("form-"+form_count,"g")
+      form = form.replace( regex , "form-"+(form_count+1))
+
+      form_count = form_count + 1
+
+      $("#id_form-TOTAL_FORMS").val( form_count + 1 )
+      $("#id_form-MAX_NUM_FORMS").val( parseInt($("#id_form-TOTAL_FORMS").val(),"10") + 1 )
+
+      var new_div = "<tr id='form-"+ form_count +"'>"+form+"</tr>"
+
+      $("#form").append( new_div )
+
+      $("#form-"+form_count).hide().slideDown("slow")
+
+      $( "#id_form-"+form_count+"-rango_inicial").attr("value","");
+      $( "#id_form-"+form_count+"-rango_final").attr("value","");
+      $( "#id_form-"+form_count+"-porcentaje_riesgo").attr("value","");
+      $( "#id_form-"+form_count+"-id").attr("value","");
+
+    }
+
+    $( "#form_factores" ).submit(function( event ) {
+      resp = confirm("Esta configuración afectará todos las comercializadoras de niveles inferiores, ¿Desea continuar?")
+      return resp
+    });
+
+  </script>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% load url from future %}
+{% load i18n %}
+                <div class="col-xs-12">
+                  <div class="panel panel-default">
+                    <form id="form_deportes" action='' method='get' encoding='utf-8'>
+                    <div class="panel-head">
+                        <p>Búsqueda</p>
+                      </div>
+                        <div class="panel-body">
+                          <div class="row form-margin">
+                            
+                            <div class="col-xs-4">
+                              <div class="form-margin">
+                                <div class="row form form-group">
+                                  
+                                  <div class="col-xs-4">
+                                    <div class="form-label">{{ form.deporte.label }}</div>
+                                  </div>
+                                  
+                                  <div class="col-xs-8">
+                                    {{ form.deporte }}
+                                  </div>
+
+                                </div>
+
+                              </div>
+                            </div>
+
+                            
+
+                            <div class="col-xs-4">
+                              <div class="form-margin">
+                                <div class="row form form-group">
+                                  
+                                  <div class="col-xs-4">
+                                    <div class="form-label">{{ form.torneo.label }}</div>
+                                  </div>
+                                  
+                                  <div class="col-xs-8">
+                                    {{ form.torneo }}
+                                  </div>
+
+                                </div>
+                              </div>
+                            </div>
+
+                            
+                            <div class="col-xs-4">
+                              <div class="form-margin">
+                              <div class="row form form-group">
+                                <div class="col-xs-4">
+                                  <div class="form-label form-label-right">{{ form.fecha.label }}</div>
+                                </div>
+                                <div class="col-xs-8">
+                                  {{ form.fecha }}
+                                </div>
+                                </div>
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+                        
+                          <div class="panel-footer panel-shadow">
+                            <div class="row form-margin">
+                                <div class="row form form-group">
+                                  <button type="submit" id="id_consultar" class="btn right btn-success">Buscar</button>
+                                </div>
+                              </div>
+                          </div>
+                      </div>
+                      </form>
+                  </div>
+                  
+                  <div class="col-xs-12">
+                    <div class="panel panel-minimal">
+                        <div class="panel-head">
+                          <p>Resultados</p>
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                            <table id='list_result' class='table table-panel table-striped table-hover'>
+                              <thead>
+                                <tr>
+                                  <th>ID</th>
+                                  <th>Fecha y hora</th>
+                                  <th>Partido</th>
+                                  <th>Torneo - Temporada</th>
+                                  <th>Deporte</th>
+                                  <th>Estatus</th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for object in object_list|dictsort:"resultado_exists" %}
+                                    <tr>
+                                    
+                                      <td width="5%" class="td-center">{{ object.pk }}</td>
+                                    
+                                      <td width="15%">
+                                        {{ object.horajuego|date:'h:i a'}} - {{ object.horajuego|date:'d/m/Y' }}
+                                      </td>                            
+                                    
+                                      <td width="35%">
+                                        {% for equipo in object.encuentrosdetail_set_order %}
+                                          <span class="tag tag-blue">{{ equipo.equipos_temporadas.equipo }}</span>
+                                        {% endfor %}
+                                      </td>
+                                      <td width="20%">
+                                          {{ object.jornada.temporadas.torneo.nombre }} - {{ object.jornada.temporadas.nombre }}
+                                      </td>
+                                      <td width="10%"><span class="tag tag-green">{{ object.jornada.temporadas.torneo.deporte }}</span></td>
+
+                                      <td >
+                                      {% if object.resultado_object.status %}
+                                        {{ object.resultado_object.status }}
+                                      {% else %}
+                                        {{ object.status }}                                      
+                                      {% endif %}
+
+                                      </td>
+                                      
+
+                                      <td width="15%">
+                                        {% if object.resultado_exists %}
+                                          {% if object.resultado.processed %}
+                                            {% if info_user.user.superuser == True %}
+                                              <a href="{% url 'admin_resultados_ecuentros_resultados_create_update' pk=object.pk %}" class="btn btn-xs btn-success">Asignar resultado</a>
+                                              <a href="{% url 'admin_resultados_premiar_edit' encuentro=object.pk %}?{{ QUERY_STRING }}" class='btn btn-xs btn-success'>Premiar</a>
+                                            {% else %}
+                                              {% url 'admin_resultados_ecuentros_resultados_create_update' pk=object.pk as NOT_404_R %}
+                                              {% if NOT_404_R != PAGE_404_URL %}
+                                                <a href="#sin-acceso" class="btn btn-xs btn-default">Asignar resultado</a>
+                                              {% endif %}
+                                              {% url 'admin_resultados_premiar_edit' encuentro=object.pk as NOT_404_P %}
+                                              {% if NOT_404_P != PAGE_404_URL %}
+                                                <a href="#sin-acceso" class='btn btn-xs btn-default'>Premiar</a>
+                                              {% endif %}
+                                              {% url 'admin_resultados_resultados_change' encuentro=object.pk as NOT_404_P %}
+                                              {% if NOT_404_P != PAGE_404_URL %}
+                                                <a href="{% url 'admin_resultados_resultados_change' pk=object.pk %}" class="btn btn-xs btn-success">Reasignar resultado</a>
+                                              {% endif %}
+
+                                            {% endif%}
+                                          {% else %}
+                                            <a href="{% url 'admin_resultados_ecuentros_resultados_create_update' pk=object.pk %}" class="btn btn-xs btn-success">Asignar resultado</a>
+                                            <a href="{% url 'admin_resultados_premiar_edit' encuentro=object.pk %}?{{ QUERY_STRING }}" class="btn btn-xs btn-danger">Premiar</a>
+                                          {% endif %}
+                                        {% else %}
+                                          <a href="{% url 'admin_resultados_ecuentros_resultados_create_update' pk=object.pk %}" class="btn btn-xs btn-danger">Asignar resultado</a>
+                                        {% endif %}
+                                      </td>
+          
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+{% block js %}
+  <script>
+
+   $('#id_fecha').datetimepicker({
+    format:'Y-m-d',
+    lang:'es',
+    timepicker:false
+   });
+         
+  </script>
+{% endblock %}

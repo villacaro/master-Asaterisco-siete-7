@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-insert-chart"></i> Porcentajes</h1>
+                            <p class="subtitle">
+                              {% if object %}
+                                {% trans "Actualizar" %}
+                              {% else %}
+                                {% trans "Crear" %}
+                              {% endif %}</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="#"><i class="icon-insert-chart"></i> Porcentajes</a>
+                                </li>
+                                <li>
+                                  {% if object %}
+                                  <i class="icon-pencil-1"></i> Actualizar
+                                  {% else %}
+                                  <i class="icon-plus-1"></i> Crear
+                                  {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+                    <form id="form_porcentaje" action='' method='post' encoding='utf-8'>{% csrf_token %}
+                      <div class="col-xs-12">
+                        <div class="panel panel-default">
+                          <div class="panel-body panel-head-border">
+
+                             
+                                
+                            <div class="form-margin">
+                               <div class="row form form-group">
+                                 <div class="col-xs-3">
+                            
+                                  </div>
+                                  <div class="col-xs-6">
+                                    {% if  form.errors  %}
+                                    <div class="alert alert-warning container-margin">
+                                      {{form.errors}}
+                                    </div>
+                                  {% endif %}
+                                  </div>
+                               </div>
+
+
+                              <div class="row form form-group">
+                                <div class="col-xs-3">
+                                  <div class="form-label">{{ form.form_object.label }}</div>
+                                </div>
+                                <div class="col-xs-6">
+                                  {{ form.form_object }}
+                                </div>
+                                <div class="col-xs-3">
+                                </div>
+                              </div>
+                              <div class="form-small form-small-800 row porcentajes">
+                                <div class="table">
+                                  <ul class="table-h">
+                                    <li>
+                                      <ul class="table-tr t-right">
+                                        {% for column in firts_column %}
+                                          {% if forloop.counter0 == 0 %}
+                                          <li class="table-head"><span class="xsmall">Nivel</span></li>
+                                          <li>
+                                            <div>
+                                              <p class="tag tag-yellow">{{ column|safe }}</p>
+                                            </div>
+                                          </li>
+                                          {% else %}
+                                          <li><span class="small"><strong>{{ column|safe }}</strong></span></li>
+                                          {% endif %}
+                                        {% endfor %}
+                                      </ul>
+                                    </li>
+                                    {% for list in form_list %}
+                                    <li>
+                                      <ul class="table-tr">
+                                        {% for column in list %}
+                                          {% if forloop.counter0 == 0 %}
+                                          <li class="table-head"><span class="xsmall">{{ column }}</span></li>
+                                          {% else %}
+                                          <li>
+                                            <div>
+                                              <div class="t-input">
+                                                <p class="input">{{ column.perc }}</p>
+                                                <p class="input-rel">{% if column.rel %}{{ column.rel }}{% endif %}</p>
+                                              </div>
+                                              {% if column.errors %}
+                                              <span class="errors">{{ column.errors.0 }}</span>
+                                              {% endif %}
+                                            </div>
+                                          </li>
+                                          {% endif %}
+                                        {% endfor %}
+                                      </ul>
+                                    </li>
+                                    {% endfor %}
+                                  </ul>
+                                </div>
+                              </div>
+                          </div>
+                          <div class="panel-footer panel-shadow">
+                              <div class="col-xs-3"></div>
+                              <div class="col-xs-4">
+                                {% if object.prefix_filter == 'agencia' %}
+                                <div class="alert alert-info container-margin">
+                                  <input id='id_valid' class='btn' type="checkbox"/>
+                                    ¿Desea que este centro de apuesta este libre de cálculo de porcentajes?
+                                </div>
+                                {% endif %}
+
+                              </div>
+                              <div class="col-xs-3">
+                                <p>
+                                <button class='btn btn-large btn-success' type='submit'>
+                                  {% if object %}
+                                  {% trans "Actualizar" %}
+                                  {% else %}
+                                  {% trans "Crear" %}
+                                  {% endif %}
+                                </button>
+                                </p>
+                              </div>
+                              
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+    
+    $( "#form_porcentaje" ).submit(function( event ) {
+
+      {% if object.prefix_filter == 'agencia' %}
+        if ($( "#id_valid" ).prop("checked")){
+          return true;
+        }
+      {% endif %}
+
+      //Sumatoria de porcentajes
+      var sumatoria_porcentajes = 0;
+      var error = false;
+
+      $("form input[type=text]").each(function (index) {
+        if (this.readOnly) return;
+        
+        if( this.id != undefined && this.id.indexOf("porcentaje") != -1 ){
+          if ( this.value == "" ){
+            error = true;
+            return;
+          }
+          else{
+
+            sumatoria_porcentajes += parseFloat(this.value.replace(",",".")); 
+          }
+        }
+      });
+
+      if( error ){
+        alert("Los porcentajes son obligatorios");
+        return false;
+      }
+
+      if( sumatoria_porcentajes == 0 )
+      {  
+        
+        /*
+        var preguntar = confirm("Estan todos los porcentajes en 0, ¿desea continuar?")
+        return preguntar;
+        */
+        alert("Los porcentajes son obligatorios, debe tener como mínimo alguno por encima de cero");
+        return false;
+      }
+      
+      return true;
+    });
+
+</script>
+{% endblock %}

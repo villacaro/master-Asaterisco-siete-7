@@ -1,0 +1,59 @@
+
+              <div class="col-xs-12">
+                <div class="panel panel-default">
+                  <div class="panel-head">
+                    
+                    <p class="left title">
+                      <h2><small>Comercializador actual:</small> {{ info_user.comercializadora }}</h2>
+                      
+                    </p>
+                    
+                  </div>
+                  <div class="panel-body panel-body-border panel-shadow">
+                      <table class='table table-data-comercializadoras'>
+                      <thead>
+                        <tr>
+                          <th>
+                            N°
+                          </th>
+                          <th>
+                            Tipo
+                          </th>
+                          <th>
+                            Comercializadora
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for comer in info_user.user.get_user_comercializadoras %}
+                        <tr>
+
+                          <td>
+                             {{forloop.counter}}
+                          </td>
+                          <td>
+                             {{ comer.get_type }}
+                          </td>
+                          <td>
+                              {% if comer.get_object.activo %}
+                                {% if comer.pk == info_user.comercializadora.pk %}
+                                  <a href="#" class="active"><i class="icon-check-3"></i>
+                                {% else %}
+                                  <a href="{% url 'admin_principal_change_comercializadora_process' pk=comer.pk %}">
+                                {% endif %}
+                                  {{ comer.get_object|safe }}
+                                </a>
+                              {% else %}
+                                <a href="#" title="Esta comercializadora a sido eliminada"></i>
+                                  {{ comer.get_object|safe }}
+                                </a>
+                              {% endif %}
+                          </td>
+                           
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                      </table>
+                    </div>
+                  </div>
+              </div>

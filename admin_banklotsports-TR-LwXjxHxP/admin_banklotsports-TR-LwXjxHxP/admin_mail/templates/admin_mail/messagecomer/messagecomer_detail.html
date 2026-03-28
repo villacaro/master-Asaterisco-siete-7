@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-embassy"></i> Mensajes</h1>
+                            <p class="subtitle">Detalle</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="{{object.get_ulr_list}}"><i class="icon-industrial-building"></i> Mensajes</a></li>
+                                <li><i class="icon-info"></i> Detalle</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+                    {% include 'admin_mail/messagecomer/object_table_detail.html' %}
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                          <div class="panel-body panel-body-border panel-head-border panel-shadow">
+                            <form id="delete_form" action='{% url 'admin_mail_message_delete' %}' charset='utf-8' method='post'>
+                                {% csrf_token %}
+                                   
+                                    {% if object.get_tray_diff_archived %}
+                                      <button id="_delete" type='submit' value="{{object.pk}}" name="archive" class="btn btn-waning" href='#delete'>
+                                        <i class="icon-save"></i>Archivar
+                                      </button>
+                                    {% endif %}
+                                    
+                                    <button id="_delete" type='submit' value="{{object.pk}}" name="delete" class="btn btn-danger" href='#delete'>
+                                      <i class="icon-delete"></i>Eliminar
+                                    </button>
+
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+{% endblock %}

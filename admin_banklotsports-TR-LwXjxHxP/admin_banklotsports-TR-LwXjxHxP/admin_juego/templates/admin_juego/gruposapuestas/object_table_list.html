@@ -1,0 +1,54 @@
+{% load url from future %}
+{% load i18n %}
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-head">
+                          <a href="{% url 'admin_juego_gruposapuestas_create' %}" class="btn btn-success side left"><i class="icon-plus-1"></i> Crear nuevo</a>
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                            <table class='table table-data'>
+                              <thead>
+                                <tr>
+                                  <th>N°</th>
+                                  <th>Nombre</th>
+                                  <th>Orden</th>
+                                  <th>Deportes</th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for object in object_list %}
+                                  <tr>
+                                      <td>{{ forloop.counter }}</td>
+                                      <td ><a class="link" href='{{ object.get_absolute_url }}'>{{ object.nombre }}</a></td>
+                                      <td >{{ object.orden }}</td>
+                                      <td>
+                                        {% for deporte in object.deporte.all %}
+                                          <span class="tag tag-blue">
+                                            {{ deporte }}
+                                          </span>
+                                        {% endfor %}
+                                      </td>
+                                      
+                                      <td>
+                                        <div class="btn-group btn-group-73">
+                                          <a class="f show" href='{% url "admin_juego_gruposapuestas_detail" pk=object.pk %}'>
+                                            <i class="icon-info"></i>
+                                          </a>
+                                          
+                                          <a class="c update" href='{% url "admin_juego_gruposapuestas_update" pk=object.pk %}'>
+                                            <i class="icon-pencil-1"></i>
+                                          </a>
+                                  
+                                          <a class="l remove" href='{% url "admin_juego_gruposapuestas_delete" pk=object.pk %}'>
+                                            <i class="icon-trash"></i>
+                                          </a> 
+                                        </div>               
+                                      </td>
+                                  </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>

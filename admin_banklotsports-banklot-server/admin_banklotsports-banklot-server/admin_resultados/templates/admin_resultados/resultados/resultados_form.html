@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-check"></i>Resultados</h1>
+                            <p class="subtitle">Asignar</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="{% url 'admin_resultados_encuentros_resultados_list_edit' %}"><i class="icon-check"></i>Resultados</a></li>
+                                <li>Asignar</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <form action="" method='post' encoding='utf-8' enctype="multipart/form-data">
+                  {% csrf_token %}
+                  
+                <div class="container">
+                  <div class="container-margin">
+                    {% include 'admin_resultados/resultados/encuentro_detail.html' %}
+                  </div>
+                </div>
+                
+                <div class="container">
+                  <div class="container-margin">
+                    <div class="col-xs-12">
+                      <div class="panel panel-minimal">
+                        <div class="panel-head">
+                          <div class="left">
+                            <p>Carga de resultados</p>
+                          </div>
+                          <div class="right">
+                              <p>
+                                Resultados automaticos
+                                
+                                <select id="copyselect" class="select-chosen">
+                                  <option >Selecciones una opcion</option>
+                                  <option value="code-grupo" selected="selected">Todo</option>
+                                  {% for option in grupos_option %}
+                                    <option value="{{option.0}}">{{option.1}}</option>
+                                  {% endfor %}
+                                </select>
+                                <input id="copy" style="width: 54px;" type="number" value="0" pattern="[0-9]+"/>
+                                <button id="copyclick" type="button" class="btn btn-info">
+                                  Aplicar
+                                </button>
+                              </p>
+                          </div>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-panel table-logros table-striped">
+                                <thead>
+                                  <tr>
+                                    <th>Participantes</th>
+                                    {% for grupo in grupos %}
+                                      <th>{{ grupo.grupo }}</th>
+                                    {% endfor %}
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                      <td>
+                                      {% for equipo in object.encuentrosdetail_set_order %}
+                                        <div class="input-table-separator-normal">
+                                          <img src="{{MEDIA_URL}}{{ equipo.equipos_temporadas.equipo.logo }}" height="15"/> {{ equipo.equipos_temporadas.equipo }}
+                                        </div>
+                                      {% endfor %}
+                                      </td>
+
+                                      {% for grupo in grupos %}
+                                        <td>
+                                          {% for field in grupo.resultados %}
+                                            <div class="input-table-separator">
+                                              {{ field.field.label }}
+                                              {{ field.field }}
+                                            </div>
+                                          {% endfor %}
+                                        </td>
+                                      {% endfor %}
+
+                                    </tr>
+                                </tbody>
+                              </table>
+                          </div>
+                          <div class="panel-footer panel-shadow">
+                            <div class="form-margin">
+                              <div class="row form form-group">
+                                <div class="col-xs-3">
+                                  <div class="form-label">
+                                    {{form.restric_result.label }}
+                                  </div>
+                                </div>
+                                <div class="col-xs-5">
+                                  {{form.restric_result}}
+                                </div>
+                                <div class="col-xs-1">
+                                </div>
+                                <div class="col-xs-3">
+                                  <button class='btn btn-success' type='submit' value="_save" name="_save">
+                                    Guardar
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+{% endblock %}
+
+{% block js %}
+  <script>
+
+    $('#id_status_result').on("change",ChangeStatus);
+
+    $('#copyclick').click(function(){
+
+      $("."+$("#copyselect").val()+" ").each(function (index) {
+        $("#"+this.id).val( $('#copy').val() );
+      });
+
+    });
+
+    function change_restric_result(){
+      $(".status ").each(function (index) {
+          $("#"+this.id).closest("div").css({"display":"block"});
+          $("#"+this.id).attr("required",true);  
+      });
+
+      $("#id_restric_result option:selected ").each(function(){
+        var option_selected = $(this).attr("value");
+        $(".status ").each(function (index) {
+            if( $("#"+this.id).attr('class').search("field-"+option_selected.replace("_","-")) != -1 ){
+              $("#"+this.id).closest("div").css({"display":"none"});
+              $("#"+this.id).attr("required",false);
+              $("#"+this.id).val("");
+            }
+        });
+      });
+
+    }
+    
+    $("#id_restric_result").on("change", change_restric_result );
+
+    function ChangeStatus() {
+        var pk = $('#id_status_result').val()
+        //alert(pk);
+
+        $(".status ").each(function (index) {
+            if( $("#"+this.id).attr('class').search("status"+pk) == -1 ){
+              $("#"+this.id).closest("div").css({"display":"none"});
+              $("#"+this.id).attr("required",false);
+              $("#"+this.id).val("");
+              //console.log("quita");
+            }
+            else{
+              $("#"+this.id).closest("div").css({"display":"block"});
+              $("#"+this.id).attr("required",true);
+              //console.log("pone");
+            }
+        });        
+    }
+
+    ChangeStatus();
+    change_restric_result();
+    
+  </script>
+{% endblock %}

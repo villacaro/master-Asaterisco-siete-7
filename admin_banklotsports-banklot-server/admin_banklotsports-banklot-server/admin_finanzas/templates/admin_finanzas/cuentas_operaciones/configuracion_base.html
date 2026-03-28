@@ -1,0 +1,239 @@
+
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load url from future %}
+{% load humanize %}
+
+
+{% block content %}
+
+<!--Incluimos el js para finanzas-->
+{% load staticfiles %}
+<div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-document"></i> Configuración Cuentas por Pagar/Cobrar</h1>
+                            {% include 'admin_finanzas/diatrabajo/dia_view.html' %}
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><i class="icon-document"></i> Configuración</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+
+     
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                        <div class="panel-head">
+
+                          <form id="form_filter"  action='' method='post' encoding='utf-8'>
+                          {% csrf_token %}
+
+                            <input type="hidden" id="id_operadora" name="operadora">  
+                            <input type="hidden" id="id_bloque" name="bloque">
+                            <input type="hidden" id="id_banca" name="banca">
+                            <input type="hidden" id="id_distribuidor" name="distribuidor">
+                            <input type="hidden" id="id_agencia" name="agencia">
+
+                            <div class="form-margin">
+                              <div class="row form form-group">
+                                <div class="col-xs-3">
+                                  <div class="form-label">
+                                    <label>Cuentas por:</label>
+                                  </div>
+                                </div>
+                                <div class="col-xs-5">
+                                  <select id="id_tipo_configuracion" name="tipo_configuracion">
+                                    
+                                    {% if tipo_configuracion == 'pp' %}
+                                      <option value="pp" selected>Pagar</option>
+                                    {% else %}
+                                      <option value="pp">Pagar</option>
+                                    {% endif %}
+                                    
+                                    {% if tipo_configuracion == 'pc' %}
+                                      <option value="pc" selected >Cobrar</option>
+                                    {% else %}
+                                      <option value="pc" >Cobrar</option>
+                                    {% endif %}
+
+                                  </select> 
+                                </div>
+                                <div class="col-xs-3">
+                                  
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="form-margin">
+                              <div class="row form form-group">
+                                <div class="col-xs-3">
+                                  <div class="form-label">
+                                    <div class="form-label">Vista</div>
+                                  </div>
+                                </div>
+                                <div class="col-xs-5">
+                                  <select id="comer_asociada" name="comer_asociada">
+                                    <option value="">Normal</option>
+                                    {% if consulta.expandido %}
+                                      <option selected value="1">Expandido</option>
+                                    {% else %}
+                                      <option value="1">Expandido</option>
+                                    {% endif %}
+                                  </select>
+                                </div>
+                                <div class="col-xs-3">
+                                  
+                                </div>
+                              </div>
+                            </div>
+
+                          </form>
+                          
+                        </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {% if consulta %}
+              
+                <div class="container">
+                  <div class="container-margin">
+                    <div class="col-xs-12">
+                      <div class="panel panel-minimal">
+                        <div class="panel-head">
+
+
+              <form name="save" action="{% url "admin_finanzas_operaciones_configuracion_pagar_cobrar_list" %}" method='post' encoding='utf-8' enctype="multipart/form-data">
+                {% csrf_token %}
+
+                  {% if consulta.atras %}
+                      <p class="left">
+                      {{consulta.atras|safe}}
+                      </p>
+                  {% endif %}
+                          
+                {% if consulta.expandido %}
+                  <input type="hidden" name="comer_asociada" value="1">  
+                {% endif %}
+                <input type="hidden" name="tipo_configuracion" value="{{tipo_configuracion}}">  
+                <input type="hidden" id="{{filter.id_comer}}" name="{{filter.name_comer}}" value="{{filter.value_comer}}">  
+
+                          <!--
+                            <div class="right">
+                                <p>
+                                  Edicción en linea
+                                  <select id="copyselect">
+                                    <option >Selecciones una opcion</option>
+                                    <option value="all" selected="selected">Todo</option>
+                                    <option value="min" >Mínimo</option>
+                                    <option value="max" >Máximo</option>
+                                    
+                                  </select>
+                                  <input id="copy" style="width: 54px;" type="number" value="0" pattern="[0-9]+"/>
+                                  <button id="copyclick" type="button" class="btn btn-info">
+                                    Aplicar
+                                  </button>
+                                </p>
+                            </div>
+                          </div>
+                          -->
+                          <div class="panel-body panel-body-border panel-shadow" >
+                              <table class='table table-striped table-panel table-small table-hover' id='table_resumen'>
+                                <thead>
+                                  <tr>
+                                    {% for title in consulta.titles %}
+                                      <th width="{{ title.width }}" title="{{ title.title }}">
+                                        {{ title.text|safe }}
+                                      </th>
+                                    {% endfor %}
+                                  </tr>
+                                </thead>
+                                
+                                <tbody>
+                                  {% for contenido in consulta.content %}
+                                  <tr>
+                                      {% for item in contenido.pertenece %}
+                                      <td class="{{item.class}}">
+                                        {% if item.html %}
+                                          {{ item.val|safe }}
+                                        {% else %}
+
+                                            {% if item.val = 0 %}
+                                              0 Bs.
+                                            {% else %}
+                                              {{ item.val|intcomma }} Bs.
+                                            {% endif %}
+                                        {% endif %}
+                                      </td>
+                                      {% endfor %}
+                                  </tr>
+                                  {% endfor %}
+                                  
+                                </tbody>
+                                
+                              </table>
+
+                          </div>
+                      </div>
+                    </div>
+                   </div>
+                  </div>
+                  </form>
+                    {% endif %}
+
+                  </div>
+                </div>
+            </div>
+
+
+{% endblock %}
+{% block js %}
+<script>
+
+  function NavegacionComercializacion(pk , name){
+      $("#id_operadora").val("");
+      $("#id_bloque").val("");
+      $("#id_banca").val("");
+      $("#id_distribuidor").val("")
+      $("#id_agencia").val("")
+      $("#id_taquilla").val("")
+
+      $("#id_"+name).val( pk )
+      $("#form_filter").submit()
+  }
+
+  $("#comer_asociada").on("change", function(event) {
+    $("#form_filter").submit()
+  });
+
+  $("#id_tipo_configuracion").on("change", function(event) {
+    $("#form_filter").submit()
+  });
+
+  $('#copyclick').click(function(){
+
+    $("."+$("#copyselect").val()+" ").each(function (index) {
+      
+      if ($("#"+this.id).prop("disabled") == false){
+        $("#"+this.id).val( $('#copy').val() );
+      }
+
+    });
+
+  });
+
+  function habilitar(id){
+    $("#id_min_"+id).removeAttr('disabled');
+    $("#id_max_"+id).removeAttr('disabled');
+  }
+  
+</script>
+{% endblock %}

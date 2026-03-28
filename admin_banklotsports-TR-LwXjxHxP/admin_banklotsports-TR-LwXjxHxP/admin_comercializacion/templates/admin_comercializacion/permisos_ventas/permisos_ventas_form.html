@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+<style type="text/css">
+    .isa-info {
+    background-color: #BDE5F8;
+}
+</style>
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-tune"></i> Permisos ventas</h1>
+                            <p class="subtitle">
+                              {% if object %}
+                                {% trans "Editar" %}
+                              {% else %}
+                                {% trans "Actualizar" %}
+                              {% endif %}</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="#"><i class="icon-tune"></i> Permisos ventas</a>
+                                </li>
+                                <li>
+                                  {% if object %}
+                                  <i class="icon-pencil-1"></i> Editar
+                                  {% else %}
+                                  <i class="icon-plus-1"></i> Actualizar
+                                  {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="container">
+                  <div class="container-margin">
+                    <form id="form_permisos" action='' method='post' encoding='utf-8'>{% csrf_token %}
+                      <div class="col-xs-12">
+                      <div class="isa-info">
+                        <p><i class="icon-info"></i>Este módulo configura los permisos de venta por deporte.</p>
+                        <p><i class="icon-info"></i>Debe presionar <i class="icon-squared-plus"></i> para ver los permisos del deporte </p>
+                        <p><i class="icon-info"></i>Si se habilita el deporte, tiene todos los permisos de venta, tanto en sus grupos como sus modalidades</p>
+                        <p><i class="icon-info"></i>Si se habilita el grupo, tiene todos los permisos de venta de sus modalidades </p>
+                        <p><i class="icon-info"></i>Si se habilita la modalidad, tiene el permiso de venta para esa modalidad, perteneciente al grupo del deporte
+                        </p>
+                      </div>
+                        <div class="panel panel-default">
+                          <div class="panel-body panel-head-border">
+                            <div class="form-margin">
+                            {% for item in form %}
+                              <div class="row form form-group">
+                                  <div class="col-xs-3 form-group">
+                                    <div id="deporte_{{ item.name }}" class="form-label">{{ item.label }}
+                                    </div>
+                                  </div>
+                                  {% if forloop.counter != 1 %}
+                                  <div class="col-xs-3 form-group">
+                                    {{ item }}&nbsp; &nbsp;
+                                    <i id="add_{{item.name}}" class="icon-squared-plus" data-count="0"></i>
+                                  </div>
+                                  {% else %}
+                                  <div class="col-xs-3 form-group">
+                                    {{ item }}</i>
+                                  </div>
+                                  {% endif %}
+                              </div>
+                              <div class="row form form-group">
+                                <div class="col-xs-3 form-group">
+                                </div>
+                                <div id="tabla_{{ item.name }}" class="col-xs-6 form-group">
+                                </div>
+                              
+                              </div>
+                            {% endfor %}
+                            </div>
+                          </div>
+                          <div class="panel-footer panel-shadow">
+                              <div class="col-xs-1"></div>
+                              <div class="col-xs-5">
+                                <div class="alert alert-info container-margin">
+                                  <input class='btn' type="checkbox" onchange="HabilitarDesabilitar()">
+                                    Esta configuración afectará todos las comercializadoras de niveles inferiores
+                                  </input>
+                                  <script type="text/javascript">
+                                    activo = false;
+                                    function HabilitarDesabilitar(){
+                                      
+                                      if(activo){
+                                        $("#guardaraccion").attr('disabled','disabled');
+                                        $("#guardaraccion").removeClass("btn-success");
+                                        activo = false;
+                                      }
+                                      else{
+                                        activo = true;
+                                        $("#guardaraccion").removeAttr('disabled');
+                                        $("#guardaraccion").addClass("btn-success");
+                                      }
+                                    }        
+                                  </script>
+                                </div>
+                              </div>
+                              <div class="col-xs-5">
+                                 <div class="container-margin">
+                                    <button id="guardaraccion" disabled class='btn ' type='submit'>
+                                      Guardar
+                                    </button>
+                                </div>
+                              </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+            <div id="add_table">
+            </div>
+
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+  
+  $(".icon-squared-plus").click(function() {
+    id = this.id.split("_")[1];
+    input = $("#id_"+id).prop("checked");
+    if ($(this).data("count")==0 && input == true){
+      consultar_grupos(id);
+      $(this).data("count",1);
+    }
+  })
+
+  $(".deportes").change(function() {
+    id = this.id.split("_")[1];
+    input = $(this).prop("checked");
+    if (input==false){
+      delete_table(id);
+    }
+  });
+
+  //Funcion que elimina la tabla de grupos y modalidades
+  function delete_table(id){
+    $("#tabla_"+id).html('');
+    $("#add_"+id).data("count",0);
+  }
+
+  //Valida que cada cambio del grupo, habilito o deshabilite las modalidades
+  function validate_grupo(name){
+    ids = $(name).attr("id").split("_");
+    input = $(name).prop("checked");
+    $(".modalidades_"+ids[1]+"_"+ids[2]).each(function(){
+      $(this).prop("checked",input);
+    });
+    validate_grupo_deporte(ids[1]);
+  }
+
+  //Valida que cada cambio del grupo, si habilitar o deshabilitar el deporte
+  function validate_grupo_deporte(deporte){
+    booleano = true
+    $(".grupos_"+deporte).each(function(){
+      input = $(this).prop("checked");
+      if (input)
+        booleano = false
+    });
+    if (booleano){
+      delete_table(deporte);
+      $("#id_"+deporte).prop("checked",false);
+    }
+  }
+
+  //Valida que cada cambio de la modalidad, si habilitar o deshabilitar el grupo
+  function validate_modalidad(name){
+    ids = $(name).attr("id").split("_");
+    booleano = true
+    $(".modalidades_"+ids[1]+"_"+ids[2]).each(function(){
+      input = $(this).prop("checked");
+      if (input)
+        booleano = false
+    });
+    if (booleano){
+      $("#grupo_"+ids[1]+"_"+ids[2]).prop("checked",false);
+      validate_grupo_deporte(ids[1]);
+    }
+  }
+
+  function consultar_grupos(id){
+    dajax(
+      {"deporte": id,"comercializadora": "{{comercializadora}}"},
+      '{% url "admin_comercializacion_permisos_ventas_ajax" %}',
+      id
+    );
+  }
+
+  //Consulta ajax
+  function dajax(data, url,deporte){
+  $.ajax({
+      data : data,
+      url : url,
+      type : 'get',
+      success : function(data_recibe){
+        create_table(data_recibe,deporte);
+      },
+      error : function(xhr,errmsg,err) {
+        console.log("#================ERROR=====================")
+        console.log( xhr )
+        console.log( errmsg )
+        console.log( err )
+        console.log("#==========================================") 
+      }
+    });
+  }
+
+  //Cargar tabla
+  function create_table(data,deporte){
+    table = '<table>'
+    table += '<thead>'
+    table += '<tr>'
+    for (var i = 0; i < data['i']; i++) {
+      table += '<th></th>'
+    }
+    table += '</tr>'
+    table += '</thead>'
+     
+    table += '<body>'
+    for (var i = 0; i < data['j']; i++) {
+      table += '<tr>'
+      for (var j = 0; j < data['i']; j++) {
+        table += '<td></td>'
+      }
+      table += '</tr>'
+    }
+    table += '</body>'
+    table += '</table>'
+    table = $(table);
+
+
+    var ig = 0;
+    $.each(data['grupos'], function(grupo){
+      $.each(data['grupos'][grupo], function(obj_grupo){
+        datos_grupo = data['grupos'][grupo][obj_grupo]
+        if (datos_grupo["checked"] == true)
+          checked = 'checked="checked"'
+        else
+          checked = ''
+        
+        name = 'grupo_'+deporte+'_'+datos_grupo["pk"]
+        checkbox = '<input '+checked+' id="'+name+'" name="'+name+'" class="grupos_'+deporte+'" type="checkbox" onchange="validate_grupo('+name+')">'
+        table.find('thead').find('tr').each(function() {
+          $(this.cells[ig]).append(obj_grupo);
+          $(this.cells[ig]).append("&nbsp; &nbsp;");
+          $(this.cells[ig]).append(checkbox);
+        });
+        var im = 0;
+        $.each(data['grupos'][grupo][obj_grupo].modalidades, function(modalidad){
+          $.each(data['grupos'][grupo][obj_grupo].modalidades[modalidad], function(obj_modalidad){
+            datos_modalidad = data['grupos'][grupo][obj_grupo].modalidades[modalidad][obj_modalidad]
+            if (datos_modalidad["checked"] == true)
+              checked = 'checked="checked"'
+            else
+              checked = ''
+
+            name = 'modalidad_'+deporte+'_'+datos_grupo["pk"]+'_'+datos_modalidad["pk"]+''
+            checkbox = '<input '+checked+' id="'+name+'" class="modalidades_'+deporte+'_'+datos_grupo["pk"]+'" name="'+name+'" type="checkbox" onchange="validate_modalidad('+name+')">'
+
+            table.find('tbody').find('tr').each(function(i) {
+              if (i==im){
+                $(this.cells[ig]).append(obj_modalidad)
+                $(this.cells[ig]).append("&nbsp; &nbsp;");
+                $(this.cells[ig]).append(checkbox);
+              }
+            });
+          });
+          im++;
+        });
+      });
+      ig++;
+    });
+    table_end = '<table class="table">'
+    table_end += table.html()
+    table_end += '</table>'
+    $("#tabla_"+deporte).append(table_end);
+  }
+
+  /*Submit
+  $( "#form_permisos" ).submit(function( event ) {
+    $('#form_permisos input:checked').remove();
+    $('#form_permisos input:checkbox').each(function(){
+      $(this).prop("checked", true);
+    });
+  });
+  */
+
+
+</script>
+{% endblock %}

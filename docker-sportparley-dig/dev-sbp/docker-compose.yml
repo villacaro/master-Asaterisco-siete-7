@@ -1,0 +1,101 @@
+mongo:
+  image: mongo
+  volumes:
+    - ./../../db/mongodb:/data/db
+
+postgres:
+  image: postgres
+  volumes:
+    - ./../../db/postgres:/var/lib/postgresql/data
+
+redis:
+  extends:
+    file: docker-compose-common.yml
+    service: redis
+  log_driver: "none"
+
+rabbit:
+  extends:
+    file: docker-compose-common.yml
+    service: rabbit
+  log_driver: "none"
+
+crontab:
+  extends:
+    file: docker-compose-common.yml
+    service: panel
+  command: python manage.py celery worker --hostname=crontab -B -E -Q default #--loglevel=DEBUG
+  links:
+    - redis:redis
+    - rabbit:rabbit
+
+worker:
+  extends:
+    file: docker-compose-common.yml
+    service: panel
+  command: /etc/app/conf/worker.bash
+  links:
+    - redis:redis
+    - rabbit:rabbit
+
+flower:
+  extends:
+    file: docker-compose-common.yml
+    service: panel
+  command: python manage.py celery flower --port=5555 --basic_auth=dev:dev123 --persistent=True
+  links:
+    - redis:redis
+    - rabbit:rabbit
+  log_driver: "none"
+
+panel:
+  extends:
+    file: docker-compose-common.yml
+    service: panel
+  command: /etc/app/conf/panel.bash
+  links:
+    - redis:redis
+    - rabbit:rabbit
+
+ws:
+  extends:
+    file: docker-compose-common.yml
+    service: ws
+  command: /etc/app/conf/ws.bash
+  links:
+    - redis:redis
+    - rabbit:rabbit
+
+webapp:
+  extends:
+      file: docker-compose-common.yml
+      service: webapp
+  command: /etc/app/conf/webapp.bash
+  links:
+      - redis:redis
+      - mongo:mongo
+
+nginx:
+  extends:
+    file: docker-compose-common.yml
+    service: nginx
+  volumes:
+    - ./../../:/usr/src/
+  ports:
+    - "443:443"
+  links:
+    - panel:panel
+    - ws:ws
+    - flower:flower
+    - rabbit:rabbit
+    - webapp:webapp
+
+nodejs:
+  extends:
+    file: docker-compose-common.yml
+    service: nodejs
+  command: node server.js
+  ports:
+    - "3000:3000"
+  links:
+    - redis:redis

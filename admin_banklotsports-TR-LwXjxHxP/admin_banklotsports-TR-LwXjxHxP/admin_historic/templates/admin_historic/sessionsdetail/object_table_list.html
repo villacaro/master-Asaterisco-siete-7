@@ -1,0 +1,98 @@
+  {% load humanize %}
+ <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-head">
+                          <div class="title left">
+                            <p>
+                              Historico de operaciones
+                            </p>
+                          </div>
+                          
+                            <div class="title right">
+                            <p>
+                                <button id="atras" class='btn btn-mini btn-success' >Volver </button>
+                            </p>
+                            </div>
+                          
+                        </div>
+                         <div class="panel-body panel-body-border panel-shadow">
+                          <table class='table datatable table-striped table-panel table-small table-hover'>
+                            <thead>
+                                <tr>
+                                  <th>Nro.</th>
+                                  <th>Tiempo</th>
+                                  <th>Usuario</th>
+                                  <th>Comercializadora</th>
+                                  <th>Proceso</th>
+                                  <th>Ip</th>
+                                  <th>Detalle</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                </tr>
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+{% block js%}
+<script type="text/javascript">
+  $("#atras").click(function(event) {
+        history.back();
+      }); 
+/////////////////////////////////////////////////////////////////
+/////////////////////DATATABLE///////////////////////////////////
+/////////////////////////////////////////////////////////////////
+  $(document).ready(function(){
+    consultar();                      
+  });
+
+  function consultar() {
+      data = "{{request.path}}"
+      url = "{% url 'app_model_list_datatables' %}";
+      
+      data = data.split("/");
+      
+      if ( typeof(dt_table) != "undefined" ){
+        dt_table.fnDestroy()
+      }
+      
+      params = "&app="+data[2]+"&model="+data[4]+"&ref="+data[5]
+      dt_table = $('.datatable').dataTable({
+          "sPaginationType": "full_numbers",
+          "iDisplayLength" : 25,
+          "bFilter": true,
+          "bProcessing": true,
+          "bServerSide": true,
+          "sAjaxSource": url,
+          "aaSorting": [[5,'desc']],
+          "sProcessing": "Procesando...",
+          "fnServerData": function ( sSource, aoData, fnCallback ) {
+            $.ajax({
+                  "dataType": 'json',
+                  "type": "GET",
+                  "processData": false,
+                  "contentType": "application/json",
+                  "url": url + '?' + $.param(aoData) + params,
+                  "success": function(result){
+                    fnCallback(result);
+                  },
+                  error : function(xhr,errmsg,err) {
+                    console.log("#================ERROR=====================")
+                    console.log( xhr )
+                    console.log( errmsg )
+                    console.log( err )
+                    console.log("#==========================================") 
+                  }
+              });
+            
+
+          }
+        });
+  }
+
+</script>
+{% endblock %}
+
+

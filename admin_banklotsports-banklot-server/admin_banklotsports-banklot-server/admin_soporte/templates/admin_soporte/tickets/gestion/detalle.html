@@ -1,0 +1,545 @@
+ {% extends 'base.html' %}
+
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-ticket"></i> Soporte</h1>
+                            <p class="subtitle">Tickets</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="{% url 'admin_soporte_BuscarTicket_url' %}"><i class="icon-ticket"></i>Soporte Tickets</a></li>
+                                <li><i class="icon-info"></i>Detalle de ticket</li>
+                            </ul>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="container">
+                  <form method='post' encoding='utf-8'>
+                  <div class="container-margin">
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                          <div class="panel-head">
+                            <div class="title left">
+                            
+                              <p>Ticket N° {{ object.pk }}</p>
+
+                            </div>
+
+                            {% if object.get_url_historic %}
+                            <div class="title right">
+                              <a class='btn btn-success' href='{{object.get_url_historic}}'>
+                                <i class="icon-history"></i>
+                                {% trans "Ver historico" %}
+                              </a>
+                            </div>
+                            {% endif %}
+                            
+                          </div>
+                          <div class="panel-body panel-body-border panel-shadow">
+                            <table class='table'>
+                              <thead>
+                                <tr>
+                                  <th>
+                                    {% trans "Dato" %}
+                                  </th>
+                                  <th>
+                                    {% trans "Valor" %}
+                                  </th>
+                                  {% if master %}
+                                    <th>Nuevo Estatus</th>
+                                  {% endif %}
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                
+                                <tr>
+                                  <td>
+                                    Referencia
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 2 {% endif %}">{{ object.pk }}</td>
+                                </tr>
+                                
+                                 <tr>
+                                  <td>
+                                    Operadora
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 2 {% endif %}">{{ object.user.taquilla.agencia.distribuidores.banca.bloque.operadora }}</td>
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    Bloque
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 2 {% endif %}">{{ object.user.taquilla.agencia.distribuidores.banca.bloque }}</td>
+                                </tr>
+                                <tr>
+                                  <td>
+                                    Banca
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 2 {% endif %}">{{ object.user.taquilla.agencia.distribuidores.banca }}</td>
+                                </tr>
+                                <tr>
+                                  <td>
+                                    Distribuidor
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 2 {% endif %}">{{ object.user.taquilla.agencia.distribuidores }}</td>
+                                </tr>
+                                <tr>
+                                  <td>
+                                    Agencia
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 2 {% endif %}">{{ object.user.taquilla.agencia }}</td>
+                                </tr>
+                                <tr>
+                                  <td>
+                                    Taquilla
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 2 {% endif %}">{{ object.user.taquilla }}</td>
+                                </tr>
+                
+                                <tr>
+                                  <td>
+                                    Tipo de ticket
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 2 {% endif %}">{{ object.ticket_type }}</td>
+                                </tr>
+                                
+                                
+                                <tr>
+                                  <td>
+                                    Monto
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 2 {% endif %}">{{ object.monto }}</td>
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    Monto premio
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 2 {% endif %}">{{ object.get_monto_premio }}</td>
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    Posible monto ganancia
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 1 {% endif %}">{{ object.monto_ganancia }}</td>
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    Fecha
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 2 {% endif %}">{{ object.fecha|date }}</td>
+                                </tr>
+                                
+                                <tr>
+                                  <td>
+                                    Hora
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 2 {% endif %}">{{ object.fecha|time }}</td>
+                                </tr>
+                                
+                                <tr>
+                                  <td>
+                                    Estatus
+                                  </td>
+                                  <td>
+                                    {{ object.get_status }}
+                                  </td>
+                                  {% if master %}
+                                    <td>
+                                      <div></div>
+                                      <select name='ticket_status_new' class="select-chosen">
+                                        <option value=''>-------------</option>
+                                        {% for status in status_filter %}
+                                          <option value="{{ status.pk }}">{{status}}</option>
+                                        {% endfor %}
+                                      </select>
+                                    </td>
+                                  {% endif %}
+                                  <td>
+                                     <div class="title right">
+                                        <a onclick="expandir_status('{{object.get_pk}}')" class="btn btn-mini btn-icon"> 
+                                        <div id="click_{{object.get_pk}}">+</div> 
+                                        </a>
+                                     </div>
+                                  </td>
+                                </tr>
+                                
+                                <tr>
+                                  <td colspan="{% if master %} 4 {% else %} 3 {% endif %}">
+                                  
+                                      <div id="{{object.get_pk}}" class="barra">   
+
+
+                                          <div class="col-xs-12">
+                                            <div class="panel panel-default">
+                                              <div class="panel-head">
+                                                <p>Historial de estatus</p>
+                                              </div>
+                                              <div class="panel-body panel-body-border panel-shadow">
+                                                
+                                              
+                                              <table class='table'>
+                                                <thead>
+                                                  <tr>
+                                                    <th>
+                                                      {% trans "Estatus" %}
+                                                    </th>
+                                                    <th>
+                                                      {% trans "Iniciado" %}
+                                                    </th>
+                                                    <th>
+                                                      {% trans "Finalizado" %}
+                                                    </th>
+                                                  </tr>
+                                                </thead>
+                                                <tbody>
+                                                  {% for status in object.get_status_all %}
+                                                      
+                                                      <tr>
+                                                        <td>
+                                                          {{ status.status }} 
+                                                        </td>
+                                                        <td>  {{ status.startdate }} </td>
+                                                        <td>    
+                                                              {% if status.enddate %} 
+                                                                  {{ status.enddate }} 
+                                                              {% endif %}
+                                                        </td>
+                                                      </tr>
+                                                          
+                                                  {% endfor %}
+                                                </tbody>
+                                              </table>
+                                              
+                                            </div> 
+                                           </div> 
+                                          </div> 
+                                        </div>   
+                                    
+                                  </td>
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    Cantidad de apuestas
+                                  </td>
+                                  <td colspan="{% if master %} 3 {% else %} 4 {% endif %}">{{ object.ticketsdetail_set.count }}</td>
+                                </tr>                                
+                                
+                              </tbody>
+                            </table>
+                        
+                          </div>
+                      </div>
+                    
+                    </div>
+
+
+                    <div class="col-xs-12">
+                        <div class="panel panel-default">
+                                <div class="panel-head">
+                                  <p>Detalle del ticket N° {{ object.pk }}</p>
+                                </div>
+                                <div class="panel-body panel-body-border panel-shadow">
+                                    <table class='table '>
+                                      <thead>
+                                        <tr>
+
+                                          <th>Detalle</th>
+                                          <th>Deporte</th>
+                                          <th>Torneo - Temporada</th>
+                                          <th>Encuentro</th>
+                                          <th>Fecha</th>
+                                          <th>Hora</th>
+                                          <th>Equipos</th>
+
+                                          <th>Jugada</th>
+                                          <th>Grupo</th>
+                                          
+                                          <th>Modalidad</th>
+                                          <th>Condicion</th>
+
+                                          <th>{{object.get_verbose_column_type}}</th>
+                                          <th>Estatus</th>
+                                          {% if master %}
+                                            <th>Nuevo Estatus</th>
+                                          {% endif %}
+                                          <th></th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {% for obj in object.ticketsdetail_set.all %}
+                                          
+                                          <tr>
+                                               <td>
+                                                {{ obj.pk }}
+                                              </td>
+                                              <td>
+                                                {{ obj.jugada.encuentros_modalidad.encuentro.jornada.temporadas.torneo.deporte }}
+                                              </td>
+                                              <td>
+                                                {{ obj.jugada.encuentros_modalidad.encuentro.jornada.temporadas.torneo }}
+                                                -
+                                                {{ obj.jugada.encuentros_modalidad.encuentro.jornada.temporadas }}
+                                              </td>
+                                              
+                                              <td>
+                                                {{ obj.jugada.encuentros_modalidad.encuentro.pk }}
+                                              </td>
+
+                                              <td>
+                                                {{ obj.jugada.encuentros_modalidad.encuentro.horajuego|date }}
+                                              </td>
+
+                                              <td>
+                                                {{ obj.jugada.encuentros_modalidad.encuentro.horajuego|time }}
+                                              </td>
+
+                                              <td>
+                                                {% for equipo in obj.jugada.encuentros_modalidad.encuentro.encuentrosdetail_set.all %}
+                                                  <span class="tag tag-light-green">
+                                                    {{ equipo.equipos_temporadas.equipo }}
+                                                  </span> 
+                                                {% endfor %}
+
+                                              </td>
+
+                                              <td>
+                                                {{ obj.jugada.pk }}
+                                              </td>
+                                              
+                                              <td>
+                                                {{ obj.jugada.encuentros_modalidad.modalidad_grupo.grupo }}
+                                              </td>
+
+                                              <td>
+                                                
+                                                {{ obj.jugada.condicion.modalidad.modalidad }}
+
+                                                {% if obj.jugada.condicion.modalidad.etiqueta_ref %}
+                                                  ( {{ obj.modalidad_ref }} )
+                                                {% endif %}
+                                                
+                                              </td>
+
+                                              <td>
+                                                {{ obj.jugada.condicion.nombre }}
+                                                {% with pertenece=obj.jugada.get_pertenece %}
+                                                  {% if pertenece %}
+                                                  <span class="tag tag-light-green">
+                                                  {{ pertenece }}
+                                                  </span> 
+                                                  {% endif %}
+                                                {% endwith %}
+
+                                                {% if obj.jugada.condicion.etiqueta_ref %}
+                                                  : {{ obj.condicion_ref }}
+                                                {% endif %}
+
+                                              </td>
+
+                                              <td>{{ obj.get_valor_column_type }}</td>
+                                              <td>
+                                                  {{ obj.get_status }}
+                                              </td>
+                                              {% if master %}
+                                                <td>
+                                                  <select name='status_new' class="select-chosen">
+                                                    <option value=''>-------------</option>
+                                                    {% for status in status_filter %}
+                                                      <option value="{{obj.pk}}-{{status.pk}}">{{status}}</option>
+                                                    {% endfor %}
+                                                  </select>
+                                                </td>
+                                              {% endif %}
+                                              <td>
+                                                  <a onclick="expandir_status('{{obj.get_pk}}')" class="btn btn-mini btn-icon"> 
+                                                    <div id="click_{{obj.get_pk}}">+</div> 
+                                                  </a>
+                                              </td>
+                                              
+                                          </tr>
+
+                                          <tr>
+                                            <td colspan="15">
+                                              <div id="{{obj.get_pk}}" class="barra">
+                                                
+                                                <div class="col-xs-12">
+                                                  <div class="panel panel-default">
+                                                    <div class="panel-head">
+                                                      <p>Historial de estatus</p>
+                                                    </div>
+                                                    <div class="panel-body panel-body-border panel-shadow">
+                                                      
+
+                                                      <table class='table'>
+                                                        <thead>
+                                                          <tr>
+                                                            <th>
+                                                              {% trans "Estatus" %}
+                                                            </th>
+                                                            <th>
+                                                              {% trans "Iniciado" %}
+                                                            </th>
+                                                            <th>
+                                                              {% trans "Finalizado" %}
+                                                            </th>
+                                                          </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                          
+                                                          {% for status in obj.get_status_all %}
+                                                              
+                                                              <tr>
+                                                                <td>
+                                                                  {{ status.status }} 
+                                                                </td>
+                                                                <td>  {{ status.startdate }} </td>
+                                                                <td>    
+                                                                      {% if status.enddate %} 
+                                                                        {{ status.enddate }} 
+                                                                      {% endif %}
+                                                                </td>
+                                                              </tr>
+                                                                  
+                                                          {% endfor %}
+
+                                                        </tbody>
+                                                      </table>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </td>
+                                          </tr>
+
+                                        {% endfor %}
+                                      </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                    </div>
+
+                    {% if object.get_clonados_exists %}
+                      <div class="col-xs-12">
+                        <div class="panel panel-default">
+                            <div class="panel-head">
+                              <p>Detalle de tickets clonados</p>
+                            </div>
+                            <div class="panel-body panel-body-border panel-shadow">
+                                <table class='table'>
+                                    <thead>
+                                      <tr>
+                                        
+                                        <th>
+                                            Nro. Fact
+                                        </th>
+                                        <th>
+                                            Fecha y Hora
+                                        </th>
+                                        <th>
+                                            Monto Bs.
+                                        </th>
+                                        <th>
+                                            Posible ganancia Bs.
+                                        </th>
+                                        <th>
+                                            Premio Bs.
+                                        </th>
+                                        <th>
+                                            Estatus
+                                        </th>
+                                        
+                                      </tr>
+                                    </thead>
+
+                                     <tbody>
+                                      {% for object_clone in object.get_clonados_exists_and_ref %}
+                                        <tr>
+                                            <td>
+                                              <a class="link" href='{{ object_clone.get_absolute_url_soporte }}'>
+                                                {{ object_clone.pk }}
+                                              </a>
+                                               <a class="link" href='{{ object_clone.get_absolute_url }}'>
+                                                {{ object_clone.pk }}
+                                              </a>
+                                            </td>
+
+                                            <td>{{ object_clone.fecha|date:'d-m-Y P'}}</td>
+                                            
+                                            <td>{{ object_clone.monto }}</td>
+                                            <td>{{ object_clone.monto_ganancia }}</td>
+                                            <td>{{ object_clone.get_monto_premio }}</td>
+                                            <td>{{ object_clone.get_status }}</td>
+                                        
+                                        </tr>
+                                      {% endfor %}
+                                    </tbody>
+
+                                    
+                                  </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="col-xs-12">
+                      <div class="panel panel-default panel-filters2">
+                        <form action='' method='post' encoding='utf-8'>
+                          {% csrf_token %}
+                          <div class="panel-footer panel-shadow">
+                              <div class="col-xs-6">
+                                  <p>
+                                    <button name='accion' value="anular" type="submit" class='btn btn-large btn-success'>
+                                      {{ object.get_status_change }}
+                                    </button>
+                                    {% if master %}
+                                      <button name='accion' value="procesar" type="submit" class='btn btn-large btn-success'>
+                                        Procesar estatus
+                                      </button>
+                                    {% endif %}
+                                  </p>
+                              </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                  </form>
+                </div>
+            </div>
+{% endblock %}
+
+
+{% block js %}
+<script>
+    var expandido = true;
+    $(".barra").slideUp();
+
+    function expandir_status(id){
+
+        if( $("#click_"+id).html() == "+"){
+            $("#"+id).slideDown("slow");
+            $("#click_"+id).html("-");
+        }
+        else{
+            $("#"+id).slideUp();
+            $("#click_"+id).html("+");
+        }
+    }
+
+</script>
+{% endblock %}

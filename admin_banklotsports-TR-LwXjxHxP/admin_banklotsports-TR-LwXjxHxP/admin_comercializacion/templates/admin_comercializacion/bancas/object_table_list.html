@@ -1,0 +1,70 @@
+{% load url from future %}
+{% load i18n %}
+
+              {% include 'js/admin_comercializacion_ajax.html' %}
+
+                <div class="col-xs-12">
+                  <div class="panel panel-default">
+                      <div class="panel-head">
+                       <a href="{% url 'admin_comercializacion_bancas_create' %}" class="btn btn-sm btn-primary side left"><i class="icon-squared-plus i-right"></i> Crear nuevo</a>
+                      </div>
+                    
+                          <form id="form_filters" action='' method='get' encoding='utf-8'>
+                            <div class="panel-body panel-filters">
+                                <div class="form form-small">            
+                                        <div class="form-margin">
+                                              {% for item in form %}
+                                                 <div class="row form form-group">
+                                                  <div class="column md-4 sm-12">
+                                                    <div class="form-label">{{ item.label }}</div>
+                                                  </div>
+                                                  <div class="column md-8 sm-12">
+                                                    {{ item }}
+                                                  </div>
+                                                </div>
+                                              {% endfor %}
+                                          </div>
+                                </div>
+                              </div>
+                              </form>
+                              <div class="panel-footer panel-shadow">
+                                  <div class="col-xs-12">
+                                    <p>
+                                      <button id="id_consultar" class='btn btn-primary' >Buscar </button>
+                                    </p>
+                                  </div>
+                              </div>
+                            
+                  </div>
+                </div>
+                
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-head">
+                          <p class="title left">
+                            Bancas
+                          </p>
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                            <table class='table datatable table-striped table-panel table-small table-hover'>
+                              <thead>
+                                <tr>
+                                  <th>Nro.</th>
+                                  <th>Banca</th>
+                                  <th>Multi Banca</th>
+                                  <th>Estatus</th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                  <tr>
+                                  </tr>
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                
+

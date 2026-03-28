@@ -1,0 +1,22 @@
+nginx:
+  restart: always
+  build: nginx
+  volumes:
+    - /home/cparlay/docker/admin_banklotsports:/usr/src/admin_banklotsports
+    - /home/cparlay/docker/ws_sportparley:/usr/src/ws_sportparley
+    - /home/tparlay/docker/sbp:/usr/src/sbp
+    - /home/tparlay/docker/WSWebAPI:/usr/src/WSWebAPI
+    - /home/tparlay/docker/ParlayWebApp:/usr/src/ParlayWebApp
+    - /home/websites/docker/viwmed.com:/var/www/viwmed
+    - /home/websites/docker/sportsbetparlay.com:/var/www/sportsbetparlay
+    - /home/websites/docker/mipuntopago.com:/var/www/mipuntopago
+  ports:
+    - "80:80"
+    - "443:443"
+    - "8090:8090"
+    - "8091:8091"
+    - "8092:8092"
+    - "8080:8080"
+    - "8081:8081"
+    - "8082:8082"
+    - "8083:8083"

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-flow-parallel"></i> Condiciones</h1>
+                            <p class="subtitle">
+                                {% trans "¿Está seguro que desea eliminar?" %}
+                            </p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="{% url 'admin_juego_condiciones_list' %}"><i class="icon-flow-parallel"></i> Condiciones</a></li>
+                                <li>
+                                  <i class="icon-trash"></i>Eliminar
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+                    {% include 'admin_juego/condiciones/object_table_detail.html' %}
+                    {% include 'admin_lib/util_delete/relate.html' %}
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                          <div class="panel-body panel-body-border panel-head-border panel-shadow">
+                          <form action='{% url 'admin_juego_condiciones_delete' pk=object.pk %}' charset='utf-8' method='post' class="form-margin">
+                                {% csrf_token %}
+                                <button class='btn btn-danger' type='submit' value="_delete" name="_delete">
+                                  {% trans "Eliminar" %}
+                                </button>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+{% endblock %}

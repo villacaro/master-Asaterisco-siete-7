@@ -1,0 +1,18 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta chartset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error 500</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style_errorpages.css' %}">
+  </head>
+  <body>
+    <div class="panel panel-center error-pages">
+      <figure><img src="{% static 'images/500.jpg' %}" width="400"></figure>
+      <h1>Error interno en el servidor</h1>
+      <h4>Algo salio mal. Por favor intente de nuevo.</h4>
+      <div class="btn-toolbar"><a href="#" onclick="window.history.back()" class="btn btn-primary">Volver</a><a href="/" class="btn btn-default">Ir a inicio</a></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+{% load humanize %}
+{% block content %}
+
+<div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-swap"></i> Movimientos</h1>
+                            {% include 'admin_finanzas/diatrabajo/dia_view.html' %}
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="{% url 'admin_finanzas_resumenadministrativo_general' %}"><i class="icon-swap"></i> Ir a resumen administrativo</a></li>
+                                <li><i class="icon-industrial-building"></i>
+                                Estado de cuenta</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="container">
+                  <div class="container-margin">
+
+                    
+
+                    <div class="col-xs-12">
+                      <div class="panel panel-default panel-filters">
+                        
+                        
+                        <div class="panel-head">
+                          
+                          <p class="left">
+                            Busqueda
+                          </p>
+
+                        </div>
+
+                        <div>
+                          <form id="form_movimientos_filter" action='' method='post' encoding='utf-8'>
+                      
+                          {% csrf_token %}
+                                    
+                              <div class="panel-body">
+                                <div class="row">
+                                  <div class="col-xs-6">
+
+                                      <div class="form-margin">
+                                        
+                                        <div class="row form form-group">
+                                          <div class="col-xs-4">
+                                            <div class="form-label">{{ form.filter_cuenta.label }}</div>
+                                          </div>
+                                          
+                                          <div class="col-xs-8">
+                                            {{ form.filter_cuenta }}
+                                          </div>
+                                          <div class="col-xs-3">
+                                              
+                                          </div>
+                                        </div>
+
+                                        
+                                      </div>
+                                    
+                                  </div>
+                                  <div class="col-xs-6">
+
+                                      <div class="form-margin">
+                                        
+                                        <div class="row form form-group">
+                                          <div class="col-xs-4">
+                                            <div class="form-label">{{ form.filter_fecha.label }}</div>
+                                          </div>
+                                          
+                                          <div class="col-xs-8">
+                                            {{ form.filter_fecha }}
+                                          </div>
+                                          <div class="col-xs-3">
+                                              
+                                          </div>
+                                        </div>                                        
+                                      </div>
+                                    
+                                  </div>
+                                  
+                                  <div class="col-xs-12">
+                                    <div class="form-margin">
+                                    <div class="row form form-group">
+                                      <div class="col-xs-3">
+                                      </div>
+                                      <div class="col-xs-6">
+                                        
+                                      </div>
+                                      <div class="col-xs-3">
+                                      </div>
+                                    </div>
+                                    </div>
+                                  </div>
+                                  
+                                </div>
+                              </div>
+                            
+
+                              <div class="panel-footer panel-shadow">
+                                <div class="row form-margin">
+                                  <div class="row form form-group">
+                                      <button class='right btn btn-large btn-success' type='submit'>
+                                      Buscar
+                                    </button>
+                                  </div>
+                                </div>
+                                
+                              </div>
+                        
+                          </form>
+                        
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                          <div class="panel-head">
+                              <div class="title left">
+                              <p>
+                                
+                                Movimientos
+
+                              </p>
+                              </div>
+                              
+                          </div>
+                          <div class="panel-body panel-body-border panel-shadow" >
+                              <table class='table table-data table-striped table-panel table-small table-hover'>
+                                <thead>
+                                  <tr>
+
+                                    <th width="3%">
+                                      Nro
+                                    </th>
+                                    <th width="15%">
+                                      Fecha
+                                    </th>
+                                    <th width="7%">
+                                      Dia
+                                    </th>
+                                    <th width="10%">
+                                      Tipo
+                                    </th>
+                                    <th width="10%">
+                                      Descripción
+                                    </th>
+                                    <th width="8%">
+                                      Referencia
+                                    </th>
+                                    <th width="15%">
+                                      Destino
+                                    </th>
+                                    <th width="25%">
+                                      Fecha Reg.
+                                    </th>
+                                    <th width="20%">
+                                      Usuario
+                                    </th>
+                                    <th >
+                                      Monto
+                                    </th>
+                                    <th >
+                                      Saldo
+                                    </th>
+
+                                  </tr>
+                                  
+                                </thead>
+
+                                
+                                <tbody>
+
+                                  {% for object in objects_list %}
+                                  <tr>
+                                    <td >
+                                      <a href="#" class="exe-modal image" exe_modal_funct="modal_image" exe_modal_param="{% url "admin_finanzas_movimiento_detail" pk=object.pk %}">
+                                        {{ forloop.counter }}
+                                      </a>
+                                    </td>
+                                    {% with fecha=object.dia.fecha %}
+                                    <td>
+                                      {{ fecha|date:"d-m-Y" }} 
+                                    </td>
+                                    <td>
+                                      {{ fecha|date:"l" }}
+                                    </td>
+                                    {% endwith %}
+                                    <td>
+                                      {{ object.tipo }}
+                                    </td>
+                                    <td>
+                                      {{ object.observacion }}
+                                    </td>
+                                    <td>
+                                      {{ object.numero }}
+                                    </td>
+                                     <td>
+                                      {{ object.comercializadora.get_object }}
+                                    </td>
+                                    <td title="{{ object.created_at|naturaltime }}">
+                                      {{ object.created_at|date:"d-m-Y H:m:s" }}
+                                    </td>
+                                    <td>
+                                      {{ object.user }}
+                                    </td>
+                                    <td  
+                                        {% if object.monto < 0 %} 
+                                          class="text-align-right link-red" 
+                                        {% else%}
+                                          class="text-align-right link-blue"
+                                        {% endif%}
+
+                                    >
+                                      {{ object.monto }}
+                                    </td>
+                                    
+                                    <td 
+                                      {% if object.saldo_calculado < 0 %} 
+                                          class="text-align-right link-red" 
+                                        {% else%}
+                                          class="text-align-right link-blue"
+                                        {% endif%}
+                                    >
+                                      {{ object.saldo_calculado }}
+                                    </td>
+                                  </tr>
+                                  {% endfor %}
+                                  
+                                </tbody>
+                                  
+                                <tfoot>
+                                  <tr class="text-align-right">
+                                    <td colspan="9"> Totales </td>
+                                    <td> {{ totales.total }} </td>
+                                    <td> {{ totales.saldo_actual }} </td>
+                                  </tr>
+                                </tfoot>
+                                 
+                                <tfoot>
+                                  <tr class="text-align-right">
+                                    <td colspan="10">
+                                      Mes anterior
+                                    </td>
+                                    <td >
+                                      {{ totales.saldo_anterior }}
+                                    </td>
+                                  </tr>
+                                </tfoot>
+
+                              </table>
+
+
+                          </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+            </div>
+
+{% endblock %}
+{% block js %}
+  <script>
+
+    $(".filter_movimientos").on("change", function(){
+          $("#form_movimientos_filter").submit();      
+    });
+
+    function modal_image(modal_param){
+      $.get(modal_param, function(data){
+          $("#modal_ajax").html( data ).hide().slideDown("slow");
+      });
+    }
+
+  </script>
+{% endblock %}

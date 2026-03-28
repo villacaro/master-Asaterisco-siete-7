@@ -1,0 +1,9 @@
+#admin_banklotsports/media
+#admin_banklotsports/static/themes
+staticfiles/
+flower*
+celerybeat-schedule*
+*.pyc*
+#*.json
+core
+#admin_banklotsports/_settings.py

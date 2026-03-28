@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-account-balance-wallet"></i> Cuentas</h1>
+                            {% include 'admin_finanzas/diatrabajo/dia_view.html' %}
+                            <p class="subtitle">
+                              {% if object %}
+                                {% trans "Actualizar" %}
+                              {% else %}
+                                {% trans "Crear" %}
+                              {% endif %}</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                             <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="{% url 'admin_finanzas_cuenta_list' %}"><i class="icon-account-balance-wallet"></i> Cuentas</a></li>
+                                <li>
+                                  {% if object %}
+                                  <i class="icon-pencil-1"></i> Actualizar
+                                  {% else %}
+                                  <i class="icon-plus-1"></i> Crear
+                                  {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+                    <form id="form_cuenta" action='{% if object %}{% url 'admin_finanzas_cuenta_update' pk=object.pk %}{% else %}{% url 'admin_finanzas_cuenta_create' %}{% endif %}' method='post' encoding='utf-8' enctype="multipart/form-data">
+                      {% csrf_token %}
+
+                      <div class="col-xs-12">
+                        <div class="panel panel-default">
+                          <div class="panel-body panel-head-border">
+                            <div class="form-margin">
+                              
+                              {% if form.non_field_errors  %}
+
+                              <div class="row form form-group">
+
+                                <div class="col-xs-3">
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="alert alert-warning">
+                                      {{form.non_field_errors }} 
+                                    </div>
+                                
+                                </div>
+                                <div class="col-xs-3">
+                                </div>
+                              </div>
+                              {% endif %}
+
+                              {% for item in form %}
+                              <div class="row form form-group">
+
+                                {% if item.is_hidden == 0 %}
+                                <div class="col-xs-3">
+                                  <div class="form-label">{{ item.label }}</div>
+                                </div>
+                                {% endif %}
+                                <div class="col-xs-6">
+                                  {{ item }}
+                                </div>
+                                <div class="col-xs-3">
+                                  {%  if item.errors %}   
+                                    <div class="alert alert-warning">{{ item.errors }}</div>
+                                  {% endif %}  
+                                </div>
+                              </div>
+                            {% endfor %}
+                           
+
+                            <div class="row form form-group">
+
+                                <div class="col-xs-3">
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="alert alert-info">Los campos con (*) son obligatorios</div>
+                                </div>
+                                <div class="col-xs-3">
+                                </div>
+
+                            </div>
+
+                          </div>
+                          <div class="panel-footer panel-shadow">
+                              <div class="col-xs-3"></div>
+                              <div class="col-xs-6">
+                                <p>
+                                    <button class='btn btn-default' type='submit' value="_addanother" name="_save">
+                                      Guardar y añadir otro
+                                    </button>
+                                    <button class='btn btn-success' type='submit' value="_save" name="_save">
+                                      Guardar
+                                    </button>
+                                </p>
+                              </div>
+                              <div class="col-xs-3"></div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+{% endblock %}
+{% block js %}
+  <script>
+
+  </script>
+{% endblock %}

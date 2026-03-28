@@ -1,0 +1,52 @@
+{% if page_obj.has_previous or page_obj.has_next %}
+  <div class='pagination pagination-centered'>
+    <div class="pagination-margin">
+      <ul>
+
+        <li>
+          {% if page_obj.has_previous %}
+            <a href='?page=1'>
+              Primero
+            </a>
+          {% else %}
+            Primero
+          {% endif %}
+        </li>
+        <li>
+          {% if page_obj.has_previous %}
+            <a href='?page={{ page_obj.previous_page_number }}'>
+              ← Anterior
+            </a>
+          {% else %}
+            ← Anterior
+          {% endif %}
+        </li>
+        <li>
+          <a href='?page={{ page_obj.number }}'>
+              {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+          </a>
+        </li>
+
+        <li>
+          {% if page_obj.has_next %}
+            <a href='?page={{ page_obj.next_page_number }}'>
+              Siguiente →
+            </a>
+          {% else %}
+            Siguiente →
+          {% endif %}
+        </li>
+        <li>
+          {% if page_obj.has_next %}
+            <a href='?page={{ paginator.num_pages }}'>
+              Último
+            </a>
+          {% else %}
+            Último
+          {% endif %}
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+{% endif %}

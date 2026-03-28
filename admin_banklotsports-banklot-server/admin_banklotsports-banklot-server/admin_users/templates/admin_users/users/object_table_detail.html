@@ -1,0 +1,236 @@
+{% load url from future %}
+{% load humanize %}
+{% load i18n %}
+                  <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-head">
+
+                          <div class="title left">
+                            <p>
+                              Datos del usuario
+                            </p>
+                          </div>
+
+                          {% if not info_user.user.pk = object.pk %}
+
+                            {% if object.get_url_historic %}
+                            <div class="title right">
+                              <a class='btn btn-success' href='{{object.get_url_historic}}'>
+                                <i class="icon-history"></i>
+                                {% trans "Ver historico" %}
+                              </a>
+                            </div>
+                            {% endif %}
+
+                          {% endif %}
+                            
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                          <table class='table'>
+                            <thead>
+                              <tr>
+                                <th>
+                                  {% trans "Dato" %}
+                                </th>
+                                <th>
+                                  {% trans "Valor" %}
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                              <td>
+                                Nombre de usuario
+                              </td>
+                              <td>{{ object }}</td>
+                            </tr>
+                            
+                            <tr>
+                              <td>
+                                Etiqueta
+                              </td>
+                              <td> {{ object.get_etiqueta }}</td>
+                            </tr>
+
+                            <tr>
+                              <td>
+                                Tipo
+                              </td>
+                              <td> {{ object.profile }}</td>
+                            </tr>
+                            
+                            <tr>
+                              <td>
+                                Correo
+                              </td>
+                              <td>{{ object.get_email }}</td>
+                            </tr>
+
+                            <tr>
+                              <td>
+                                Estatus
+                              </td>
+                              <td>{{ object.get_status }}</td>
+                            </tr>
+
+                            <tr>
+                              <td>
+                                Ultimo acceso
+                              </td>
+                              <td title="{{ object.last_login }}">{{ object.last_login|naturaltime}}</td>
+                            </tr>
+
+                            <tr>
+                              <td>
+                                ¿Es super usuario?
+                              </td>
+                              <td>{{ object.get_superuser_display }}</td>
+                            </tr>
+
+                            <tr>
+                              <td>
+                                Creado 
+                                {% if object.user_ref %}
+                                  por:  {{object.user_ref}}
+                                {% endif %}
+                              </td>
+                              <td> {{ object.created_at }}</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                  Creado
+                                </td>
+                                <td title="{{ object.created_at }}">
+                                  <i class="icon-clock"><i>
+                                  {{ object.created_at|naturaltime }}
+                                </td>
+                              </tr>
+                              
+                              <tr>
+                                <td>
+                                  Actualizado
+                                </td>
+                                <td title="{{ object.updated_at }}">
+                                  <i class="icon-clock"><i>
+                                  {{ object.updated_at|naturaltime }}
+                                </td>
+                              </tr>
+                            
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                  </div>
+
+                  <div class="col-xs-12">
+                <div class="panel panel-default">
+                  <div class="panel-head">
+                    
+                    <p class="left title">
+                      Comercializadoras
+                    </p>
+                    
+                  </div>
+                  <div class="panel-body panel-body-border panel-shadow">
+                      <table class='table table-data'>
+                      <thead>
+                        <tr>
+                          <th>
+                            N°
+                          </th>
+                          <th>
+                            Tipo
+                          </th>
+                          <th>
+                            Comercializadora
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for comer in object.get_user_comercializadoras %}
+                        <tr>
+
+                          <td>
+                             {{forloop.counter}}
+                          </td>
+                          <td>
+                             {{ comer.get_type }}
+                          </td>
+                          <td>
+                                {{ comer.get_object }}
+                              
+                          </td>
+                           
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                      </table>
+                    </div>
+                  </div>
+              </div>
+
+                  {% if object.groups.all.exists %}
+                  <div class="col-xs-12">
+                    <div class="panel panel-default">
+                      <div class="panel-head">
+                        <p class="left title">
+                          Grupos
+                        </p>
+                        
+                      </div>
+                      <div class="panel-body panel-body-border panel-shadow">
+                        <table class="table">
+                          <thead>
+                            
+                          </thead>
+                          <tbody>
+                                  
+                                    {% for obj in object.groups.all %}
+                                      <tr>
+                                        <td>
+                                        
+                                          {{ obj }}
+                                        </td>
+                                      </tr>
+                                    {% endfor %}
+                              
+                          </tbody>
+                        </table>    
+                      </div>
+                      </div>
+                  </div>
+                  {% endif %}
+
+
+                   {% if object.user_permissions.all.exists %}
+                  <div class="col-xs-12">
+                    <div class="panel panel-default">
+                      <div class="panel-head">
+                        <p class="left title">
+                          Permisos
+                        </p>
+                        
+                      </div>
+                      <div class="panel-body panel-body-border panel-shadow">
+                        <table class="table">
+                          <thead>
+                            
+                          </thead>
+                          <tbody>
+                                    
+                                    {% for obj in object.user_permissions.all %}
+                                      <tr>
+                                        <td>
+                                        
+                                          {{ obj }}
+                                        </td>
+                                      </tr>
+                                    {% endfor %}
+                                 
+                          </tbody>
+                        </table>    
+                      </div>
+                      </div>
+                  </div>
+                  {% endif %}

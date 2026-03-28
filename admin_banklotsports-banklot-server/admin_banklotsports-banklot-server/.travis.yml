@@ -1,0 +1,24 @@
+notifications:
+    slack: triple7team:qyuKfLfaVZhJJumPNW3lvez9
+    email: false
+addons:
+    ssh_known_hosts:
+        - 50.97.55.155
+
+sudo: true
+language: python
+python: 3.4
+
+before_install:
+    - sudo apt-get install sshpass
+
+install:
+    - pip install flake8
+    - pip install isort
+
+script:
+    - isort -c -rc -df
+    - flake8
+
+# after_success:
+#     - ./deploy-slim.sh

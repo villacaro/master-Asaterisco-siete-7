@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load url from future %}
+{% load i18n %}
+
+  <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-users"></i> Usuarios</h1>
+                            <p class="subtitle">
+                                {% trans "¿Está seguro que desea eliminar?" %}
+                            </p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="{% url 'admin_users_users_list' %}"><i class="icon-industrial-building"></i> Usuarios</a></li>
+                                <li>
+                                  <i class="icon-trash"></i>Eliminar
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+    </div>
+
+   <div class="container">
+                  <div class="container-margin">
+                    {% include 'admin_users/users/object_table_detail.html' %}
+                    {% include 'admin_lib/util_delete/relate.html' %}
+
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                          <div class="panel-body panel-body-border panel-head-border panel-shadow">
+                            <form action='' charset='utf-8' method='post' class="form-margin">
+                            <fieldset>
+                              {% csrf_token %}
+                              <div class='form-actions'>
+                                <button name="_delete" value="_delete" class='btn btn-danger' type='submit'>
+                                  {% trans "Eliminar" %}
+                                </button>
+                              </div>
+                            </fieldset>
+                          </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+{% endblock %}

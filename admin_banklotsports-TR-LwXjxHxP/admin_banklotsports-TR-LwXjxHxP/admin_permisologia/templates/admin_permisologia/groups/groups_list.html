@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-share2"></i> Grupos de usuario</h1>
+                            <p class="subtitle">Lista</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><i class="icon-share2"></i> Grupos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+                      {% include 'admin_permisologia/groups/object_table_list.html' %}
+                      {% include 'admin_permisologia/groups/pagination.html' %}
+                  </div>
+                </div>
+            </div>
+{% endblock %}

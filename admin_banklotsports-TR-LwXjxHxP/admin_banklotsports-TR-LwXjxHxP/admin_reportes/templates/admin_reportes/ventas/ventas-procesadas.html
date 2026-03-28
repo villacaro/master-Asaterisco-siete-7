@@ -1,0 +1,425 @@
+
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load url from future %}
+{% load humanize %}
+
+{% block content %}
+
+{% include 'js/admin_juegos_ajax.html' %}
+{% include 'js/admin_comercializacion_ajax.html' %}
+
+<ul class="messagelist">
+</ul>
+
+
+<div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-line-graph"></i> Ventas Procesadas</h1>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><i class="icon-trending-up"></i> Ventas</li>
+                                <li><i class="icon-line-graph"></i> Ventas Procesadas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container">
+                  <div class="container-margin">
+
+     
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                        <div class="panel-head">
+                          <p class="left">Búsqueda</p>
+                        
+                          
+                          </div>
+      
+                    <form id="form_ventas_procesadas" action='' method='post' encoding='utf-8'>
+
+                        <div class="panel-body panel-filters">
+                          <div class="form">
+                            
+                            <div class="row">
+                              <div class="column hd-4 lg-6 md-12 sm-12">
+                                {% for item in form_cadena %} 
+                                  {% if item.is_hidden == 0 %}
+                                    <div class="row form form-group">
+                                       <div class="column md-4 sm-12">
+                                         <div class="form-label">{{ item.label }}</div>
+                                       </div>
+                                       <div class="column md-8 sm-12">
+                                         {{ item }}
+                                       </div>
+                                     </div>
+                                  {% else %}
+                                    {{ item }}
+                                  {% endif %}
+                                {% endfor %}
+                                  <div class="row form form-group">
+                                     <div class="column md-4 sm-12">
+                                       <div class="form-label">{{ form_agrupado.orden.label }}</div>
+                                     </div>
+                                     <div class="column md-8 sm-12">
+                                       {{ form_agrupado.orden }}
+                                     </div>
+                                   </div>
+                                   <div class="row form form-group">
+                                     <div class="column md-4 sm-12">
+                                       <div class="form-label">Solo ventas procesadas</div>
+                                     </div>
+                                     <div class="column md-2 sm-12">
+                                       <input name="data_process" class="btn" checked="" type="checkbox" title="¿Desea ver solo data proocesada?"></input>
+                                     </div>
+                                   </div>
+                              </div>
+
+                            <div class="column hd-4 lg-6 md-12 sm-12">
+                                {% for item in form_deporte %} 
+                                  {% if item.is_hidden == 0 %}
+                                     <div class="row form form-group">
+                                        <div class="column md-4 sm-12">
+                                          <div class="form-label">{{ item.label }}</div>
+                                        </div>
+                                        <div class="column md-8 sm-12">
+                                          {{ item }}
+                                        </div>
+                                      </div>
+                                  {% else %}
+                                    {{ item }}
+                                  {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <div class="column hd-4 lg-6 md-12 sm-12">
+                                  
+                                <input type="hidden" id="id_grupo_modalidad" name="grupo_modalidad">
+                                <input type="hidden" id="id_modalidad" name="modalidad">
+
+                                <div class="row form form-group">
+                                   <div class="column md-4 sm-12">
+                                     <div class="form-label">{{ form_fecha.fecha_inicio.label }}</div>
+                                   </div>
+                                   <div class="column md-8 sm-12">
+                                     {{ form_fecha.fecha_inicio }}
+                                   </div>
+                                 </div>
+                                 <div class="row form form-group">
+                                   <div class="column md-4 sm-12">
+                                     <div class="form-label">{{ form_fecha.fecha_fin.label }}</div>
+                                   </div>
+                                   <div class="column md-8 sm-12">
+                                     {{ form_fecha.fecha_fin }}
+                                   </div>
+                                 </div>
+                                 <div class="row form form-group">
+                                   <div class="column md-4 sm-12">
+                                     <div class="form-label">{{ form_codigo.codigo.label }}</div>
+                                   </div>
+                                   <div class="column md-8 sm-12">
+                                     {{ form_codigo.codigo }}
+                                   </div>
+                                 </div>
+                            </div>                        
+                            
+                          </div>
+                        </div>
+    
+                    </div>
+                    </form>
+                    <div class="panel-footer panel-shadow">
+                          <div class="col-xs-12">
+                            <p>
+                              <button id="id_consultar" class='btn btn-primary' >
+                                Buscar 
+                              </button>
+                            </p>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-head">
+            
+                      <div class="title left ">
+                        <a id="atras" data-status="new" class="btn btn-mini"><span>←</span> Atras
+                        </a>
+                      </div>
+
+                      <div class="title right">
+                        <a class="btn btn-mini btn-pdf" target="_blank" href="#">
+                          <i class="icon-print"></i>PDF
+                        </a>  
+                      </div>
+                      <div class="title right">
+                        <a class="btn btn-mini btn-excel right" target="_blank" href="#">
+                          <i class="icon-download"></i>EXCEL
+                        </a>
+                      </div>
+
+                    </div>
+                    <div id='dt_table' class="panel-body panel-body-border panel-shadow">
+                    </div>
+                </div>
+            </div>
+
+{% endblock %}
+{% block js %}
+<script>
+
+function NavegacionComercializacion(pk , name){
+  //Navegar comercializadoras eliminadas
+  key = name+'_'+pk
+  list_values =$("#id_"+name+" option").map(function() {return $(this).val();}).get();
+  if ($.inArray(pk, list_values)==-1){
+    $("#id_"+name).append($('<option>', {
+        value: pk,
+        text: $("#"+key).text(),
+    }));
+  }
+
+  $("#id_"+name).val(pk);
+  $("#id_"+name).trigger("chosen:updated");
+
+
+  //Gestion localStorage para manejar el atras
+  $("#atras").data("status","last_cadena_venta_procesada");
+  if (localStorage.getItem('last_cadena_venta_procesada')){
+    var names = JSON.parse(localStorage["last_cadena_venta_procesada"]);
+    names.push(name);
+    localStorage["last_cadena_venta_procesada"] = JSON.stringify(names);
+  }else{
+    names = []
+    names.push(name);
+    localStorage["last_cadena_venta_procesada"] = JSON.stringify(names);
+  }
+  //
+
+  consultar();
+}
+
+function Navegaciondeportes(pk , name){
+  console.log(name)
+  $("#id_"+name).val(pk);
+  $("#id_"+name).trigger("chosen:updated");
+
+  //Gestion localStorage para manejar el atras
+  $("#atras").data("status","last_juego_venta_procesada");
+  if (localStorage.getItem('last_juego_venta_procesada')){
+    var names = JSON.parse(localStorage["last_juego_venta_procesada"]);
+    names.push(name);
+    localStorage["last_juego_venta_procesada"] = JSON.stringify(names);
+  }else{
+    names = []
+    names.push(name);
+    localStorage["last_juego_venta_procesada"] = JSON.stringify(names);
+  }
+  //
+  consultar();
+}
+
+$("#atras").click(function(event) {
+  if ($(this).data("status")=='last_cadena_venta_procesada'){
+      
+    var names = JSON.parse(localStorage["last_cadena_venta_procesada"]);
+    ix = names.length-1
+    name = names[ix]
+    names.splice(ix, 1);
+    localStorage["last_cadena_venta_procesada"] = JSON.stringify(names);
+
+    $("#id_"+name).val('');
+    $("#id_"+name).trigger("chosen:updated");
+
+    consultar();
+
+  }else if($(this).data("status")=='last_juego_venta_procesada'){
+      
+    var names = JSON.parse(localStorage["last_juego_venta_procesada"]);
+    ix = names.length-1
+    name = names[ix]
+    names.splice(ix, 1);
+    localStorage["last_juego_venta_procesada"] = JSON.stringify(names);
+
+    $("#id_"+name).val('');
+    $("#id_"+name).trigger("chosen:updated");
+
+    consultar();
+  }
+
+  return false;
+});
+
+$('#id_fecha_inicio').datetimepicker({
+  format:'Y-m-d',
+  lang:'es',
+  onShow:function( ct ){
+
+    fecha = $('#id_fecha_fin').val().split("-")
+    fecha_max = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+
+   this.setOptions({
+    maxDate:$('#id_fecha_fin').val()?fecha_max:false
+   })
+
+  },
+  timepicker:false
+});
+
+$('#id_fecha_fin').datetimepicker({
+  format:'Y-m-d',
+  lang:'es',
+  onShow:function( ct ){
+
+    fecha = $('#id_fecha_inicio').val().split("-")
+    fecha_min = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+    if ( parseInt(fecha[1]) == 12 ){
+      fecha[0] = parseInt( fecha[0] ) + 1
+      fecha[1] = 1
+    }
+    else{
+      fecha[1] = parseInt( fecha[1] ) + 1
+    }
+    fecha_max = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+
+    this.setOptions({
+      minDate:$('#id_fecha_inicio').val()?fecha_min:false,
+      maxDate:'0'
+    })
+  },
+  timepicker:false
+ });
+
+//////////////////////////////////////////////////////
+//////////////////DATATABLE///////////////////////////
+//////////////////////////////////////////////////////
+$('#id_consultar').on("click",function () {
+    localStorage.removeItem("last_juego_venta_procesada");
+    localStorage.removeItem("last_cadena_venta_procesada");
+    $("#atras").data("status","new");
+    consultar();
+});
+
+    function consultar(data, url, process){
+      var $form = $("#form_ventas_procesadas");
+      url = "{% url 'admin_reportes_ventas_procesadas_list_datatable' %}?action=get_titles";
+      data = $form.serialize();
+      $.ajax({
+          data : data,
+          url : url,
+          type : 'get',
+          success : function(datain){
+            var titles = [];
+            var len = datain.length;
+            for (var i = 0; i < len; i++) {
+                titles.push({
+                    sTitle: datain[i]["text"],
+                    sWidth: datain[i]["width"],
+                });
+            }
+            init_datatable(titles);
+          },
+          error : function(xhr,errmsg,err) {
+                  console.log("#================ERROR=====================")
+                  console.log( xhr )
+                  console.log( errmsg )
+                  console.log( err )
+                  console.log("#==========================================") 
+                }
+          });   
+    }
+
+  function init_datatable(titles) {
+      var $form = $("#form_ventas_procesadas"),
+      url = "{% url 'admin_reportes_ventas_procesadas_list_datatable' %}";
+      data = $form.serialize();
+
+      $('#dt_table').html('')
+      table_html = ''
+      table_html += '<table class="table datatable table-striped table-panel table-small table-hover">'
+      table_html +='<thead></thead><tbody><tr></tr></tbody><tfoot><tr></tr></tfoot></table>'
+      $('#dt_table').html(table_html)
+    
+      dt_table = $('.datatable').dataTable({
+        "aoColumns":titles,
+        "sPaginationType": "full_numbers",
+        "iDisplayLength" : 25,
+        "bFilter": true,
+        "bProcessing": true,
+        "bServerSide": true,
+        "sAjaxSource": url,
+        "sProcessing": "Procesando...",
+        "fnServerData": function ( sSource, aoData, fnCallback ) {
+          datos = $.param(aoData);
+          $.ajax({
+                "dataType": 'json',
+                "type": "GET",
+                "processData": true,
+                "contentType": "application/json",
+                "url": url + '?' + datos, 
+                "data": data, 
+                "success": function(result){
+                  $(".messagelist").empty();
+                  render_messages(result.messages);
+                  fnCallback(result);
+                  fnFooterCallback(result.aaFooter);
+                },
+                error : function(xhr,errmsg,err) {
+                  console.log("#================ERROR=====================")
+                  console.log( xhr )
+                  console.log( errmsg )
+                  console.log( err )
+                  console.log("#==========================================") 
+                }
+            });
+        },
+      });
+      dt_table.fnSetFilteringDelay(500);
+  }
+
+  function fnFooterCallback(aaFooter){
+    $(".datatable tfoot").html('')
+    footer_extras = aaFooter.splice(0,2);
+    footer_totales = aaFooter;
+
+    $.each(footer_totales, function( index, value ) {
+      th='';
+      th+='<th class="text-align-right">'+aaFooter[index]+'</th>';
+      $(".datatable tfoot").append(th);
+    });
+
+    $(".btn-pdf").prop("href", footer_extras[0]);
+    $(".btn-excel").prop("href", footer_extras[1]);
+  }
+
+   $(".btn-pdf").click(function(){
+      $(".btn-excel").prop("href",$(".btn-excel").prop("href")+'&cache=1');
+   });
+
+   $(".btn-excel").click(function(){
+      $(".btn-pdf").prop("href",$(".btn-pdf").prop("href")+'&cache=1');
+   });
+
+  function render_messages(messages){
+  $.each(messages, function( index, value ) {
+    $(".messagelist").append('<li class="'+value['tags']+'">'+value['message']+'</li>')
+  });
+}
+
+
+
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,235 @@
+
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+{% load humanize %}
+
+{% load staticfiles %}
+<div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-document"></i> Movimientos</h1>
+                            {% include 'admin_finanzas/diatrabajo/dia_view.html' %}
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li>
+                                  <a href="{% url 'admin_finanzas_resumenadministrativo_general' %}"> <i class="icon-industrial-building"></i> Resumen administrativo</a>
+                                </li>
+                                <li> 
+                                  <a href="{% url 'admin_finanzas_resumenadministrativo_comercializadora_list' comercializadora=by_comercializadora.pk %}"><i class="icon-document"></i> {{ by_comercializadora.get_object.get_verbose_name }}</a></li>
+                                <li> 
+                                  <i class="icon-document"></i> 
+                                  {{tipo.label}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+
+     
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                        <div class="panel-head">
+                          <p class="left">{{tipo.label}} cargados</p>
+                          {% if consulta %}
+                          <div class="title right">
+                              <a id="expandir" class="btn btn-mini btn-icon"> - </a>
+                          </div>
+                          {% endif %}
+                          </div>
+
+                   <div>
+
+                        <div class="panel-body panel-filters">
+                          <div class="row">
+                            
+                            <div class="col-xs-12">
+                              <div class="form-margin">
+                                
+                                <div class="row form form-group">
+                                  <div class="col-xs-4">
+                                    <div class="form-label">
+                                    </div>
+                                  </div>
+                                  <div class="col-xs-6">
+
+                                      <h3 class="title">
+                                          {{ by_comercializadora.get_object.get_verbose_name }} :
+                                        <span class="link-red">
+                                          {{ by_comercializadora.get_object }}
+                                        </span>
+                                      </h3>
+                                      
+                                  </div>
+
+                                </div>
+
+                                <div class="row form form-group">
+                                 
+
+                                  <div class="col-xs-4">
+                                          <div class="form-label">
+                                          </div>
+                                          </div>
+                                          
+                                          <div class="col-xs-8">
+                                            <h3 class="title">
+                                              Fecha: 
+                                              <span class="link-red">
+                                              {{ fecha }}
+                                              </span>
+                                            </h3>
+                                          </div>
+                                          <div class="col-xs-3">
+                                            
+                                          </div>
+                                </div>
+                                
+                              </div>
+                            </div>
+                            
+                          </div>
+                        </div>
+                        <div class="panel-footer panel-shadow">
+                              
+                              <div class="col-xs-6">
+                                <p>
+
+                                </p>
+                              </div>
+
+                        </div>
+                        
+                      </div>
+
+
+                      </div>
+                    </div>
+
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                           <div class="panel-head">
+
+                              <div class="title left">
+                                 <a href="{% url 'admin_finanzas_resumenadministrativo_comercializadora_list' comercializadora=by_comercializadora.pk %}" class='btn btn-mini'>
+                                    <span class="">←</span> Atras
+                                 </a> 
+                              </div>
+                       
+                              <div class="title right">
+                                <a class="btn btn-mini btn-pdf" target="_blank" href='#'>
+                                  <i class="icon-print"></i>PDF
+                                </a>  
+                              </div>
+                              <div class="title right">
+                                <a class="btn btn-mini btn-excel" target="_blank" href='#'><i class="icon-download"></i>EXCEL
+                                </a>  
+                              </div>
+                          </div>
+                          <div class="panel-body panel-body-border panel-shadow" >
+                              <table class='table table-data table-striped table-panel table-small table-hover' id='table_resumen'>
+                                <thead>
+                                  <tr>
+                                      
+                                      <th width="">
+                                        Nro.
+                                      </th>
+                                      <th width="20%">
+                                        Cuenta
+                                      </th>
+                                      <th width="">
+                                        Nro {{tipo.verbose}}
+                                      </th>
+                                      <th width="">
+                                        Monto
+                                      </th>
+                                      <th width="">
+                                        Registrado
+                                      </th>
+                                      <th width="">
+                                        Observaciones
+                                      </th>
+
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% for object in objects %}
+                                  <tr>
+                                    <td>
+                                      {{ forloop.counter }}
+                                    </td>
+                                    <td>
+                                       {{ object.cuenta }}
+                                    </td>
+                                    <td>
+                                       {{ object.numero }}
+                                    </td>
+                                    <td class="text-align-right ">
+                                      {% if object.monto = 0 %}
+                                        0
+                                      {% else %}
+                                        <span class="{% if object.monto < 0 %} link-red {% endif %} ">
+                                        {{ object.monto|floatformat:2 }}
+                                        </span>
+                                      {% endif %}
+                                    </td>  
+                                    
+                                    <td title="{{object.created_at|naturaltime}}">
+                                       {{ object.created_at }}
+                                    </td>  
+                                    
+                                    <td>
+                                        {{ object.observacion }}
+                                    </td>   
+                                  </tr>
+                                  {% endfor %}
+                                  
+                                </tbody>
+                                  
+                                <tfoot>
+                                  <tr class="text-align-right">
+                                    <td colspan="3">
+                                        
+                                    </td>
+                                    
+                                    <td class="text-align-right ">
+                                      {% if objects_sum.monto__sum = 0 %}
+                                        0
+                                      {% else %}
+                                        <span class="{% if objects_sum.monto__sum < 0 %} link-red {% endif %} ">
+                                        {{ objects_sum.monto__sum|floatformat:2 }}
+                                        </span>
+                                      {% endif %}
+                                    </td> 
+                                     <td colspan="3">
+                                        
+                                    </td> 
+                                     
+                                  </tr>
+                                  
+                                </tfoot>
+
+                              </table>
+
+                          </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+            </div>
+
+
+{% endblock %}
+{% block js %}
+<script>
+
+</script>
+{% endblock %}

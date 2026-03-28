@@ -1,0 +1,107 @@
+{% load i18n %}
+{% load humanize %}
+<div class="col-xs-12">
+  <div class="panel panel-default">
+    <div class="panel-head">
+    <p>
+           Detalle del movimiento
+    </p>
+    </div>
+    <div class="panel-body panel-body-border panel-shadow">
+    <table class='table'>      
+      <thead>
+            <tr>
+              <th>
+                {% trans "Dato" %}
+              </th>
+              <th>
+                {% trans "Valor" %}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                Registrado por
+              </td>
+              <td>{{ object.user }}</td>
+            </tr>
+            
+            <tr>
+              <td>
+                Fecha
+              </td>
+              <td>{{ object.fecha }}</td>
+            </tr>
+
+            {% with comer=object.comercializadora.get_object %}
+            <tr>
+              <td>
+                {{ comer.get_verbose_name }}
+              </td>
+              <td>{{ comer }}</td>
+            </tr>
+            {% endwith %}
+
+            <tr>
+              <td>
+                Cuenta
+              </td>
+              <td>{{ object.cuenta }}</td>
+            </tr>
+
+            <tr>
+              <td>
+                Número de referencia
+              </td>
+              <td>{{ object.numero }}</td>
+            </tr>
+
+            <tr>
+              <td>
+                Comprobantee
+              </td>
+              <td>
+              {% if object.comprobante %}
+                  <a href="{{MEDIA_URL}}{{object.comprobante}}">
+                    <img src="{{MEDIA_URL}}{{object.comprobante}}" width="30%" height="20%">
+                  </a>
+                {% else %}
+                  Sin imagen
+                {% endif %}
+              </td>
+            </tr>
+            
+            <tr>
+              <td>
+                Monto
+              </td>
+              <td>{{ object.monto }}</td>
+            </tr>
+
+            <tr>
+              <td>
+                Registrado
+              </td>
+              <td title="{{ object.updated_at|naturaltime }}">{{ object.created_at }}</td>
+            </tr>
+
+             <tr>
+              <td>
+                Día de trabajo
+              </td>
+              <td>{{ object.dia.fecha }}</td>
+            </tr>
+             
+            <tr>
+              <td>
+                Observación
+              </td>
+              <td>{{ object.observacion }}</td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

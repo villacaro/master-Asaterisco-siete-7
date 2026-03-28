@@ -1,0 +1,124 @@
+{% load humanize %}
+<div class="col-xs-12">
+  <div class="panel panel-default">
+      <div class="panel-head">
+          <div class="title left">
+                <p class="left">Búsqueda</p>
+          </div>
+      </div>
+      <form id="form_filters" action='' method='post' encoding='utf-8'>
+        <div class="panel-body panel-filters">
+            <div class="form form-small">            
+                    <div class="form-margin">
+                        {% for item in form %}
+                           <div class="row form form-group">
+                            <div class="column md-4 sm-12">
+                              <div class="form-label">{{ item.label }}</div>
+                            </div>
+                            <div class="column md-8 sm-12">
+                              {{ item }}
+                            </div>
+                          </div>
+                        {% endfor %}
+                    </div>
+            </div>
+        </div>
+      </form>
+      <div class="panel-footer panel-shadow">
+          <div class="col-xs-12">
+            <p>
+              <button id="id_consultar" class='btn btn-primary' >Buscar </button>
+            </p>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="col-xs-12">
+      <div class="panel panel-default">
+          <div class="panel-head">
+            <p class="title left">
+              Operaciones
+            </p>
+          </div>
+          <div class="panel-body panel-body-border panel-shadow">
+              <table class='table datatable table-striped table-panel table-small table-hover'>
+                <thead>
+                <tr>
+                  <th width="10%">Nro.</th>
+                  <th width="20%">Tiempo</th>
+                  <th width="20%">Módulo</th>
+                  <th width="20%">Proceso</th>
+                  <th width="30%"></th>
+                </tr>
+              </thead>
+              <tbody>
+               <tr>
+                </tr>
+              </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+
+  $('#id_fecha_inicio').datetimepicker({
+    format:'Y-m-d',
+    lang:'es',
+    timepicker:false
+  });
+
+  $('#id_fecha_fin').datetimepicker({
+    format:'Y-m-d',
+    lang:'es',
+    timepicker:false
+  });
+
+
+  $('#id_consultar').on("click", function() {
+    consultar();
+  });
+
+  function consultar() {
+    var $form = $("#form_filters"),
+    url = "{% url 'users_auditoria_detalle_datatables' %}";
+    data = $form.serialize() + "&user={{object.pk}}";
+    
+    if ( typeof(dt_table) != "undefined" ){
+      dt_table.fnDestroy()
+    }
+    
+    dt_table = $('.datatable').dataTable({
+      "sPaginationType": "full_numbers",
+      "iDisplayLength" : 25,
+      "bFilter": true,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": url,
+      "sProcessing": "Procesando...",
+      "fnServerData": function ( sSource, aoData, fnCallback ) {
+        $.ajax({
+              "dataType": 'json',
+              "type": "GET",
+              "processData": true,
+              "contentType": "application/json",
+              "url": url + '?' + $.param(aoData), 
+              "data": data, 
+              "success": function(result){
+                fnCallback(result);
+              },
+              error : function(xhr,errmsg,err) {
+                console.log("#================ERROR=====================")
+                console.log( xhr )
+                console.log( errmsg )
+                console.log( err )
+                console.log("#==========================================") 
+              }
+          });
+      }
+    });
+    dt_table.fnSetFilteringDelay(500);
+  }
+
+</script>

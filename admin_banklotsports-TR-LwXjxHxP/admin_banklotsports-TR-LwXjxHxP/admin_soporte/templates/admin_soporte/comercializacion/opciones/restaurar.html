@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!--Incluimos el js para finanzas-->
+{% load staticfiles %}
+<div class="row">
+<div class="col-xs-12">
+    <div class="page-toolbar page-toolbar-default">
+        <div class="page-toolbar-body page-toolbar-border">
+            <h1><i class="icon-store-mall-directory"></i>Soporte</h1>
+        </div>
+        <div class="page-toolbar-footer page-toolbar-shadow">
+            <ul class="breadcrumb">
+                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                <li><i class="icon-restore"></i> Restaurar comercializadora</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="container">
+  <div class="container-margin">
+    <form  autocomplete="off" action='{% if object %}{% url 'admin_comercializacion_bancas_update' pk=object.pk %}{% else %}{% url 'admin_comercializacion_bancas_create' %}{% endif %}' method='post' encoding='utf-8'>{% csrf_token %}
+      <div class="col-xs-12">
+        <div class="panel panel-default">
+          <div class="panel-body panel-head-border">
+            <div class="form-margin">
+              {% if form.non_field_errors  %}
+                <div class="row form form-group">
+                  <div class="col-xs-3">
+                  </div>
+                  <div class="col-xs-6">
+                      <div class="alert alert-warning">
+                        {{form.non_field_errors }} 
+                      </div>
+                  </div>
+                  <div class="col-xs-3">
+                  </div>
+                </div>
+              {% endif %}
+              {% for item in form %}
+                {% if item.is_hidden == 0 %}
+                  <div id="div_{{item.name}}" class="row form form-group">
+                    <div class="col-xs-3">
+                      <div class="form-label">
+                        {{ item.label }}
+                      </div>
+                    </div>
+                    <div class="col-xs-6">
+                      <div>{{ item }}</div>
+                    </div>
+                    <div class="col-xs-3">
+                      {%  if item.errors %}   
+                        <div class="alert alert-warning">
+                          {{ item.errors }}
+                        </div>
+                      {% endif %}  
+                    </div>
+                {% else %}
+                  {{ item }}
+                {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="panel-footer panel-shadow">
+              <div class="col-xs-3"></div>
+              <div class="col-xs-6">
+                <p>
+                    <button class='btn btn-success' type='submit' value="_save" name="_save">
+                        Restaurar
+                    </button>
+                </p>
+              </div>
+              <div class="col-xs-3"></div>
+          </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

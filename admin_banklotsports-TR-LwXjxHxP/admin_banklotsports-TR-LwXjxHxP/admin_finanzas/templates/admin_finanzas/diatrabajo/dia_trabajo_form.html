@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-clock"></i> Día de trabajo</h1>
+                            {% include 'admin_finanzas/diatrabajo/dia_view.html' %}
+                            <p class="subtitle">
+                              {% if object %}
+                                {% trans "Cerrar" %}
+                              {% else %}
+                                {% trans "Cambiar" %}
+                              {% endif %}</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                             <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="{% url 'admin_finanzas_resumenadministrativo_general' %}"><i class="icon-clock"></i> Ir a resumen administrativo</a></li>
+                                <li>
+                                    <i class="icon-plus-1"></i> 
+                                    {% if object %}
+                                      {% trans "Cerrar día" %}
+                                    {% else %}
+                                      {% trans "Cambiar día" %}
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+                    <form id="form_dia_trabajo" action='{% if object %}{% url 'admin_finanzas_diatrabajo_close' %} {% else %} {% url 'admin_finanzas_diatrabajo_update' %} {% endif %}' method='post' encoding='utf-8' enctype="multipart/form-data">
+                      {% csrf_token %}
+
+                      <div class="col-xs-12">
+                        <div class="panel panel-default">
+                          
+                          <div class="panel-body panel-head-border">
+                            <div class="form-margin">
+                              
+                              {% if form.non_field_errors  %}
+
+                              <div class="row form form-group">
+
+                                <div class="col-xs-3">
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="alert alert-warning">
+                                      {{form.non_field_errors }} 
+                                    </div>
+                                
+                                </div>
+                                <div class="col-xs-3">
+                                </div>
+                              </div>
+                              {% endif %}
+
+                              {% for item in form %}
+                              <div class="row form form-group">
+
+                                {% if item.is_hidden == 0 %}
+                                <div class="col-xs-3">
+                                  <div class="form-label">{{ item.label }}</div>
+                                </div>
+                                {% endif %}
+                                <div class="col-xs-6">
+                                  {{ item }}
+                                </div>
+                                <div class="col-xs-3">
+                                  {%  if item.errors %}   
+                                    <div class="alert alert-warning">{{ item.errors }}</div>
+                                  {% endif %}  
+                                </div>
+                              </div>
+                            {% endfor %}
+                           
+
+                            <div class="row form form-group">
+
+                                <div class="col-xs-3">
+                                </div>
+                                <div class="col-xs-6">
+                                    {% if object %}
+                                        <div class="alert alert-info">Una vez cerrado el dia de trabajo no es posible modificar nada del mismo</div>
+
+                                        {%  if cerrar_dia_error %}   
+                                          <div class="alert alert-warning">Para cerrar el día primero se deben importar saldos</div>
+                                        {% endif %}
+
+                                    {% else %}
+                                    <div class="alert alert-info">Los campos con (*) son obligatorios</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-xs-3">
+                                </div>
+
+                            </div>
+
+                          </div>
+                          <div class="panel-footer panel-shadow">
+                              <div class="col-xs-3"></div>
+                              <div class="col-xs-6">
+                                <p>
+                                    <button class='btn btn-success' type='submit' value="_save" name="_save">
+                                      {% if object %}
+                                        Cerrar día
+                                      {% else %}
+                                        Cambiar día
+                                      {% endif %}
+                                    </button>
+                                </p>
+                              </div>
+                              <div class="col-xs-3"></div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+{% endblock %}
+{% block js %}
+  <script>
+
+    $('#id_fecha').datetimepicker({
+      format:'d/m/Y',
+      lang:'es',
+      timepicker:false
+    });
+
+  </script>
+{% endblock %}

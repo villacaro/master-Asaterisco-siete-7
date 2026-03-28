@@ -1,0 +1,38 @@
+redis:
+  restart: always
+  image: redis:latest
+
+rabbit:
+  restart: always
+  image: rabbitmq:3-management
+  env_file: ./../../env.dig
+
+postgres:
+  build: postgres
+  restart: always
+  volumes:
+    - /data/dig/postgres:/var/lib/postgresql/data
+  env_file: ./../../env.dig
+  ports:
+    - "15432:5432"
+
+panel:
+  restart: always
+  build: django_app
+  volumes:
+      - ./../../../Triple 7/sbp:/usr/src/sbp
+  working_dir: /usr/src/sbp
+  env_file: ./../../env.dig
+
+ws:
+  restart: always
+  build: django_app
+  volumes:
+      - ./../../../Triple 7/sbp:/usr/src/sbp
+      - ./../../../Triple 7/WSWebAPI:/usr/src/WSWebAPI
+  working_dir: /usr/src/WSWebAPI
+  env_file: ./../../env.dig
+
+nginx:
+  restart: always
+  build: nginx

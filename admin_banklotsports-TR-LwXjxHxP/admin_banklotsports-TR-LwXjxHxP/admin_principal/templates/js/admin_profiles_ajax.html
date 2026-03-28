@@ -1,0 +1,154 @@
+<script type="text/javascript">
+
+$(document).on("ready",page);
+
+function page(e)
+{
+	$("#id_estado").on("change",consultar_capitales);
+	$("#id_estado").on("change",consultar_municipios);
+
+	$("#id_ciudad").on("change",consultar_municipio);
+
+	$("#id_municipio").on("change",consultar_ciudades);
+	$("#id_ciudad").on("change",consultar_ciudades);
+}
+
+function ver (argument) {
+    if( $("#"+argument).css("display") == "none" ){
+      $("#"+argument).css({"display":"block"})
+
+    }
+    else{
+      $("#"+argument).css({"display":"none"})
+    }
+}
+
+function consultar_capitales(){
+
+	$("#id_ciudad").empty();
+	$("#id_ciudad").attr("disabled",true);
+	$("#id_ciudad").trigger("chosen:updated");
+
+	$("#id_parroquia").empty();
+	$("#id_parroquia").attr("disabled",true);
+	$("#id_parroquia").trigger("chosen:updated");
+
+	if( $("#id_estado").val() ){
+		dajax_profiles(
+			{
+            	"estado": $("#id_estado").val()
+          	},
+			'{% url "admin_profiles_capitales_by_estado_ajax" %}',
+			"id_ciudad"
+		);
+	}
+
+}
+
+
+function consultar_municipio(){
+
+	$("#id_municipio").empty();
+	$("#id_municipio").attr("disabled",true);
+	$("#id_municipio").trigger("chosen:updated");
+
+	$("#id_parroquia").empty();
+	$("#id_parroquia").attr("disabled",true);
+	$("#id_parroquia").trigger("chosen:updated");
+
+	if( $("#id_ciudad").val() ){
+		dajax_profiles(
+			{
+            	"ciudad": $("#id_ciudad").val()
+          	},
+			'{% url "admin_profiles_municipios_by_capital_ajax" %}',
+			"id_municipio"
+		);
+	}
+
+}
+
+function consultar_municipios(){
+
+	$("#id_municipio").empty();
+	$("#id_municipio").attr("disabled",true);
+	$("#id_municipio").trigger("chosen:updated");
+
+	$("#id_parroquia").empty();
+	$("#id_parroquia").attr("disabled",true);
+	$("#id_parroquia").trigger("chosen:updated");
+
+	if( $("#id_estado").val() ){
+		dajax_profiles(
+			{
+            	"estado": $("#id_estado").val()
+          	},
+			'{% url "admin_profiles_municipios_by_estado_ajax" %}',
+			"id_municipio"
+		);
+	}
+
+}
+
+function consultar_ciudades(){
+
+	$("#id_parroquia").empty();
+	$("#id_parroquia").attr("disabled",true);
+	$("#id_parroquia").trigger("chosen:updated");
+
+	if( $("#id_municipio").val() ){
+		dajax_profiles(
+			{
+            	"municipio": $("#id_municipio").val()
+          	},
+			'{% url "admin_profiles_ciudades_by_municipio_ajax" %}',
+			"id_parroquia"
+		);
+	}
+}
+
+function dajax_profiles(data, url, process_id){
+  $.ajax({
+      data : data,
+      url : url,
+      type : 'get',
+      success : function(data_recibe){
+	    //alert(JSON.stringify( data ))
+	    //console.log(data_recibe)
+	    if(data_recibe.length > 0){
+	      verbose = process_id.split("_")[1].capitalize()
+
+          $("#"+process_id).append('<option value="" >Seleccione '+verbose+'</option>');
+
+          $.each(data_recibe, function(obj){
+          	if (data_recibe[obj].nombre){
+            	$("#"+process_id).append('<option value="'+data_recibe[obj].pk+'">'+data_recibe[obj].nombre+'</option>');
+        	}else{
+        		$("#"+process_id).append('<option value="'+data_recibe[obj].pk+'">'+data_recibe[obj].capital+'</option>');
+        	}
+          });
+
+          $("#"+process_id).attr("disabled",false);
+
+        }else{
+
+          $("#"+process_id).append('<option value="">No se encontraron datos, selecciona otra opción</option>');
+
+        }
+
+        $("#"+process_id).trigger("chosen:updated");
+
+
+      },
+      error : function(xhr,errmsg,err) {
+        console.log("#================ERROR=====================")
+		console.log( xhr )
+		console.log( errmsg )
+		console.log( err )
+		console.log("#==========================================")
+      }
+    });
+}
+
+
+</script>

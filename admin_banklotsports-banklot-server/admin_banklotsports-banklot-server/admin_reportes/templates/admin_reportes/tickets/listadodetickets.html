@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% include 'js/admin_juegos_ajax.html' %}
+{% include 'js/admin_comercializacion_ajax.html' %}
+
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-list2"></i> Listado de Tickets</h1>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><i class="icon-ticket"></i> Tickets</li>
+                                <li><i class="icon-list2"></i> Listado de Tickets</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+                    <div class="col-xs-12">
+                      <div class="panel panel-default panel-filters2">
+                        <div class="panel-head">
+                          <p class="left">Búsqueda</p>
+                          {% if consulta %}
+                          <div class="title right">
+                              <a id="expandir" class="btn btn-mini btn-icon"> - </a>
+                          </div>
+                          {% endif %}
+                          </div>
+                        {% if consulta %}
+                          <div id="barra" class="">
+                        {% else %}
+                          <div>
+                        {% endif %}
+                          <form id="filter_form" action='' method='post' encoding='utf-8'>{% csrf_token %}
+                              <div class="panel-body">
+                                <div class="form">
+                                  <div class="row">
+                                    <div class="column hd-4 lg-6 md-12">
+                                        {% for item in form_deportes %}
+                                          <div class="row form form-group">
+                                            <div class="column md-4 sm-12">
+                                              <div class="form-label">{{ item.label }}</div>
+                                            </div>
+                                            <div class="column md-8 sm-12">
+                                              {{ item }}
+                                            </div>
+                                          </div>
+                                        {% endfor %}
+                                        {% for item in form_modalidad %}
+                                          <div class="row form form-group">
+                                            <div class="column md-4 sm-12">
+                                              <div class="form-label">{{ item.label }}</div>
+                                            </div>
+                                            <div class="column md-8 sm-12">
+                                              {{ item }}
+                                            </div>
+                                          </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="column hd-4 lg-6 md-12">
+                                      {% for item in form_cadena %}
+                                        {% if item.is_hidden == 0 %}
+                                          <div class="row form form-group">
+                                            <div class="column md-4 sm-12">
+                                              <div class="form-label">{{ item.label }}</div>
+                                            </div>
+                                            <div class="column md-8 sm-12">
+                                              {{ item }}
+                                            </div>
+                                          </div>
+                                        {% else %}
+                                          {{ item }}
+                                        {% endif %}
+                                      {% endfor %}
+                                    </div>
+                                    <div class="column hd-4 lg-6 md-12">
+                                      {% for item in form_tipos %}
+                                       <div class="row form form-group">
+                                        <div class="column md-4 sm-12">
+                                          <div class="form-label">{{ item.label }}</div>
+                                        </div>
+                                        <div class="column md-8 sm-12">
+                                          {{ item }}
+                                        </div>
+                                      </div>
+                                      {% endfor %}
+                                      <div class="row form form-group">
+                                        <div class="column md-4 sm-12">
+                                          <div class="form-label">{{ form_fecha.fecha_inicio.label }}</div>
+                                        </div>
+                                        <div class="column md-8 sm-12">
+                                          {{ form_fecha.fecha_inicio }}
+                                        </div>
+                                      </div>
+                                      <div class="row form form-group">
+                                        <div class="column md-4 sm-12">
+                                          <div class="form-label">{{ form_fecha.fecha_fin.label }}</div>
+                                        </div>
+                                        <div class="column md-8 sm-12">
+                                          {{ form_fecha.fecha_fin }}
+                                        </div>
+                                      </div>
+                                      <div class="row form form-group">
+                                        <div class="column md-4 sm-12">
+                                          <div class="form-label">{{ form_ticket_byid.code_ticket.label }}</div>
+                                        </div>
+                                        <div class="column md-8 sm-12">
+                                          {{ form_ticket_byid.code_ticket }}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </form>
+                            <div class="panel-footer panel-shadow">
+                                  <div class="col-xs-12">
+                                    <p>
+                                      <button id="sumit_form" class='btn btn-large btn-success'>
+                                        Buscar tickets 
+                                      </button>
+                                    </p>
+                                  </div>
+                            </div>
+                        </div>
+                      </div>
+                    <div class="col-xs-12">
+                      <div class="panel panel-default ">
+                          <div class="panel-head">
+                            <div class="title left">
+                              <p>Ventas en línea</p>
+                            </div>
+                            
+                              <!--<div class="title right">
+                                <a class="btn btn-mini btn-pdf" target="_blank" href='#'>
+                                  <i class="icon-print"></i>PDF
+                                </a>  
+                              </div>
+                              <div class="title right">
+                                <a class="btn btn-mini btn-excel" target="_blank" href='#'><i class="icon-download"></i>EXCEL
+                                </a>  
+                              </div>-->
+                          </div>
+                          <div class="panel-body panel-body-border panel-shadow" >
+                           
+                           
+                            <table class='table datatable table-striped table-panel table-small table-hover'>
+                              <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Banca</th>
+                                  <th>Agencia</th>
+                                  <th>Fecha y hora</th>
+                                  <th>Nro. Ticket</th>
+                                  <th>Apuestas</th>
+                                  <th>Monto</th>
+                                  <th>Premio calculado</th>
+                                  <th>Premio</th>
+                                  <th>Estado</th>
+                                </tr>
+                              </thead>
+                              <tfoot>
+                                <tr>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                </tr>
+                                <tr>
+                                  <td colspan="6">
+                                    Media
+                                  </td>
+                                  <td id="info_media" colspan="4" class="text-align-right">
+                                    0 
+                                  </td>
+
+                                </tr>
+                              </tfoot>
+                              <tbody>
+                              </tbody>
+                            </table>
+
+                              <script type="text/javascript">
+                                  /* Datatables */
+                                  $(document).ready(function(){
+                                  
+                                  });
+                                  /***/
+                                  
+                              </script>
+
+                           
+
+                          </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+            </div>
+
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+
+  $('#id_fecha_inicio').datetimepicker({
+    format:'Y-m-d',
+    lang:'es',
+    onShow:function( ct ){
+
+      fecha = $('#id_fecha_fin').val().split("-")
+      fecha_max = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+
+     this.setOptions({
+      maxDate:$('#id_fecha_fin').val()?fecha_max:false
+     })
+
+    },
+    onChangeDateTime:function(dp,$input){
+    
+      //$('#id_fecha_fin').val( $('#id_fecha_inicio').val() )
+
+    },
+    timepicker:false
+   });
+
+   $('#id_fecha_fin').datetimepicker({
+    format:'Y-m-d',
+    lang:'es',
+    onShow:function( ct ){
+
+      fecha = $('#id_fecha_inicio').val().split("-")
+      fecha_min = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+      if ( parseInt(fecha[1]) == 12 ){
+        fecha[0] = parseInt( fecha[0] ) + 1
+        fecha[1] = 1
+      }
+      else{
+        fecha[1] = parseInt( fecha[1] ) + 1
+      }
+      fecha_max = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+
+     this.setOptions({
+      minDate:$('#id_fecha_inicio').val()?fecha_min:false,
+      maxDate:$('#id_fecha_inicio').val()?fecha_max:false
+     })
+
+    },
+    timepicker:false
+   });
+
+  var expandido = false
+  $('#expandir').on("click",function (){ 
+      if( expandido == true ){
+        expandido = false
+        $("#barra").slideDown("slow");
+        $(this).html("-")
+        $(".chosen-container").css("width","100%")
+      }
+      else{
+        expandido = true
+        $("#barra").slideUp();
+        $(this).html("+")
+      }
+  });
+
+  json = $("#filter_form").serializeArray()
+  count = 0
+  for( obj in json){
+    if(json[obj].value)
+    {
+      //console.log(json[obj].value)
+      count++
+    }
+  }
+
+  if ( count > 3){
+    //si hay mas parametros seleccionados consulta
+    consultar() 
+  }
+
+  $('#sumit_form').on("click",function () {
+    consultar()
+  });
+
+  function consultar(){
+
+    var $form = $("#filter_form"),
+    url = "{% url 'admin_reportes_tickets_get' %}";
+    data = $form.serialize();
+
+    if ( typeof(dt_table) != "undefined" ){
+      dt_table.fnDestroy()
+    }
+    
+    dt_table = $('.datatable').dataTable({
+      "sPaginationType": "full_numbers",
+      "iDisplayLength" : 25,
+      "bFilter": true,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": url,
+      "aaSorting": [[5,'desc']],
+      "sProcessing": "Procesando...",
+      "fnServerData": function ( sSource, aoData, fnCallback ) {
+        
+        $.ajax({
+              "dataType": 'json',
+              "type": "GET",
+              "processData": true,
+              "contentType": "application/json",
+              "url": url + '?' + $.param(aoData), 
+              "data": data, 
+              "success": function(result){
+                fnCallback(result);
+                fnFooterCallback(result.aaFooter);
+              },
+              error : function(xhr,errmsg,err) {
+                console.log("#================ERROR=====================")
+                console.log( xhr )
+                console.log( errmsg )
+                console.log( err )
+                console.log("#==========================================") 
+              }
+          });
+
+      }
+    });
+
+    
+
+    function fnFooterCallback(aaFooter){
+      $(".datatable tfoot tr").eq(0).find('td').eq(0).empty().append(aaFooter[0][3]);
+      $(".datatable tfoot tr").eq(0).find('td').eq(6).empty().append("Total:"+aaFooter[0][0]);
+    
+      $(".datatable tfoot tr").eq(0).find('td').eq(8).empty().append(aaFooter[0][1]);
+
+      $(".datatable").find('tr').each(function(){
+        $(this).children('td').eq(5).addClass("text-align-right");
+        $(this).children('td').eq(6).addClass("text-align-right");
+        $(this).children('td').eq(7).addClass("text-align-right");
+        $(this).children('td').eq(8).addClass("text-align-right");
+      });
+
+      $("#info_media").html(aaFooter[0][2])
+      
+    }
+  
+  }
+
+    
+</script>
+{% endblock %}

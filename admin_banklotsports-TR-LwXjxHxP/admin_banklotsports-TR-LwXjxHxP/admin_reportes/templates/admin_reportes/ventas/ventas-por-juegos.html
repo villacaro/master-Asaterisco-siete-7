@@ -1,0 +1,355 @@
+
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load url from future %}
+{% load humanize %}
+
+
+{% block content %}
+
+{% include 'js/admin_comercializacion_ajax.html' %}
+
+
+<div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-area-graph"></i> Ventas por juegos</h1>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><i class="icon-trending-up"></i> Ventas</li>
+                                <li><i class="icon-area-graph"></i> Ventas por juegos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="container">
+                  <div class="container-margin">
+
+                    
+
+                    <div class="col-xs-12">
+                      <div class="panel panel-default panel-filters">
+                        
+                        
+                        <div class="panel-head">
+                          <p class="left">Búsqueda</p>
+                          {% if consulta %}
+                          <div class="title right">
+                              <a id="expandir" class="btn btn-mini btn-icon"> - </a>
+                          </div>
+                          {% endif %}
+                          </div>
+
+                        {% if consulta %}
+                          <div id="barra" class="">
+                        {% else %}
+                          <div>
+                        {% endif %}
+                          <form id="form_venta_en_linea" action='' method='post' encoding='utf-8'>
+                              {% csrf_token %}
+                              <div class="panel-body">
+                                <div class="row">
+                                  <div class="col-xs-6">
+
+                                      <div class="form-margin">
+                                        {% for item in form_cadena %}
+
+                                          {% if item.is_hidden == 0 %}
+                                             <div class="row form form-group">
+                                              <div class="col-xs-4">
+                                                <div class="form-label">{{ item.label }}</div>
+                                              </div>
+                                              <div class="col-xs-8">
+                                                {{ item }}
+                                              </div>
+                                            </div>
+                                          {% else %}
+                                            {{ item }}
+                                          {% endif %}
+                                          
+                                        {% endfor %}
+
+                                        <input type="hidden" id="id_deporte" name="deporte" value="{{deporte}}">
+                                        <input type="hidden" id="id_temporada" name="temporada" value="{{temporada}}">
+                                        <input type="hidden" id="id_encuentro" name="encuentro" value="{{encuentro}}">
+                                        <input type="hidden" id="id_grupo_modalidad" name="grupo_modalidad" value="{{grupo_modalidad}}">
+                                        <input type="hidden" id="id_modalidad" name="modalidad" value="{{modalidad}}">
+                                      </div>
+                                    
+                                  </div>
+                                  <div class="col-xs-6">
+                                      <div class="form-margin">
+                                        
+                                        <div class="row form form-group">
+                                          <div class="col-xs-4">
+                                            <div class="form-label">Desde</div>
+                                          </div>
+                                          <div class="col-xs-8">
+                                            <input required type="text" id="id_fecha_inicio" name="fecha_inicio"
+                                            value='{{ form_fecha.fecha_inicio.value }}'>
+                                          </div>
+                                        </div>
+
+                                        
+                                        <div class="row form form-group">
+                                          <div class="col-xs-4">
+                                            <div class="form-label">{{ form_fecha.fecha_fin.label }}</div>
+                                          </div>
+                                          <div class="col-xs-8">
+                                            <input required type="text" id="id_fecha_fin" name="fecha_fin"
+                                            value='{{ form_fecha.fecha_fin.value }}'>
+                                          </div>
+                                        </div>
+                                        
+
+                                      </div>
+                                    </div>
+                                 
+                                  
+                                </div>
+                              </div>
+                            
+                            </form>
+
+                              <div class="panel-footer panel-shadow">
+                                    <div class="col-xs-12">
+                                      <p>
+                                        <button id="btn_refres" class='btn btn-large btn-success' onclick="ConsultaEnLinea(0,0)">
+                                          Buscar 
+                                        </button>
+                                      </p>
+                                    </div>
+                              </div>
+
+                        </div>
+
+
+                      </div>
+                    </div>
+
+
+                    {% if consulta %}
+
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                          <div class="panel-head">
+                              
+                              <div class="title left">
+                                <a id="atras" href="#" class='btn btn-mini' >
+                                    <span class="">←</span> Atras
+                                </a> 
+                              </div>
+                              <div class="title right">
+                                {% if cache_key %}
+                                  <a class="btn btn-mini btn-pdf" target="_blank" href="{% url 'admin_reportes_venta_por_juegos_print_pdf' cache_key=cache_key %}">
+                                    <i class="icon-print"></i>PDF
+                                  </a>  
+                                {% endif %}
+                              </div>
+
+                              <div class="title right">
+                                {% if cache_key %}
+                                  <a class="btn btn-mini btn-excel" target="_blank" href="{% url 'admin_reportes_venta_por_juegos_print_csv' cache_key=cache_key %}"><i class="icon-download"></i>EXCEL
+                                  </a>
+                                {% endif %}
+                              </div>
+                              
+                          </div>
+                          <div class="panel-body panel-body-border panel-shadow" >
+                              <table class='table table-data table-striped table-panel table-small table-hover' id='table_resumen'>
+                                <thead>
+                                  <tr>
+                                    {% for title in consulta.juegos_detalle_title %}
+                                      <th>
+                                          {{ title.text|safe }}
+                                      </th>
+                                    {% endfor %}
+                                  </tr>
+                                </thead>
+                                <tfoot>
+                                  <tr>
+                                    <td>Total</td>
+                                    <td></td>
+                                    {% for extra in consulta.column_extra %}
+                                      <td>
+                                          
+                                      </td>
+                                    {% endfor %}
+
+                                    <td>{{ consulta.montos|intcomma }}</td>
+                                    <td>{{ consulta.premios|intcomma }}</td>
+                                    <td>{{ consulta.apuestas_count|intcomma }}</td>
+                                    <td> {{ consulta.porcentaje }} </td>
+                                  </tr>
+                                </tfoot>
+                                <tbody>
+                                  {% for contenido in consulta.juegos_detalle %}
+                                  <tr>
+                                      {% for item in contenido.pertenece %}
+                                      <td>
+                                        {% if item.html %}
+                                          {{ item.val|safe }}
+                                        {% else %}
+
+                                            {{item.val|intcomma}}
+                                          
+                                        {% endif %}
+                                      </td>
+                                      {% endfor %}
+                                  </tr>
+                                  {% endfor %}
+                                  
+                                </tbody>
+                                
+                              </table>
+
+                          </div>
+                      </div>
+                    </div>
+
+                    {% endif %}
+
+
+                  </div>
+                </div>
+            </div>
+
+
+{% endblock %}
+
+{% block js %}
+  <script>
+
+
+  function ConsultaEnLinea(type , pk){
+  
+  var id_deporte = $("#id_deporte").val()
+  var id_temporada = $("#id_temporada").val()
+  var id_encuentro = $("#id_encuentro").val()
+  var id_grupo_modalidad = $("#id_grupo_modalidad").val()
+  var id_modalidad = $("#id_modalidad").val()
+
+  if (type == 0) {
+    var id_deporte = ""
+    var id_temporada = ""
+    var id_encuentro = ""
+    var id_grupo_modalidad = ""
+    var id_modalidad = ""
+  }
+  else{
+    if (type == 1){
+      id_deporte = pk
+    }
+    else{
+      if (type == 2)
+      {
+        id_temporada = pk
+      }
+      else{
+        if (type == 3)
+        {
+          id_encuentro = pk
+        }
+        else{
+          if (type == 4)
+          {
+            id_grupo_modalidad = pk
+          }
+          else{
+            if (type == 5)
+            {
+              id_modalidad = pk
+            }
+          } 
+        } 
+      } 
+    }
+  }
+
+  $("#id_deporte").val(id_deporte)
+  $("#id_temporada").val(id_temporada)
+  $("#id_encuentro").val(id_encuentro)
+  $("#id_grupo_modalidad").val(id_grupo_modalidad)
+  $("#id_modalidad").val(id_modalidad)
+
+  $("#form_venta_en_linea").submit()
+  
+}
+
+$('#id_fecha_inicio').datetimepicker({
+    format:'Y-m-d',
+    lang:'es',
+    onShow:function( ct ){
+
+      fecha = $('#id_fecha_fin').val().split("-")
+      fecha_max = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+
+     this.setOptions({
+      maxDate:$('#id_fecha_fin').val()?fecha_max:false
+     })
+
+    },
+    onChangeDateTime:function(dp,$input){
+    
+      //$('#id_fecha_fin').val( $('#id_fecha_inicio').val() )
+
+    },
+    timepicker:false
+   });
+
+   $('#id_fecha_fin').datetimepicker({
+    format:'Y-m-d',
+    lang:'es',
+    onShow:function( ct ){
+
+      fecha = $('#id_fecha_inicio').val().split("-")
+      fecha_min = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+      if ( parseInt(fecha[1]) == 12 ){
+        fecha[0] = parseInt( fecha[0] ) + 1
+        fecha[1] = 1
+      }
+      else{
+        fecha[1] = parseInt( fecha[1] ) + 1
+      }
+      fecha_max = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+
+     this.setOptions({
+      minDate:$('#id_fecha_inicio').val()?fecha_min:false,
+      maxDate:$('#id_fecha_inicio').val()?fecha_max:false
+     })
+
+    },
+    timepicker:false
+   });
+
+    var expandido = false
+
+    $('#expandir').on("click",function (){
+        
+        if( expandido == true ){
+          expandido = false
+          $("#barra").slideDown("slow");
+          $(this).html("-")
+
+          $(".chosen-container").css("width","100%")
+        }
+        else{
+          expandido = true
+          $("#barra").slideUp();
+          $(this).html("+")
+        }
+    });
+
+  $("#atras").click(function(event) {
+    event.preventDefault();
+    history.back();
+  }); 
+    
+ </script>
+{% endblock %}

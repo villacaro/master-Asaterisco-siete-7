@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load staticfiles %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-tune"></i> Preferencias</h1>
+                            <p class="subtitle">Lista</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><i class="icon-tune"></i> Preferencias</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+                    {% include 'admin_comercializacion/preferencias/object_table_list.html' %}
+                    {% include 'admin_comercializacion/preferencias/pagination.html' %}
+                  </div>
+                </div>
+            </div>
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+
+  $('#id_consultar').on("click",function () {
+      consultar()
+  });
+
+  json = $("#form_filters").serializeArray()
+  count = 0
+  for( obj in json){
+    if(json[obj].value)
+    {
+      count++
+    }
+  }
+  
+  if ( count > 1){
+    consultar() 
+  }
+
+  function consultar() {
+      var $form = $("#form_filters"),
+      cadena = $("#cadena").val();
+      if (cadena == "Bloques") {
+        url = "{% url 'bloques_preferencias_list_datatables' %}";
+      }else if (cadena == "Bancas"){
+        url = "{% url 'bancas_preferencias_list_datatables' %}";
+      }else if (cadena == "Distribuidores") {
+        url = "{% url 'distribuidores_preferencias_list_datatables' %}";
+      }else if (cadena == "Agencias") {
+        url = "{% url 'agencias_preferencias_list_datatables' %}";
+      };
+      data = $form.serialize()+"&cadena="+cadena;
+      //$(".datatable").find("td").empty()
+      if ( typeof(dt_table) != "undefined" ){
+        dt_table.fnDestroy()
+      }
+
+      dt_table = $('.datatable').dataTable({
+        "sPaginationType": "full_numbers",
+        "iDisplayLength" : 25,
+        "bFilter": true,
+        "bProcessing": true,
+        "bServerSide": true,
+        "sAjaxSource": url,
+        "sProcessing": "Procesando...",
+        "fnServerData": function ( sSource, aoData, fnCallback ) {
+          $.ajax({
+                "dataType": 'json',
+                "type": "GET",
+                "processData": true,
+                "contentType": "application/json",
+                "url": url + '?' + $.param(aoData), 
+                "data": data,
+                "success": function(result){
+                  fnCallback(result);
+                },
+                error : function(xhr,errmsg,err) {
+                  console.log("#================ERROR=====================")
+                  console.log( xhr )
+                  console.log( errmsg )
+                  console.log( err )
+                  console.log("#==========================================") 
+                }
+            });
+        }
+      });
+      dt_table.fnSetFilteringDelay(500);
+}
+</script>
+{% endblock %}
+

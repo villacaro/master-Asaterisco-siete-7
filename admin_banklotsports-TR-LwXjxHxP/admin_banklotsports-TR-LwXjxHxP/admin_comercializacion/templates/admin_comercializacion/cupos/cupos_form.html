@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-credit"></i> Cupos</h1>
+                            <p class="subtitle">
+                              {% if object %}
+                                {% trans "Editar" %}
+                              {% else %}
+                                {% trans "Crear" %}
+                              {% endif %}</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="#"><i class="icon-credit"></i> Cupos</a>
+                                </li>
+                                <li>
+                                  {% if object %}
+                                  <i class="icon-pencil-1"></i> Editar
+                                  {% else %}
+                                  <i class="icon-plus-1"></i> Crear
+                                  {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+                    <form action='{% url 'admin_comercializacion_cupos_update' pk=object.pk %}' method='post' encoding='utf-8'>{% csrf_token %}
+                      <div class="col-xs-12">
+                        <div class="panel panel-default">
+                          <div class="panel-body panel-head-border">
+                            <div class="form-margin">
+                            {% for item in form %}
+                              <div class="row form form-group">
+                                <div class="col-xs-3">
+                                  <div class="form-label">{{ item.label }}</div>
+                                </div>
+                                <div class="col-xs-6">
+                                  {{ item }}
+                                </div>
+                                <div class="col-xs-3">
+                                  {%  if item.errors %}   
+                                    <div class="alert alert-warning">{{ item.errors }}</div>
+                                  {% endif %}
+                                </div>
+                              </div>
+                            {% endfor %}
+                            </div>
+                          </div>
+                          <div class="panel-footer panel-shadow">
+                              <div class="col-xs-3"></div>
+                              <div class="col-xs-6">
+                                <p>
+                                <button class='btn btn-large btn-success' name="_save" value="_save" type='submit'>
+                                  {% trans "Editar" %}
+                                </button>
+                                </p>
+                              </div>
+                              <div class="col-xs-3"></div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+{% endblock %}

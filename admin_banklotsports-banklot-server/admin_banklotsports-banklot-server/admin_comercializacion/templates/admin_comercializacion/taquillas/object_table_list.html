@@ -1,0 +1,181 @@
+{% load url from future %}
+{% load i18n %}
+{% load humanize %}
+                {% include 'js/admin_comercializacion_ajax.html' %}
+
+                <div class="col-xs-12">
+                  <div class="panel panel-default">
+                      <div class="panel-head">
+                       <a href="{% url 'admin_comercializacion_taquillas_create' %}" class="btn btn-sm btn-primary side left"><i class="icon-squared-plus i-right"></i> Crear nuevo</a>
+                      </div>
+                    
+                          <form id="form_filters" action='' method='get' encoding='utf-8'>
+                            <div class="panel-body panel-filters">
+                                <div class="form form-small">            
+                                        <div class="form-margin">
+                                            {% for item in form %}
+                                               <div class="row form form-group">
+                                                <div class="column md-4 sm-12">
+                                                  <div class="form-label">{{ item.label }}</div>
+                                                </div>
+                                                <div class="column md-8 sm-12">
+                                                  {{ item }}
+                                                </div>
+                                              </div>
+                                            {% endfor %}
+                                          </div>
+                                </div>
+                              </div>
+                              <div class="panel-footer panel-shadow">
+                                  <div class="col-xs-12">
+                                    <p>
+                                      <button class='btn btn-primary' >Buscar </button>
+                                    </p>
+                                  </div>
+                              </div>
+                            </form>
+                  </div>
+                </div>
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-head">
+                          
+                          {% if object_list.0.get_verbose_name_plural %}
+                              <div class="title left">
+                                <p>
+                                  <a href="#" id="atras" class="icon-left-circle-1">
+                                  </a>
+                                </p>
+                              </div>
+                          {% endif %}
+
+                          <div class="title left">
+                            <p>
+                              {{ object_list.0.get_verbose_name_plural }}
+                            </p>
+                          </div>
+
+                           {% if  object_list.0.get_verbose_name_plural %}
+                            
+                              <div class="title right">
+                                <p>
+                                  <a href="#" id="recargar" class="icon-cw-circle">
+                                  </a>
+                                </p>
+                              </div>
+                           
+                           {% endif %}
+
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                            <table class='table table-data'>
+                              <thead>
+                                <tr>
+                                  <th>N°</th>
+                                  
+                                  {% if not object_list.0.get_class_name = "taquillas" %}
+
+                                    <th>{{ object_list.0.get_verbose_name }}</th>
+                                    <th>N° de {{ verbose_title_suc }}</th>
+
+                                  {% else %}
+
+                                    <th>Taquilla</th>
+                                    <th>Centro de apuesta</th>
+                                    <th>Estatus</th>
+                                    <th>Master</th>
+                                    <th>Ultima Conexión</th>
+                                    <th></th>
+
+                                  {% endif %}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                  
+                                  {% if not object_list.0.get_class_name = "taquillas" %}
+
+                                    {% for object in object_list %}
+                                    <tr>
+                                        
+                                        <td width="5%">{{ forloop.counter }}</td>
+                                        
+                                        <td>
+                                          {% if  object.get_offspring.exists %}
+                                            <a href="?{{ object.prefix_filter }}={{ object.pk }}" class="link">
+                                              {{ object }}
+                                            </a>
+                                          {% else %}
+                                            {{ object }}
+                                          {% endif %}
+                                        </td>
+                                        
+                                        <td >{{ object.get_offspring.count }}</td>
+                                        
+                                    </tr>    
+                                    {% endfor %}
+
+                                  {% else %}
+                                    {% for object in object_list %}
+                                      <tr>
+                                        <td width="5%">{{ forloop.counter }}</td>
+                                        <td>{{ object }}</td>
+                                        <td>{{ object.agencia }}</td>
+                                        <td>{{ object.get_status }}</td>
+                                        {% if object.is_taquilla_master %}
+                                          <td>
+                                            Sí
+                                          </td>
+                                        {% else %}
+                                          <td>
+                                            No
+                                          </td>
+                                        {% endif %}
+                            
+                                        {% with fecha=object.get_ultima_conexion %}
+                                          <td title="{{ fecha }}">
+                                            <i class="icon-clock"><i>
+                                            {{ fecha|naturaltime }}
+                                          </td>
+                                        {% endwith %}
+                            
+                                        <td>
+                                        <div class="btn-group">
+                                          <a class="btn btn-xs btn-ico btn-default" href='{% url "admin_comercializacion_taquillas_detail" pk=object.pk %}'>
+                                            <i class="icon-info2"></i>
+                                          </a>
+                                          
+                                          <a class="btn btn-xs btn-ico btn-default" href='{% url "admin_comercializacion_taquillas_update" pk=object.pk %}'>
+                                            <i class="icon-edit2"></i>
+                                          </a>
+                                        
+                                          <a class="btn btn-xs btn-ico btn-default" href='{% url "admin_comercializacion_taquillas_delete" pk=object.pk %}'>
+                                            <i class="icon-delete"></i>
+                                          </a>
+                                        </div>          
+                                      </td>
+                                       </tr>    
+                                    {% endfor %}
+
+                                  {% endif %}  
+
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+{% block js %}
+<script>
+
+  $("#atras").click(function(event) {
+      event.preventDefault();
+      history.back();
+  }); 
+
+  $("#recargar").click(function(event) {
+      event.preventDefault();
+      location.reload();
+  });
+
+</script>
+
+{% endblock %}

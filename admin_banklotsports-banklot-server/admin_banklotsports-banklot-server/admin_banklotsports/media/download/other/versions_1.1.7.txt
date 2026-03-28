@@ -1,0 +1,1 @@
+1.0.6,"http://50.97.55.155:8090/media/download/matchpointparley_setup.exe"

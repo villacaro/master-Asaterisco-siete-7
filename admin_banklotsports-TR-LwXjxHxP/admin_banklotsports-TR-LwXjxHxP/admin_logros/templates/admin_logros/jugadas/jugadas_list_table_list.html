@@ -1,0 +1,162 @@
+{% load url from future %}
+{% load i18n %}
+                <div class="col-xs-12">
+                  <div class="panel panel-default panel-filters">
+                    <form id="form_deportes" action='' method='get' encoding='utf-8'>
+                                        <div class="panel-head">
+                                            <p>Búsqueda</p>
+                                          </div>
+                                            <div class="panel-body">
+                                              <div class="row form-margin">
+                                                
+                                                <div class="col-xs-4">
+                                                  <div class="form-margin">
+                                                    <div class="row form form-group">
+                                                      
+                                                      <div class="col-xs-4">
+                                                        <div class="form-label">{{ form.deporte.label }}</div>
+                                                      </div>
+                                                      
+                                                      <div class="col-xs-8">
+                                                        {{ form.deporte }}
+                                                      </div>
+
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                                
+                                                <div class="col-xs-4">
+                                                  <div class="form-margin">
+                                                  <div class="row form form-group">
+                                                    <div class="col-xs-4">
+                                                      <div class="form-label form-label-right">
+                                                        {{ form.fecha.label }}
+
+                                                      </div>
+
+                                                    </div>
+                                                      <div class="col-xs-8">
+                                                      {{ form.fecha }}
+                                                      
+                                                      </div>
+                                                    </div>
+                                                  </div>
+
+                                                </div>
+                                              </div>
+                                            </div>
+                                            
+                                              <div class="panel-footer panel-shadow">
+                                                <div class="row form-margin">
+                                                    <div class="row form form-group">
+                                                        <button type="submit" id="id_consultar" class="btn right btn-success">Buscar</button>
+                                                    </div>
+                                                  </div>
+                                              </div>
+                          </form>
+                      </div>
+                  </div>
+                
+                <div class="col-xs-12">
+                    <div class="panel panel-minimal">
+                        <div class="panel-head">
+                          <p>Logros</p>
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                            <table class='table table-data table-panel table-striped table-hover'>
+                              <thead>
+                                <tr>
+                                  <th>ID</th>
+                                  <th>Fecha y hora</th>
+                                  <th>Partido</th>
+                                  <th>Torneo - Temporada</th>
+                                  <th>Deporte</th>
+                                  <th>Estato</th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for object in object_list %}
+                                  <tr>
+
+                                    <td class="td-center">{{ object.pk }}</td>
+                                  
+                                    <td>
+                                      {{ object.horajuego|date:'h:i a'}} - {{ object.horajuego|date:'d/m/Y' }}
+                                    </td>                            
+                                  
+                                    <td >
+                                      {% for equipo in object.encuentrosdetail_set_order %}
+                                        <span class="tag tag-blue">{{ equipo.equipos_temporadas.equipo }}</span>
+                                      {% endfor %}
+                                    </td>
+                                    <td>
+                                        {{ object.jornada.temporadas.torneo.nombre }} - {{ object.jornada.temporadas.nombre }}
+                                    </td>
+                                    <td><span class="tag tag-green">{{ object.jornada.temporadas.torneo.deporte }}</span></td>
+
+                                     <td>
+                                      {{ object.status}}
+                                    </td> 
+
+                                      <td>
+                                        <a href="{% url 'admin_logros_ecuentros_create_update' pk=object.pk %}" 
+                                        class="btn btn-xs {% if object.get_exists_logros %} btn-success {% else %} btn-danger {% endif %}"
+                                        >Asignar logros</a>
+                                        
+                                      </td>
+                                  </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 
+                    target="_blank" onClick="window.open(this.href, this.target, 'resizable=0,width=1024,height=600'); return false;"
+                -->
+                <!--
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-head">
+                          <p class="title left">
+                            Logros
+                          </p>
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                            <table class='table datatable table-striped table-panel table-small table-hover'>
+                              <thead>
+                                <tr>
+                                  <th width="4%">ID</th>
+                                  <th width="16%">Fecha y hora</th>
+                                  <th width="30%">Partido</th>
+                                  <th width="20%">Torneo - Temporada</th>
+                                  <th width="7%">Deporte</th>
+                                  <th width="7%">Estado</th>
+                                  <th width="16%"></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                  <tr>
+                                  </tr>
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                -->
+
+
+
+{% block js %}
+  <script>
+
+   $('#id_fecha').datetimepicker({
+    format:'Y-m-d',
+    lang:'es',
+    timepicker:false
+   });
+
+  </script>
+{% endblock %}

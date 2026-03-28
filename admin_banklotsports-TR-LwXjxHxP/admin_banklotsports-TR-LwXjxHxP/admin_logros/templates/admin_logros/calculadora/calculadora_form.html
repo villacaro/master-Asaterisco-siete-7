@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}  
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-account-balance"></i> Logros</h1>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><i class="icon-account-balance"></i> Logros</a></li>
+                                <li>
+                                  <i class="icon-pencil-1"></i> Calculadora parley
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+                    <form id="calculadora">
+                      <div class="col-xs-12">
+                      <h1></i>Calculadora Parley</h1>
+                        <div class="panel panel-default">
+                          <div class="panel-body panel-head-border">                           
+                            
+                            <div class="col-xs-3">
+                              <div class="form-margin">
+                              {% for item in form %}
+                                
+                                {% if not "logro" in item.name %}
+                                <div class="row form form-group">
+                                  <div class="col-xs-6">
+                                    <div class="form-label">{{ item.label }}</div>
+                                  </div>
+                                  <div class="col-xs-6">
+                                    {{ item }}
+                                  </div>
+                                  
+                                </div>
+                                <div class="row form form-group"></div>
+                                <div class="row form form-group"></div>
+                                <div class="row form form-group"></div>
+                                <div class="row form form-group"></div>
+                                {% endif %}
+                                         
+                              {% endfor %}
+                              <div class="row form form-group">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-3">
+                                  <div id="clear" class='btn btn-large btn-success'>
+                                    Limpiar 
+                                  </div>
+                                </div>
+                              </div>
+                                
+                              </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                              <div class="form-margin">
+                              {% for item in form %}
+                                {% if "logro" in item.name %}
+                                  <div class="row form form-group">
+                                    <div class="col-xs-6">
+                                      <div class="form-label">{{ item.label }}</div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                      {{ item }}
+                                    </div>
+                                  </div>
+                                {% endif %}
+                              {% endfor %}
+                              </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                              <div id="extras" class="form-margin">
+                                <div class="row form form-group">
+                                  <div class="col-xs-6">
+                                    <div class="form-label">Logro 11</div>
+                                  </div>
+                                  <div class="col-xs-6">
+                                    <input class="calculo" id="id_logro_11" name="logro_11" type="number">
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="col-xs-3">
+                              <div class="form-margin">
+                                <div class="row form form-group">
+                                  <div class="col-xs-6">
+                                    <div id="plus" class='btn' data-number="11">
+                                      <i class="icon-squared-plus"></i>
+                                    </div>
+                                  </div>
+                                  <div class="col-xs-6">
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          
+                          </div>
+                          <div class="panel-footer panel-shadow">
+                              <div class="col-xs-3"></div>
+                              <div class="col-xs-6">
+
+                              </div>
+                              <div class="col-xs-3"></div>
+                          </div>
+                        </div>
+                      </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+
+
+{% endblock %}
+
+{% block js %}
+  <script>
+  function calcular() {
+    var items = $(".calculo");
+    var factor = 1;
+    console.log(items);
+
+    
+    items.each(function() {
+      if ($(this).val().replace(/_/g, "").match(/^(\-|\+)?[0-9]+$/)) {
+        var value = parseInt($(this).val());
+        factor *= 1+(value >= 0 ? value/100 : -100/value);
+      }
+    });
+    
+    var monto = $("#id_apuesta").val();
+    
+    if (monto.match(/^[0-9]+\.?[0-9]*$/)) {
+      monto = parseInt(monto);
+      
+      var ganancia = Math.round((factor-1)*monto);
+      var premio = Math.round(factor*monto);
+      
+      $("#id_ganancia").val(ganancia);
+      $("#id_total").val(premio);1
+    }
+  }
+
+  $(":input").keyup(function() {
+    calcular();
+  })
+  $(":input").change(function() {
+    calcular();
+  })
+
+
+
+  $("#plus").click(function() {
+    if ($("#plus").data("number") < 20){
+      var number = $("#plus").data("number") + 1
+      $("#plus").data("number",number);
+      html = $('<div class="row form form-group calculoextra">
+                <div class="col-xs-6">
+                <div class="form-label">Logro '+number+'</div>
+              </div>
+              <div class="col-xs-6">
+                <input class="calculo" id="id_logro_'+number+'" name="logro_'+number+'" type="number" onKeyUp="calcular()" onchange="calcular()">
+              </div>
+              </div>')
+      $("#extras").append(html);
+    }
+  })
+
+  $("#clear").click(function() {
+    //Borramos los inputs extras
+    $("#plus").data("number",11);
+    var itemsextra = $(".calculoextra");
+    itemsextra.each(function(){
+      $(this).remove();
+    });
+
+    //Se limpian los inputs
+    var items = $(":input");
+    items.each(function(){
+      $(this).val(0);
+    });
+
+
+  })
+
+</script>
+
+{% endblock %}

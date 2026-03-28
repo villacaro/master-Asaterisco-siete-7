@@ -1,0 +1,1 @@
+start jbin/matchpointparley_updater.jar

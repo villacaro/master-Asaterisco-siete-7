@@ -1,0 +1,55 @@
+{% load url from future %}
+{% load i18n %}
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-head">
+                          <p>
+                            Sistema de juego
+                          </p>
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                            <table class='table table-data'>
+                              <thead>
+                                <tr>
+                                  <th>N°</th>
+                                  <th>Nombre</th>
+                                  <th>Logo</th>
+                                  <th>Actualización</th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for object in object_list %}
+                                  <tr>
+                                      <td>{{forloop.counter}}</td>
+                                      <td><a href="{{object.get_absolute_url}}" class="link">{{ object }}</a></td>
+                                      <td>
+                                        
+                                        {% if object.logo %}
+                                          <img src="{{MEDIA_URL}}{{object.logo}}" width="35" height="auto">
+                                        {% else %}
+                                          Sin imagen
+                                        {% endif %}
+                                      
+                                      </td>
+                                      <td>{{object.get_notificacion_automatica_display}}</td>
+                                      <td>
+                                        <div class="btn-group btn-group-73">
+                                          <a class="btn btn-xs btn-ico btn-default" href='{% url "admin_juego_sistemajuego_detail" pk=object.pk %}'>
+                                            <i class="icon-info2"></i>
+                                          </a>
+                                          
+                                          <a class="btn btn-xs btn-ico btn-default" href='{% url "admin_juego_sistemajuego_update" pk=object.pk %}'>
+                                            <i class="icon-edit2"></i>
+                                          </a>
+
+                                  
+                                        </div>               
+                                      </td>
+                                  </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>

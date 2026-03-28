@@ -1,0 +1,158 @@
+<script type="text/javascript">
+  
+$(document).on("ready",page);
+
+function page(e)
+{	
+	$("#id_deporte").on("change",consultar_torneos_temporadas);
+	$("#id_temporada").on("change",consultar_encuentros);
+	$("#id_grupo_modalidad").on("change",consultar_modalidades);
+	$("#id_encuentro").on("change",limpiar_encuentro);
+}
+
+function consultar_torneos_temporadas(){
+	
+	if ( $("#id_temporada").length ){
+		$("#id_temporada").empty();
+		$("#id_temporada").attr("disabled",true); 
+		$("#id_temporada").trigger("chosen:updated");
+
+		$("#id_encuentro").empty();
+		$("#id_encuentro").attr("disabled",true); 
+		$("#id_encuentro").trigger("chosen:updated");
+
+		if( $("#id_deporte").val() ){
+			dajax_profiles(
+				{
+	            	"deporte": $("#id_deporte").val()
+	          	},
+				'{% url "admin_juego_temporadas_by_deporte_ajax" %}',
+				"id_temporada"
+			);
+		}
+	}
+
+	if ( $("#id_grupo_modalidad").length ){
+		$("#id_grupo_modalidad").empty();
+		$("#id_grupo_modalidad").attr("disabled",true); 
+		$("#id_grupo_modalidad").trigger("chosen:updated");
+
+		if( $("#id_deporte").val() ){
+			dajax_profiles(
+				{
+	            	"deporte": $("#id_deporte").val()
+	          	},
+				'{% url "admin_juego_gruposapuestas_by_deporte_ajax" %}',
+				"id_grupo_modalidad"
+			);
+		}
+	}
+
+}
+
+restart_var_click = false
+function consultar_encuentros(){
+
+	if ( $("#id_encuentro").length ){
+		$("#id_encuentro").empty();
+		$("#id_encuentro").attr("disabled",true); 
+		$("#id_encuentro").trigger("chosen:updated");
+
+		if( $("#id_temporada").val() ){
+			if ( $("id_fecha_inicio") ){
+				dajax_profiles(
+					{
+		            	"temporada": $("#id_temporada").val(),
+		            	"fecha_inicio": $("#id_fecha_inicio").val(),
+		            	"fecha_fin": $("#id_fecha_fin").val()	          	
+		            },
+					'{% url "admin_juego_encuentros_by_temporada_ajax" %}',
+					"id_encuentro"
+				);
+			}else {
+				dajax_profiles(
+					{
+		            	"temporada": $("#id_temporada").val(),
+		            	"fecha_inicio": "",
+		            	"fecha_fin": ""
+		          	},
+					'{% url "admin_juego_encuentros_by_temporada_ajax" %}',
+					"id_encuentro"
+				);
+			}
+		}
+	}
+
+	if ( restart_var_click == true ){
+		$("#id_grupo_modalidad").val("")
+    	$("#id_modalidad").val("")
+    }
+}
+
+function limpiar_encuentro () {
+	if ( restart_var_click == true ){
+		$("#id_grupo_modalidad").val("")
+    	$("#id_modalidad").val("")
+    }
+}
+
+function consultar_modalidades(){
+
+	if( $("#id_modalidad").length ){
+		$("#id_modalidad").empty();
+		$("#id_modalidad").attr("disabled",true); 
+		$("#id_modalidad").trigger("chosen:updated");
+
+		if( $("#id_grupo_modalidad").val() ){
+			dajax_profiles(
+				{
+	            	"grupo": $("#id_grupo_modalidad").val()
+	          	},
+				'{% url "admin_juego_modalidades_by_grupo_ajax" %}',
+				"id_modalidad"
+			);
+		}
+	}
+}
+
+
+function dajax_profiles(data, url, process_id){
+  $.ajax({
+      data : data,
+      url : url,
+      type : 'get',
+      success : function(data_recibe){
+	    //alert(JSON.stringify( data ))
+
+	    if(data_recibe.length > 0){
+	      verbose = process_id.split("_")[1].capitalize()
+
+          $("#"+process_id).append('<option value="" >Seleccione '+verbose+'</option>');
+          
+          $.each(data_recibe, function(obj){
+            $("#"+process_id).append('<option value="'+data_recibe[obj].pk+'">'+data_recibe[obj].nombre+'</option>');
+          });
+
+          $("#"+process_id).attr("disabled",false); 
+        
+        }else{
+
+          $("#"+process_id).append('<option value="">No se encontraron datos, selecciona otra opción</option>');
+        
+        }
+
+        $("#"+process_id).trigger("chosen:updated");
+	
+
+      },
+      error : function(xhr,errmsg,err) {
+        console.log("#================ERROR=====================")
+		console.log( xhr )
+		console.log( errmsg )
+		console.log( err )
+		console.log("#==========================================") 
+      }
+    });
+}
+
+</script>

@@ -1,0 +1,45 @@
+{% load url from future %}
+{% load i18n %}
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-head">
+                          <a href="{% url 'admin_comercializacion_operadoras_create' %}" class="btn btn-success side left"><i class="icon-plus-1"></i> Crear nuevo</a>
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                            <table class='table table-data'>
+                              <thead>
+                                <tr>
+                                  <th>N°</th>
+                                  <th>Nombre</th>
+                                  <th>Estatus</th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for object in object_list %}
+                                  <tr>
+                                      <td>{{forloop.counter}}</td>
+                                      <td>{{ object.nombre }}</td>
+                                      <td>{{ object.status }}</td>
+                                      <td>
+                                        <div class="btn-group btn-group-73">
+                                          <a class="btn btn-xs btn-ico btn-default" href='{% url "admin_comercializacion_operadoras_detail" pk=object.pk %}'>
+                                            <i class="icon-info2"></i>
+                                          </a>
+                                          
+                                          <a class="btn btn-xs btn-ico btn-default" href='{% url "admin_comercializacion_operadoras_update" pk=object.pk %}'>
+                                            <i class="icon-edit2"></i>
+                                          </a>
+                                        
+                                          <a class="btn btn-xs btn-ico btn-default" href='{% url "admin_comercializacion_operadoras_delete" pk=object.pk %}'>
+                                            <i class="icon-delete"></i>
+                                          </a>
+                                        </div>          
+                                      </td>
+                                  </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>

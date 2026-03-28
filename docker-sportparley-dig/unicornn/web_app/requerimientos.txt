@@ -1,0 +1,13 @@
+docutils
+django-extensions
+django-redis-cache
+gunicorn
+hiredis
+pillow==2.7.0
+pycrypto
+psycopg2
+python-social-auth
+redis
+requests
+rsa
+Werkzeug

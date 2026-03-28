@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+{% load staticfiles %}
+
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-view-week"></i> Jornadas</h1>
+                            <p class="subtitle">
+                              {% if object %}
+                                {% trans "Actualizar" %}
+                              {% else %}
+                                {% trans "Crear" %}
+                              {% endif %}</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="{% url 'admin_juego_jornadas_list' %}"><i class="icon-view-week"></i> Jornadas</a></li>
+                                <li>
+                                  {% if object %}
+                                  <i class="icon-pencil-1"></i> Actualizar
+                                  {% else %}
+                                  <i class="icon-plus-1"></i> Crear
+                                  {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container">
+                  <div class="container-margin">
+
+                    <form id="form_jornada" action='{% if object %}{% url 'admin_juego_jornadas_update' pk=object.pk %}{% else %}{% url 'admin_juego_jornadas_create' %}{% endif %}' method='post' encoding='utf-8'>
+                      {% csrf_token %}
+
+                      <div class="col-xs-12">
+                        <div class="panel panel-default">
+                          <div class="panel-body panel-head-border">
+                            <div class="form-margin">
+                              {% if form.non_field_errors  %}
+
+                              <div class="row form form-group">
+
+                                <div class="col-xs-3">
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="alert alert-warning">
+                                      {{form.non_field_errors }} 
+                                    </div>
+                                
+                                </div>
+                                <div class="col-xs-3">
+                                </div>
+                              </div>
+                              {% endif %}
+
+                              {% for item in form %}
+                                {% if item.is_hidden == 0 %}
+                                
+                                  {% if item.field.widget.attrs.class == "invisible" %}
+                                    <div class="row form form-group {{item.field.widget.attrs.class}} {{item.name}}">
+                                  {% else %}
+                                    <div class="row form form-group {{item.name}}">
+                                  {% endif %}
+                                    
+                                    <div class="col-xs-3">
+                                      <div class="form-label">{{ item.label }}</div>
+                                    </div>
+                                    
+                                    <div class="col-xs-6">
+                                      
+                                      {{ item }}
+                                    
+                                    </div>
+                                    <div class="col-xs-3">
+                                      {%  if item.errors %}   
+                                        <div class="alert alert-warning">{{ item.errors }}</div>
+                                      {% endif %}  
+                                    </div>
+                                  </div>
+
+                                {% else %}
+                                  {{item}}
+                                {% endif %}
+                              {% endfor %}
+
+                            {% if not object %}
+                            <div class="row form form-group">
+                                  <div class="col-xs-3">
+                                    <div class="form-label">
+                                      <button id="jornada_especial" type="button" class="btn btn-success">+</button>   
+                                    </div>
+                                  </div>
+                                  <div class="col-xs-6">
+                                    <div class="alert alert-info">Para crear una jornada especial, ingresa la fecha de fin del último partido.</div>
+                                  </div>
+                                  <div class="col-xs-3">
+                                     
+                                  </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="row form form-group">
+
+                                <div class="col-xs-3">
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="alert alert-info">Los campos con (*) son obligatorios</div>
+                                </div>
+                                <div class="col-xs-3">
+                                </div>
+
+                            </div>
+
+                            </div>
+                          </div>
+                          <div class="panel-footer panel-shadow">
+                              <div class="col-xs-3"></div>
+                              <div class="col-xs-6">
+                                <p>
+                                    {% if object %}
+                                      <button class='btn btn-success' type='submit' value="_save" name="_save">
+                                        Actualizar
+                                      </button>
+                                    {% else %}
+                                      <button class='btn btn-default' type='submit' value="_addanother" name="_save">
+                                        Guardar y añadir otro
+                                      </button>
+                                      <button class='btn btn-success' type='submit' value="_save" name="_save">
+                                        Guardar
+                                      </button>
+                                    {% endif %}
+                                </p>
+                              </div>
+                              <div class="col-xs-3"></div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+            </div>
+{% endblock %}
+{% block js %}
+  <script>
+    
+    
+    $("#form_jornada").submit(function( event ) {
+      if( $("input[type='checkbox']:checked").length < 1){
+        alert("Debe activar almenos un tipo de apuesta para la jornada."); 
+        return false
+      }
+    });
+
+    $('#id_fechaini').datetimepicker({
+      format:'d/m/Y',
+      onShow:function( ct ){
+
+        fecha = $('#id_fechafin').val().split("/")
+        fecha = fecha[2]+"/"+fecha[1]+"/"+fecha[0]
+
+        this.setOptions({
+          maxDate:$('#id_fechafin').val()?fecha:false
+        })
+      },
+      timepicker:false
+    });
+
+    $('#id_fechafin').datetimepicker({
+      format:'d/m/Y',
+      onShow:function( ct ){
+
+        fecha = $('#id_fechaini').val().split("/")
+        fecha = fecha[2]+"/"+fecha[1]+"/"+fecha[0]
+
+       this.setOptions({
+        minDate:$('#id_fechaini').val()?fecha:false
+       })
+      },
+      timepicker:false
+    });
+
+    $('#id_horajuego').datetimepicker({
+      format:'d/m/Y H:i',
+      onShow:function( ct ){
+
+        fecha = $('#id_fechaini').val().split("/")
+        fecha = fecha[2]+"/"+fecha[1]+"/"+fecha[0]
+
+       this.setOptions({
+        minDate:$('#id_fechaini').val()?fecha:false
+       })
+
+       fecha = $('#id_fechafin').val().split("/")
+        fecha = fecha[2]+"/"+fecha[1]+"/"+fecha[0]
+
+       this.setOptions({
+        maxDate:$('#id_fechafin').val()?fecha:false
+       })
+      }
+    });
+
+    var jornada_especial = false;
+
+    $("#jornada_especial").on("click",function(){
+      
+      if( jornada_especial == false){
+        $(".invisible").css({"display":"block"});
+        jornada_especial = true
+        $("#jornada_especial").html("-")
+      }else{
+        $(".invisible").css({"display":"none"});
+        jornada_especial = false
+        $("#jornada_especial").html("+")
+      }
+      
+    });
+
+    $('#id_deporte').on("change", torneosbydeporte);
+    $('#id_liga').on("change", temporadasbytorneo);
+
+    function torneosbydeporte() {
+        $("#id_liga").empty()
+        $("#id_liga").attr("disabled",true); 
+        $('#id_liga').trigger("chosen:updated");
+        
+        $("#id_temporadas").empty()
+        $("#id_temporadas").attr("disabled",true); 
+        $('#id_temporadas').trigger("chosen:updated");
+        
+        var id = $(this).val();
+        if ( id ){ 
+          dajax_jornadas( 
+              {'deporte': id, 'por_jornadas':true},
+              '{% url "admin_juego_torneos_by_deporte_ajax" %}' ,
+              'torneosbydeporte' 
+            )
+        }
+    }
+    function temporadasbytorneo() {
+        
+        $("#id_temporadas").empty()
+        $("#id_temporadas").attr("disabled",true); 
+        $('#id_temporadas').trigger("chosen:updated");
+
+        var id = $(this).val();
+        if ( id ){
+          dajax_jornadas( 
+            {'liga': id },
+            '{% url "admin_juego_temporadas_by_torneo_ajax" %}',
+            'temporadasbytorneo' 
+          )
+        }
+    }
+
+    function dajax_jornadas(data, url, process){
+      $.ajax({
+          data : data,
+          url : url,
+          type : 'get',
+          success : function(data_recibe){
+            if(process == "torneosbydeporte"){
+                
+                if(data_recibe.length > 0){
+
+                  $("#id_liga").append('<option value="0" >Selecciona Liga</option>');
+                  
+                  $.each(data_recibe, function(obj){
+                    $("#id_liga").append('<option value="'+data_recibe[obj].pk+'">'+data_recibe[obj].nombre+'</option>');
+                  });
+
+                  $("#id_liga").attr("disabled",false); 
+                
+                }else{
+
+                  $("#id_liga").append('<option value="0" >No se encontraron datos, selecciona otro deporte</option>');
+                
+                }
+
+                $("#id_liga").trigger("chosen:updated");
+              
+            }
+            if(process == "temporadasbytorneo"){
+              
+              if(data_recibe.length > 0){
+                
+                $("#id_temporadas").append('<option value="0" >Selecciona Temporada</option>');
+                $.each(data_recibe, function(obj){
+                  $("#id_temporadas").append('<option value="'+data_recibe[obj].pk+'">'+data_recibe[obj].nombre+'</option>');
+                });
+                $("#id_temporadas").attr("disabled",false);
+
+              }else{
+                $("#id_temporadas").append('<option value="0" >No se encontraron datos, selecciona otra torneo</option>');
+              }
+              
+              $("#id_temporadas").trigger("chosen:updated");
+
+            }
+          },
+          error : function(xhr,errmsg,err) {
+            alert(xhr.status + ": " + xhr.responseText);    
+          }
+        });
+    }
+
+    
+    function verificar_quiniela(){
+      var band = $("#id_quiniela").is(':checked');
+      if (band){
+        $(".count_encuentros").slideDown("slow");
+        $(".monto_inicial").slideDown("slow");
+        $(".valor").slideDown("slow");
+      }
+      else{
+        $(".count_encuentros").slideUp( "slow", function(){ });
+        $(".monto_inicial").slideUp( "slow", function(){ });
+        $(".valor").slideUp( "slow", function(){ });
+      }
+    }
+    $('#id_quiniela').on("change", verificar_quiniela);
+
+    verificar_quiniela();
+
+    $.urlParam = function(name){
+      var results = new RegExp('[\?&]' + name + '=([^#]*)').exec(window.location.href);
+      if (results==null){
+         return null;
+      }
+      else{
+         return results[1] || 0;
+      }
+    }
+
+    if ($.urlParam('next') != null){
+      var input = $("<input>").attr("type", "hidden").attr("name", "next").val($.urlParam('next'));
+      $('#form_jornada').append($(input));
+    }
+
+  </script>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% block content_dia %}
+<h3 class="title right">
+ Fecha de trabajo: 
+ <span class="link-red">
+ {% with dia_trabajo=info_user.comercializadora.get_dia_trabajo %}
+   {% if dia_trabajo %}
+    {{ dia_trabajo.dia.fecha|date:"l" }}, {{ dia_trabajo.dia.fecha }}
+   {% else %}
+    No hay fecha asignada
+  {% endif %}
+ {% endwith %}
+ </span>
+</h3>
+{% endblock %}

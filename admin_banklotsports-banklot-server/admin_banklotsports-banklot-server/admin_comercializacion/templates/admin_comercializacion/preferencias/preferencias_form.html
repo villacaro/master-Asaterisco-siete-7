@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+
+{% load principal_tags %}
+
+<div class="row">
+    <div class="col-xs-12">
+       <div class="page-toolbar page-toolbar-default">
+            <div class="page-toolbar-body page-toolbar-border">
+                <h1><i class="icon-tune"></i> Preferencias {{cadena}}</h1>
+                <p class="subtitle">
+                  {% if object %}
+                    {% trans "Editar" %}
+                  {% else %}
+                    {% trans "Actualizar" %}
+                  {% endif %}</p>
+            </div>
+            <div class="page-toolbar-footer page-toolbar-shadow">
+                <ul class="breadcrumb">
+                    <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                    <li><a href="#"><i class="icon-tune"></i> Preferencias {{cadena}}</a>
+                    </li>
+                    <li>
+                      {% if object %}
+                      <i class="icon-pencil-1"></i> Editar
+                      {% else %}
+                      <i class="icon-plus-1"></i> Actualizar
+                      {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+               
+
+    <div class="container">
+      <div class="container-margin">
+        <form id="form_preferencias" action='' method='post' encoding='utf-8'>{% csrf_token %}
+          <div class="col-xs-12">
+            <div class="panel panel-default">
+              <div class="panel-body panel-head-border">
+                <h3 align="center">{{object.get_comercializadora}}</h3>
+                <div class="form-margin">
+                  
+                    <div class="row form form-group">
+                      <div class="col-xs-1 form-group ">
+                      </div>
+                      <div class="col-xs-3 form-group "> 
+                        <strong>Preferencia</strong>
+                      </div>
+                      <div class="col-xs-4 form-group "> 
+                        <strong>Valor</strong>
+                      </div>
+                      <div class="col-xs-1 form-group ">
+                        {% if object.distribute %}
+                          <strong>Distribuir</strong> 
+                        {% endif %}
+                      </div>
+                      <div class="col-xs-1 form-group ">
+                        {% if object.heredity %}
+                          <strong>Herencia</strong>
+                        {% endif %}
+                      </div>
+                      <div class="col-xs-1 form-group ">
+                        <strong>Editar</strong>
+                      </div>
+                     
+                    </div>
+                  
+                        
+                          
+                      {% for form in forms%}
+                          {% for item in form%}
+                            {% if form.divide == 3 %}
+                              {% cycle "1" "2" "3" "4" as ciclo silent %}
+                            {% endif %}
+                            {% if form.divide == 2 %}
+                              {% cycle "1" "2" "3" as ciclo silent %}
+                            {% endif %}
+                            {% if ciclo == "1" %}
+                              <div class="row form form-group">
+                                <div class="col-xs-4 form-group ">
+                                  <div id="color_{{ item.name }}" class="form-label">{{ item.label }}</div>
+                                </div>
+                                <div class="col-xs-4 form-group {%  if item.errors %}alert alert-warning {%  endif %}">
+                                  {{ item }}
+                                  {%  if item.errors %} 
+                                    {{ item.errors}}
+                                  {% endif %}
+                                </div>
+                            {% endif %}
+                            {% if ciclo == "2" %}
+                             
+                              {% if form.divide == 2 %}
+                                  <div class="col-xs-1 form-group">
+                                  </div>
+                                  <div class="col-xs-1 form-group">
+                                    {{ item }}
+                                  </div>
+                              {% else %}
+                                <div class="col-xs-1 form-group">
+                                    {{ item }}
+                                  </div>
+                              {% endif %}
+                            {% endif %}
+                            {% if ciclo == "3" %}
+                              {% if form.divide == 2 %}
+                                <div class="col-xs-1 form-group">
+                                    {{ item }}
+                                  </div>
+                                </div>
+                              {% else %}
+                                <div class="col-xs-1 form-group">
+                                  {{item}}
+                                </div>
+                              {% endif %}
+                              
+                            {% endif %}
+                            {% if ciclo == "4" %}
+                              <div class="col-xs-1 form-group">
+                                  {{item}}
+                              </div>
+                              </div>
+                            {% endif %}
+                              
+
+                        {% endfor %}
+
+                     
+                    {% endfor %}
+                  </div>
+                </div>
+              <div class="panel-footer panel-shadow">
+                  <div class="col-xs-3"></div>
+
+                  <div class="col-xs-4">
+                    <div class="alert alert-info container-margin">
+                      <input class='btn' type="checkbox" onchange="HabilitarDesabilitarSeguridad()">
+                        Esta configuración afectará todos las comercializadoras de niveles inferiores
+                      </input>
+                      <script type="text/javascript">
+                        activo = false;
+                        function HabilitarDesabilitarSeguridad(){
+                          
+                          if(activo){
+                            $("#guardaraccion").attr('disabled','disabled');
+                            $("#guardaraccion").removeClass("btn-success");
+                            activo = false;
+                          }
+                          else{
+                            activo = true;
+                            $("#guardaraccion").removeAttr('disabled');
+                            $("#guardaraccion").addClass("btn-success");
+                          }
+                        }        
+                      </script>
+                    </div>
+                  </div>
+                  <div class="col-xs-5">
+                     <div class="container-margin">
+                        <button id="guardaraccion" disabled class='btn ' type='submit' value="_save" name="_save">
+                          Actualizar
+                        </button>
+                    </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+</div>
+{% endblock %}
+
+
+
+
+
+{% block js %}
+  <script type="text/javascript">
+
+
+  /*
+  $( document ).ready(function() {
+    try {
+      var section = $('.alert-warning').parent().parent();
+      ids = section.attr('id').split('-');
+      $("#tabs-t-"+ids[2]).get(0).click();
+    }
+    catch(err) {
+        console.log('No pasa nada');
+    }
+    $("#tabs-p-0").attr('style','left: 0px; display: block;')
+  });
+*/
+
+  function HabilitarDesabilitar(name){
+    if( $("#"+name).prop("checked") ){
+      $("#id_"+name).removeAttr('disabled');
+      $("#id_heredity-"+name+":visible").removeAttr('disabled');
+      $("#id_distribute-"+name+":visible").removeAttr('disabled');
+
+      $("#color_"+name).addClass("link-green");
+
+      $("#id_"+name).trigger("chosen:updated");
+    }
+    else{
+        $("#id_"+name).attr('disabled','disabled');
+        $("#id_distribute-"+name).attr('disabled','disabled');
+        $("#id_heredity-"+name).attr('disabled','disabled');
+        $("#color_"+name).removeClass("link-green");
+
+        $("#id_"+name).trigger("chosen:updated");
+    }
+  }
+
+  function Habilitar(name){
+      $("#id_"+name).removeAttr('disabled');
+      $("#"+name).prop("checked",true);
+      $("#id_distribute-"+name+":visible").removeAttr('disabled');
+      $("#id_heredity-"+name+":visible").removeAttr('disabled');
+      $("#color_"+name).addClass("link-green");
+      $("#id_"+name).trigger("chosen:updated");  
+  }
+
+  {% if form.errors %}
+    {% for error in form.errors %}
+      Habilitar('{{error}}');
+    {% endfor %}
+  {% endif %}
+
+  /*
+  $("#tabs").steps({
+    headerTag: "h3",
+    bodyTag: "section",
+    transitionEffect: "slideLeft",
+    enableFinishButton: false,
+    enablePagination: false,
+    enableAllSteps: true,
+    titleTemplate: "#title#",
+    cssClass: "tabcontrol"
+  });*/
+
+   $( "#form_preferencias" ).submit(function( event ) {
+      resp = confirm("Esta configuración afectará todos las comercializadoras de niveles inferiores, ¿Desea continuar?")
+      return resp
+    });
+
+</script>
+{% endblock %}

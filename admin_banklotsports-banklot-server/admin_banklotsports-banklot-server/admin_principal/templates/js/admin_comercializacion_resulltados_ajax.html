@@ -1,0 +1,106 @@
+<script type="text/javascript">
+  
+$(document).on("ready",page);
+
+function page(e)
+{	
+  if( $("#id_operadora").length ){
+     $("#id_operadora").on("change",consultar_bloques);
+  }
+
+  if( $("#id_bloque").length ){
+	   $("#id_bloque").on("change",consultar_bancas);
+  }
+
+}
+
+function consultar_bloques(){
+  if( $("#id_bloque").length ){ 
+    
+    $("#id_bloque").empty();
+    $("#id_bloque").attr("disabled",true); 
+    $("#id_bloque").trigger("chosen:updated");
+
+    if( $("#id_banca").length ){
+
+      $("#id_banca").empty();
+      $("#id_banca").attr("disabled",true); 
+      $("#id_banca").trigger("chosen:updated");
+
+    }
+
+    if( $("#id_operadora").val() ){
+        dajax_comercializacion(
+          {
+                  "operadora": $("#id_operadora").val(),
+                  "resultados": true,
+                },
+          '{% url "admin_comercializacion_bloques_by_operadora_ajax" %}',
+          "id_bloque"
+        );
+    }
+  }
+}
+
+function consultar_bancas(){
+
+  if( $("#id_banca").length ){
+
+    	$("#id_banca").empty();
+    	$("#id_banca").attr("disabled",true); 
+    	$("#id_banca").trigger("chosen:updated");
+
+    	if( $("#id_bloque").val() ){
+    		dajax_comercializacion(
+    			{
+                	"bloque": $("#id_bloque").val(),
+                  "resultados": true,
+              	},
+    			'{% url "admin_comercializacion_bancas_by_bloque_ajax" %}',
+    			"id_banca"
+    		);
+      }
+  }
+}
+
+function dajax_comercializacion(data, url, process_id){
+  $.ajax({
+      data : data,
+      url : url,
+      type : 'get',
+      success : function(data_recibe){
+	    //alert(JSON.stringify( data ))
+
+	    if(data_recibe.length > 0){
+          verbose = process_id.split("_")[1].capitalize()
+
+          $("#"+process_id).append('<option value="" >Seleccione '+verbose+'</option>');
+          
+          $.each(data_recibe, function(obj){
+            $("#"+process_id).append('<option value="'+data_recibe[obj].pk+'">'+data_recibe[obj].nombre+'</option>');
+          });
+
+          $("#"+process_id).attr("disabled",false); 
+        
+        }else{
+
+          $("#"+process_id).append('<option value="">No hay comercializadoras con resultados asociados</option>');
+        
+        }
+
+        $("#"+process_id).trigger("chosen:updated");
+	
+
+      },
+      error : function(xhr,errmsg,err) {
+        console.log("#================ERROR=====================")
+        console.log( xhr )
+        console.log( errmsg )
+        console.log( err )
+        console.log("#==========================================") 
+      }
+    });
+}
+
+
+</script>

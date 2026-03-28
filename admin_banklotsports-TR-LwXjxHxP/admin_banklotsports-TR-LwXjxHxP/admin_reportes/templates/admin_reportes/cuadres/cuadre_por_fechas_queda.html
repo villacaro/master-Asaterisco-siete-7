@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+{% load humanize %}
+
+
+{% block content %}
+
+{% include 'js/admin_comercializacion_ajax.html' %}
+              
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-equalizer"></i> Cuadre por fechas</h1>
+                            <p class="subtitle">Lista</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><i class="icon-documents"></i> Reportes</li>
+                                <li><i class="icon-equalizer"></i> Cuadre por fechas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="container">
+                  <div class="container-margin">
+
+                    <form id="form_filter" action='#' method='post' encoding='utf-8'>
+                      {% csrf_token %}
+
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                        <div class="panel-head">
+                          <div class="title "><p>Busqueda</p></div>
+                        </div>
+                        <div class="panel-body">
+                          <div class="form">
+                            <div class="row">
+                              {% with cant=form_cadena.fields|length %}
+                              {% for item in form_cadena %}
+                                {% if item.is_hidden == 0 %}
+                                  <div class="column hd-{% if cant == 2 %}6{% elif cant == 3 %}4{%else%}3{% endif %} lg-6 md-12">
+                                    <div class="row form form-group">
+                                      <div class="column md-4 sm-12">
+                                        <div class="form-label">{{ item.label }}</div>
+                                      </div>
+                                      <div class="column md-8 sm-12">
+                                        {{ item }}
+                                      </div>
+                                    </div>
+                                  </div>
+                                {% else %}
+                                  {{ item }}
+                                {% endif %}
+                              {% endfor %}
+                              {% endwith %}
+                            </div>
+                            <div class="row">
+                              <div class="column hd-6">
+                                <div class="row form form-group">
+                                  <div class="column sm-12">
+                                    {{ form_fecha.tipo_opcion.0 }}
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="column hd-6">
+                                <div class="row">
+                                  <div class="column hd-6 lg-12">
+                                    <div class="row form form-group">
+                                      <div class="column md-4 sm-12">
+                                        <div class="form-label">{{ form_fecha.fecha_opcion.label }}</div>
+                                      </div>
+                                      <div class="column md-8 sm-12">
+                                        {{ form_fecha.fecha_opcion }}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="column hd-6">
+                                <div class="row form form-group">
+                                  <div class="column sm-12">
+                                    {{ form_fecha.tipo_opcion.1 }}
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="column hd-6">
+                                <div class="row">
+                                  <div class="column hd-6 lg-12">
+                                    <div class="row form form-group">
+                                      <div class="column md-4 sm-12">
+                                        <div class="form-label">{{ form_fecha.fecha_inicio.label }}</div>
+                                      </div>
+                                      <div class="column md-8 sm-12">
+                                        {{ form_fecha.fecha_inicio }}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div class="column hd-6 lg-12">
+                                    <div class="row form form-group">
+                                      <div class="column md-4 sm-12">
+                                        <div class="form-label">{{ form_fecha.fecha_fin.label }}</div>
+                                      </div>
+                                      <div class="column md-8 sm-12">
+                                        {{ form_fecha.fecha_fin }}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="panel-footer panel-shadow">
+                              <div class="col-xs-12">
+                                <p>
+                                  <button type="submit" class='btn btn-primary'>
+                                    Buscar
+                                  </button>
+                                </p>
+                              </div>
+                        </form>
+                          </div>
+                      </div>
+                    </div>
+                   
+                      {% if consulta %}
+                      <div class="col-xs-12">
+                        <div class="panel panel-default ">
+                            <div class="panel-head">
+                              
+                              <div class="title left">
+                                
+                                <a id="atras" href="#" class='btn btn-mini' >
+                                    <span class="">←</span> Atras
+                                </a> 
+                                {% if consulta.object %}
+                                  <i class="icon-clock-8">
+                                    <span>
+                                      Aplican cortes de frecuencia:
+                                      {{consulta.object.get_frecuencia_queda_display}}
+                                    </span>
+                                  </i>
+                                {% endif %}
+
+                              </div>
+                              <div class="title right">
+                                  {% if cache_key %}
+                                  <a class="btn btn-mini btn-pdf" target="_blank" href="{% url 'admin_reportes_cuadre_por_fechas_queda_print_pdf' cache_key=cache_key %}">
+                                    <i class="icon-print"></i>PDF
+                                  </a>  
+                                  {% endif %}
+                                </div>
+
+                                <div class="title right">
+                                  {% if cache_key %}
+                                    <a class="btn btn-mini btn-excel" target="_blank" href="{% url 'admin_reportes_cuadre_por_fechas_queda_print_csv' cache_key=cache_key %}"><i class="icon-download"></i>EXCEL
+                                    </a>
+                                  {% endif %}
+                                </div>
+                            </div>
+                            <div class="panel-body panel-body-border panel-shadow" >
+                              <table class='table table-data table-striped table-panel table-small table-hover'>
+                                <thead>
+                                  {% for title in titles %}
+                                  <th width="{{ title.width }}" title="{{ title.title }}">
+                                    {{ title.text }}
+                                  </th>
+                                  {% endfor %}
+                                </thead>
+                                
+                                <tfoot>
+                                  <tr>
+                                    {% for total in consulta.totales %}
+                                      <td class="text-align-right ">
+                                        {{ total }}
+                                      </td>
+                                    {% endfor %}
+                                  </tr>
+                                </tfoot>
+                                
+                                <tbody>
+                                  {% for row in consulta.detalle %}
+                                  <tr>
+                                    {% for item in row.pertenece %}
+                                      
+                                      {% if row.is_corte %}
+                                        <td class="{{item.class}}" style="background-color:{{row.color}}" title="{{item.title}}">
+                                      {% else %}
+                                        <td class="{{item.class}}" title="{{item.title}}">
+                                      {% endif %}
+
+                                        {% if item.html %}
+                                          {{ item.val|safe }}
+                                        {% else %}
+
+                                            {% if item.val = 0 %}
+                                              0
+                                            {% else %}
+                                              {{ item.val|intcomma }}
+                                            {% endif %}
+                                        {% endif %}
+                                      </td>
+                                    
+                                    {% endfor %}
+                                  </tr>
+                                  {% endfor %}
+                                </tbody>
+                              </table>
+                            </div>
+                        </div>
+                      </div>
+                      {% endif %}
+                      
+                    
+                    </div>
+                  </div>
+                </div>
+                
+            
+
+
+
+{% endblock %}
+
+{% block js %}
+<script>
+
+   $('#id_fecha_inicio').datetimepicker({
+    format:'Y-m-d',
+    lang:'es',
+    onShow:function( ct ){
+
+      fecha = $('#id_fecha_fin').val().split("-")
+      fecha_max = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+
+     this.setOptions({
+      maxDate:$('#id_fecha_fin').val()?fecha_max:false
+     })
+
+    },
+    onChangeDateTime:function(dp,$input){
+    
+      //$('#id_fecha_fin').val( $('#id_fecha_inicio').val() )
+
+    },
+    timepicker:false
+   });
+
+   $('#id_fecha_fin').datetimepicker({
+    format:'Y-m-d',
+    lang:'es',
+    onShow:function( ct ){
+
+      fecha = $('#id_fecha_inicio').val().split("-")
+      fecha_min = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+      if ( parseInt(fecha[1]) == 12 ){
+        fecha[0] = parseInt( fecha[0] ) + 1
+        fecha[1] = 1
+      }
+      else{
+        fecha[1] = parseInt( fecha[1] ) + 1
+      }
+      fecha_max = fecha[0]+"/"+fecha[1]+"/"+fecha[2]
+
+     this.setOptions({
+      minDate:$('#id_fecha_inicio').val()?fecha_min:false,
+      maxDate:$('#id_fecha_inicio').val()?fecha_max:false
+     })
+
+    },
+    timepicker:false
+   });
+
+
+   $('#id_fecha_opcion').change(function() {
+      valores = $(this).val().split("_")
+      $('#id_fecha_inicio').val(valores[0])
+      $('#id_fecha_fin').val(valores[1])
+    });
+
+   function validar_selectores(){
+       if($("form input[name='tipo_opcion']:checked").val()=="del"){
+          $('#id_fecha_inicio').attr('disabled', 'disabled');
+          $('#id_fecha_fin').attr('disabled', 'disabled');
+          $('#id_fecha_opcion').removeAttr('disabled');
+       }
+       else{
+          $('#id_fecha_inicio').removeAttr('disabled');
+          $('#id_fecha_fin').removeAttr('disabled');
+          $('#id_fecha_opcion').attr('disabled', 'disabled');
+       }
+
+       $("#id_fecha_opcion").trigger("chosen:updated");
+    }
+
+    $( "#form_filter" ).submit(function( event ) {
+      $('#id_fecha_inicio').removeAttr('disabled');
+      $('#id_fecha_fin').removeAttr('disabled');
+      return true;
+    });
+
+    $(".select-periodo").on("change",validar_selectores);
+   
+    $("#atras").click(function(event) {
+      event.preventDefault();
+      history.back();
+    }); 
+  
+    validar_selectores();  
+
+</script>
+{% endblock %}

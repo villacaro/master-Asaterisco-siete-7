@@ -1,0 +1,171 @@
+{% load i18n %}
+{% load humanize %}
+<div class="col-xs-12">
+  <div class="panel panel-default">
+    <div class="panel-head">
+          <div class="title left">
+              <p>
+                Datos de la jornada
+              </p>
+            </div>
+
+            {% if object.get_url_historic %}
+            <div class="title right">
+              <a class='btn btn-success' href='{{object.get_url_historic}}'>
+                <i class="icon-history"></i>
+                {% trans "Ver historico" %}
+              </a>
+            </div>
+            {% endif %}  
+    </div>
+    <div class="panel-body panel-body-border panel-shadow">
+    <table class='table'>      
+      <thead>
+            <tr>
+              <th>
+                {% trans "Dato" %}
+              </th>
+              <th>
+                {% trans "Valor" %}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td>
+                ID
+              </td>
+              <td>{{ object.pk }}</td>
+            </tr>
+
+            <tr>
+              <td>
+                Jornada
+              </td>
+              <td>{{ object.jornada }}</td>
+            </tr>
+            
+            <tr>
+              <td>
+                Torneo (Temporada)
+              </td>
+              <td><span class="tag tag-blue">{{ object.temporadas.torneo }}</span><span class="tag">{{ object.temporadas }}</span></td>
+            </tr>
+            
+            <tr>
+              <td>
+                Fecha de inicio
+              </td>
+              <td>{{ object.fechaini }}</td>
+            </tr>
+            
+            <tr>
+              <td>
+                Fecha de fin
+              </td>
+              <td>{{ object.fechafin }}</td>
+            </tr>
+            
+            <tr>
+              <td>
+                Acepta parley
+              </td>
+              <td>
+                {% if object.parley %}
+                  Si
+                {% else %}
+                  No
+                {% endif %}
+            </tr>
+
+            <tr>
+              <td>
+                Acepta quiniela
+              </td>
+              <td>
+                {% if object.quiniela %}
+                  Si
+                {% else %}
+                  No
+                {% endif %}
+            </tr>
+
+            {% if object.quiniela %}
+            <tr>
+              <td>
+                Número de encuentros
+              </td>
+              <td>
+                  {{ object.count_encuentros }} encuentro(s) por ticket
+                  Monto inicial de {{ object.monto_inicial }}
+            </tr>
+
+            <tr>
+              <td>
+                Monto de base inicial
+              </td>
+              <td>
+                  {{ object.monto_inicial }} Bs
+            </tr>
+
+            <tr>
+              <td>
+                Valor por ticket
+              </td>
+              <td>
+                  {{ object.valor }} Bs
+            </tr>
+            {% endif %}
+
+            <tr>
+              <td>
+                Acepta apuesta simple
+              </td>
+              <td>
+                {% if object.apuestasimple %}
+                  Si
+                {% else %}
+                  No
+                {% endif %}
+            </tr>
+
+            <tr>
+              <td>
+                Deporte
+              </td>
+              <td><span class="tag tag-green">{{ object.temporadas.torneo.deporte }}</span></td>
+            </tr>
+
+            <tr>
+              <td>
+                Status
+              </td>
+              <td>{{ object.status }}</td>
+            </tr>
+
+            <tr>
+              <td>
+                Creado
+              </td>
+              <td title="{{ object.created_at }}">
+                <i class="icon-clock"><i>
+                {{ object.created_at|naturaltime }}
+              </td>
+            </tr>
+            
+            <tr>
+              <td>
+                Actualizado
+              </td>
+              <td title="{{ object.updated_at }}">
+                <i class="icon-clock"><i>
+                {{ object.updated_at|naturaltime }}
+              </td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>

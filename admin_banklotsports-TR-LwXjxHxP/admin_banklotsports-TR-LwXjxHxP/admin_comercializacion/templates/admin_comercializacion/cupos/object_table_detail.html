@@ -1,0 +1,93 @@
+{% load i18n %}
+{% load humanize %}
+
+                  <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-head">
+                          <div class="title left">
+                                <p>
+                                  Detalle del cupo
+                                </p>
+                              </div>
+
+                              {% if object.get_url_historic %}
+                              <div class="title right">
+                                <a class='btn btn-success' href='{{object.get_url_historic}}'>
+                                  <i class="icon-history"></i>
+                                  {% trans "Ver historico" %}
+                                </a>
+                              </div>
+                              {% endif %}
+                        </div>
+                        <div class="panel-body panel-body-border panel-shadow">
+                          <table class='table'>
+                            <thead>
+                              <tr>
+                                <th>
+                                  {% trans "Dato" %}
+                                </th>
+                                <th>
+                                  {% trans "Valor" %}
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                               <tr>
+                                <td>
+                                  ID
+                                </td>
+                                <td>{{ object.pk }}</td>
+                              </tr>
+
+                              <tr>
+                                <td>
+                                  {{ object.get_object.get_verbose_name }}
+                                </td>
+                                <td>{{ object.get_object }}</td>
+                              </tr>
+
+                              <tr>
+                                <td>
+                                  Monto diario venta
+                                </td>
+                                <td>{{ object.monto_diario|intcomma }} Bs</td>
+                              </tr>
+
+                              <tr>
+                                <td>
+                                  Monto diario premio
+                                </td>
+                                {% if  object.monto_premio%}
+                                <td>{{ object.monto_premio|intcomma }} Bs</td>
+                                {% else %}
+                                <td>No asignado</td>
+                                {% endif %}
+                              </tr>
+
+                              <tr>
+                                <td>
+                                  Asignado
+                                </td>
+                                <td title="{{ object.fecha_inicio }}">
+                                  <i class="icon-clock"><i>
+                                  {{ object.fecha_inicio|naturaltime }}
+                                </td>
+                              </tr>
+
+                              {% if object.fecha_fin %}
+                              <tr>
+                                <td>
+                                  Caducado
+                                </td>
+                                <td title="{{ object.fecha_fin }}">
+                                  <i class="icon-clock"><i>
+                                  {{ object.fecha_fin|naturaltime }}
+                                </td>
+                              </tr>
+                              {% endif %}
+                              
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                  </div>

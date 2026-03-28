@@ -1,0 +1,353 @@
+ {% extends 'base.html' %}
+
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-ticket"></i> Tickets</h1>
+                            <p class="subtitle">Detalle</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><a href="{% url 'admin_reportes_tickets_list' %}"><i class="icon-ticket"></i> Tickets</a></li>
+                                <li><i class="icon-info"></i> Detalle</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+
+                        <div class="col-xs-12">
+                        <div class="panel panel-default">
+                          <div class="panel-head">
+                            
+                            <div class="title left">
+                                 <a id="atras" href="#" class='btn btn-mini' >
+                                    <span class="">←</span> Atras
+                                 </a> 
+                            </div>
+
+                            <div class="title left">
+                                 <p>Ticket {{ object.pk }}</p>
+                            </div>
+
+                          </div>
+                          <div class="panel-body panel-body-border panel-shadow">
+                            <table class='table'>
+                              <thead>
+                                <tr>
+                                  <th>
+                                    {% trans "Dato" %}
+                                  </th>
+                                  <th>
+                                    {% trans "Valor" %}
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                
+                                <tr>
+                                  <td>
+                                    Referencia
+                                  </td>
+                                  <td>{{ object.pk }}</td>
+                                </tr>
+
+                                 <tr>
+                                  <td>
+                                    Operadora
+                                  </td>
+                                  <td>{{ object.user.taquilla.agencia.distribuidores.banca.bloque.operadora.nombre }}</td>
+                                </tr>
+                                <tr>
+                                  <td>
+                                    Bloque
+                                  </td>
+                                  <td>{{ object.user.taquilla.agencia.distribuidores.banca.bloque.nombre }}</td>
+                                </tr>
+                                <tr>
+                                  <td>
+                                    Banca
+                                  </td>
+                                  <td>{{ object.user.taquilla.agencia.distribuidores.banca.nombre }}</td>
+                                </tr>
+                                <tr>
+                                  <td>
+                                    Distribuidor
+                                  </td>
+                                  <td>{{ object.user.taquilla.agencia.distribuidores.nombre }}</td>
+                                </tr>
+                                <tr>
+                                  <td>
+                                    Agencia
+                                  </td>
+                                  <td>{{ object.user.taquilla.agencia.nombre }}</td>
+                                </tr>
+                                <tr>
+                                  <td>
+                                    Taquilla
+                                  </td>
+                                  <td>{{ object.user.taquilla.taquilla }}</td>
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    Tipo de ticket
+                                  </td>
+                                  <td>{{ object.ticket_type.nombre }}</td>
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    Monto
+                                  </td>
+                                  <td>{{ object.monto }}</td>
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    Monto premio
+                                  </td>
+                                  <td>{{ object.get_monto_premio }}</td>
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    Posible monto ganancia
+                                  </td>
+                                  <td>{{ object.monto_ganancia }}</td>
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    Fecha
+                                  </td>
+                                  <td>{{ object.fecha|date }}</td>
+                                </tr>
+                                
+                                <tr>
+                                  <td>
+                                    Hora
+                                  </td>
+                                  <td>{{ object.fecha|time }}</td>
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    Estatus
+                                  </td>
+                                  <td>{{ object.get_status }}</td>
+                                </tr>
+
+                                <tr>
+                                  <td>
+                                    Cantidad de apuestas
+                                  </td>
+                                  <td>{{ object.ticketsdetail_set.count }}</td>
+                                </tr>                                                              
+                                
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                        </div>
+
+                        <div class="col-xs-12">
+                            <div class="panel panel-default">
+                                <div class="panel-head">
+                                  <p>Detalle del ticket {{ object.pk }}</p>
+                                </div>
+                                <div class="panel-body panel-body-border panel-shadow">
+                                    <table class='table table-data table-striped table-panel table-small table-hover'>
+                                      <thead>
+                                        <tr>
+
+                                          <th>Detalle</th>
+                                          <th>Deporte</th>
+                                          <th>Torneo - Temporada</th>
+                                          <th>Encuentro</th>
+                                          <th>Fecha</th>
+                                          <th>Hora</th>
+                                          <th>Equipos</th>
+
+                                          <th>Jugada</th>
+                                          <th>Grupo</th>
+                                          
+                                          <th>Modalidad</th>
+                                          <th>Condicion</th>
+
+                                          <th>{{object.get_verbose_column_type}}</th>
+                                          <th>Estatus</th>
+                                          
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {% for obj in object.ticketsdetail_set.all %}
+                                          <tr>
+                                              <td>
+                                                {{ obj.pk }}
+                                              </td>
+                                              
+                                              <td>
+                                                {{ obj.jugada.encuentros_modalidad.encuentro.jornada.temporadas.torneo.deporte }}
+                                              </td>
+                                              
+                                              <td>
+                                                {{ obj.jugada.encuentros_modalidad.encuentro.jornada.temporadas.torneo }}
+                                                -
+                                                {{ obj.jugada.encuentros_modalidad.encuentro.jornada.temporadas }}
+                                              </td>
+                                              
+
+                                              <td>
+
+                                                {% with encuentro=obj.jugada.encuentros_modalidad.encuentro%}
+                                                  <a class="link" href='{{ encuentro.get_absolute_url }}'>
+                                                   {{ encuentro.pk }}
+                                                  </a>
+                                                {% endwith %}
+                                                 
+                                              </td>
+
+                                              <td>
+                                                {{ obj.jugada.encuentros_modalidad.encuentro.horajuego|date }}
+                                              </td>
+
+                                              <td>
+                                                {{ obj.jugada.encuentros_modalidad.encuentro.horajuego|time }}
+                                              </td>
+
+                                              <td>
+                                                {% for equipo in obj.jugada.encuentros_modalidad.encuentro.encuentrosdetail_set_order %}
+                                                  <span class="tag tag-light-green">
+                                                    {{ equipo.equipos_temporadas.equipo }}
+                                                  </span> 
+                                                {% endfor %}
+
+                                              </td>
+
+                                              <td>
+                                                {{ obj.jugada.pk }}
+                                              </td>
+                                              
+                                              <td>
+                                                {{ obj.jugada.encuentros_modalidad.modalidad_grupo.grupo }}
+                                              </td>
+
+                                              <td>
+                                                {{ obj.jugada.condicion.modalidad.modalidad }}
+
+                                                {% if obj.jugada.condicion.modalidad.etiqueta_ref %}
+                                                  : {{ obj.modalidad_ref }}
+                                                {% endif %}
+                                              </td>
+
+                                              <td>
+                                                {{ obj.jugada.condicion.nombre }}
+                                                {% with pertenece=obj.jugada.get_pertenece %}
+                                                  {% if pertenece %}
+                                                  <span class="tag tag-light-green">
+                                                  {{ pertenece }}
+                                                  </span> 
+                                                  {% endif %}
+                                                {% endwith %}
+
+                                                {% if obj.jugada.condicion.etiqueta_ref %}
+                                                  : {{ obj.condicion_ref }}
+                                                {% endif %}
+
+                                              </td>
+
+                                              <td>{{ obj.get_valor_column_type }}</td>
+                                              <td>{{ obj.get_status }}</td>
+
+                                          </tr>
+                                        {% endfor %}
+                                      </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if object.get_clonados_exists %}
+                          <div class="col-xs-12">
+                            <div class="panel panel-default">
+                                <div class="panel-head">
+                                  <div class="title">Detalle de tickets clonados</div>
+                                </div>
+                                <div class="panel-body panel-body-border panel-shadow">
+                                    <table class='table table-data table-striped table-panel table-small table-hover'>
+                                        <thead>
+                                          <tr>
+                                            
+                                            <th>
+                                                Nro. Fact
+                                            </th>
+                                            <th>
+                                                Fecha y Hora
+                                            </th>
+                                            <th>
+                                                Monto Bs.
+                                            </th>
+                                            <th>
+                                                Posible ganancia Bs.
+                                            </th>
+                                            <th>
+                                                Premio Bs.
+                                            </th>
+                                            <th>
+                                                Estatus
+                                            </th>
+                                            
+                                          </tr>
+                                        </thead>
+
+                                         <tbody>
+                                          {% for object_clone in object.get_clonados_exists_and_ref %}
+                                            <tr>
+                                                <td>
+                                                  <a class="link" href='{{ object_clone.get_absolute_url }}'>
+                                                    {{ object_clone.pk }}
+                                                  </a>
+                                                </td>
+
+                                                <td>{{ object_clone.fecha|date:'d-m-Y P'}}</td>
+                                                
+                                                <td>{{ object_clone.monto }}</td>
+                                                <td>{{ object_clone.monto_ganancia }}</td>
+                                                <td>{{ object_clone.get_monto_premio }}</td>
+                                                <td>{{ object_clone.get_status }}</td>
+                                            
+                                            </tr>
+                                          {% endfor %}
+                                        </tbody>
+
+                                        
+                                      </table>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    
+                  </div>
+                  </div>
+                </div>
+            </div>
+
+  <script>
+
+    $("#atras").click(function(event) {
+      event.preventDefault();
+      history.back();
+    }); 
+
+ </script>
+
+{% endblock %}

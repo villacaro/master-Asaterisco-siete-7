@@ -1,0 +1,135 @@
+{% load i18n %}
+{% load humanize %}
+<div class="col-xs-12">
+  <div class="panel panel-default">
+    <div class="panel-head">
+                        <div class="title left">
+                            <p>
+                              Datos del mensaje
+                            </p>
+                          </div>
+
+                          {% if object.get_url_historic %}
+                          <div class="title right">
+                            <a class='btn btn-success' href='{{object.get_url_historic}}'>
+                              <i class="icon-history"></i>
+                              {% trans "Ver historico" %}
+                            </a>
+                          </div>
+                          {% endif %}
+    </div>
+    <div class="panel-body panel-body-border panel-shadow">
+    <table class='table'>      
+      <thead>
+            <tr>
+              <th width="15%">
+                {% trans "Dato" %}
+              </th>
+              <th width="55%">
+                {% trans "Valor" %}
+              </th>
+              <th width="30%">
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                De
+              </td>
+              <td>{{ object.message.from_comercializadora }}</td>
+              <td>
+              </td>
+            </tr>
+
+            {% with comercializadoras=object.message.messagesend.to_comercializadora.all %}
+            <tr>
+              <td>
+                Para
+              </td>
+              <td>{{ comercializadoras|length}} comercializadora(s)</td>
+              <td>
+                Forma de envío: {{ object.message.messagesend.get_options_display }}
+              </td>
+            </tr>
+            
+            {% for to in comercializadoras %}
+            <tr>
+              <td>
+              </td>
+              <td>
+                {{forloop.counter}}
+              </td>
+              <td>
+                {{ to }}
+              </td>
+            </tr>
+            {% endfor %}
+            {% endwith %}
+
+            <tr>
+              <td>
+                Asunto
+              </td>
+              <td>{{ object.message.subject }}</td>
+              <td>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                Mensaje
+              </td>
+              <td>
+                {{ object.message.body|safe }}
+              </td>
+              <td>
+              </td>
+            </tr>
+
+            {% with adjunts=object.message.adjunts.all %}
+            <tr>
+              <td>
+                Archivos adjuntos
+              </td>
+              <td>
+                {{ adjunts|length}} archivo(s)
+              </td>
+               <td>
+              </td>
+            </tr>
+
+            {% for adjunt in adjunts %}
+            <tr>
+              <td>
+              </td>
+              <td>
+                {{forloop.counter}}
+              </td>
+              <td>
+                <a target="_blank" class="link" href="{{MEDIA_URL}}{{adjunt.adjunt}}">
+                  {{ adjunt }}, {{adjunt.adjunt.size|filesizeformat}}
+                </a>
+                
+              </td>
+            </tr>
+            {% endfor %}
+            {% endwith %}
+            
+            <tr>
+              <td>
+                Enviado
+              </td>
+              <td title="{{ object.send_at }}">
+                <i class="icon-clock"><i>
+                {{ object.message.send_at|naturaltime }}
+              </td>
+               <td>
+              </td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
