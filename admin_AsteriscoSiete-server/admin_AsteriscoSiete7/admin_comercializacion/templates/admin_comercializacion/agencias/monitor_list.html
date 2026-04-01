@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+{% load humanize %}
+
+            {% include 'js/admin_comercializacion_ajax.html' %}
+
+  <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-store-mall-directory"></i>Monitor de Centros de apuesta</h1>
+                            <p class="subtitle">Monitor</p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><i class="icon-store-mall-directory"></i>Monitor de Centros de apuesta</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="container-margin">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-head">
+                        <p>Búsqueda</p>
+                    </div>
+                            <form id="form_filters" action='' method='get' encoding='utf-8'>
+                            <div class="panel-body panel-filters">
+                                <div class="row">            
+                                    <div class="col-xs-4">
+                                        <div class="form-margin">
+                                              {% for item in form %}
+                                                 <div class="row form form-group">
+                                                  <div class="col-xs-4">
+                                                    <div class="form-label">{{ item.label }}</div>
+                                                  </div>
+                                                  <div class="col-xs-8">
+                                                    {{ item }}
+                                                  </div>
+                                                </div>
+                                            {% endfor %}
+                                          </div>
+                                      </div>
+                                </div>
+                              </div>
+                              <div class="panel-footer panel-shadow">
+                                <div class="form-margin">
+                                  <div class="col-xs-12">
+                                    <p>
+                                      <button class='btn btn-large btn-success' >Buscar </button>
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </form>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="panel panel-default">
+                    <div class="panel-head">
+                          
+                        {% if  object_list %}
+                            <div class="title left">
+                              <p>
+                                <a href="#" id="atras" class="icon-left-circle-1">
+                                </a>
+                              </p>
+                            </div>
+                        {% endif %}
+
+                        <div class="title left">
+                          <p>
+                            {{ object_list.0.get_verbose_name_plural }}
+                          </p>
+                        </div>
+
+                         {% if object_list %}
+                          
+                            <div class="title right">
+                              <p>
+                                <a href="#" id="recargar" class="icon-cw-circle">
+                                </a>
+                              </p>
+                            </div>
+                         
+                         {% endif %}
+
+                    </div>
+                    <div class="panel-body panel-body-border panel-shadow">
+                        <table class='table table-data'>
+                          <thead>
+                            <tr>
+
+                                <th>N°</th>
+                                <th>{{ object_list.0.get_verbose_name }}</th>
+
+                                {% if not object_list.0.prefix_filter = "agencia" %}
+                                  <th>N° de centros de apuesta conectados</th>
+                                {% endif %}
+
+                                <th>N° de taquillas conectadas</th>
+                                
+                            </tr>
+                          </thead>
+                          <tfoot>
+                                  <tr>
+                                    <td>
+                                      <strong>
+                                        Total
+                                      </strong>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    {% with origen=object_list.0.get_origen %}
+                                    {% if not origen.prefix_filter = 'distribuidor'  %}
+                                    <td>
+                                      <strong>
+                                            {{ origen.get_agencias_conectadas }}
+                                      </strong>
+                                    </td>
+                                    {% endif %}
+                                    <td>
+                                      <strong>
+                                      {{ origen.get_taquillas_conectadas }}
+                                      </strong>
+                                    </td>
+                                    {% endwith %}
+                                  </tr>
+                          </tfoot>
+                          <tbody>
+                            {% for object in object_list %}
+                            <tr>
+                              {% with count_taquillas=object.get_taquillas_conectadas %}
+                              <td>{{forloop.counter}}</td>
+                              <td>
+                                {% if count_taquillas and not object.prefix_filter = 'agencia' %}
+                                  <a href="?{{ object.prefix_filter }}={{ object.pk }}" class="link">
+                                    {{ object }}
+                                  </a>
+                                {% else %}
+                                  {{ object }}
+                                {% endif %}
+
+                              </td>
+
+                              {% if not object.prefix_filter = 'agencia' %}
+                                <td>{{ object.get_agencias_conectadas }}</td>
+                              {% endif %}
+                              
+                              <td>{{ count_taquillas }}</td>
+                              {% endwith %}
+                            </tr>
+                            {% endfor %}
+
+                          </tbody> 
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+{% endblock %}
+{% block js %}
+<script>
+
+  $("#atras").click(function(event) {
+      event.preventDefault();
+      history.back();
+  }); 
+
+  $("#recargar").click(function(event) {
+      event.preventDefault();
+      location.reload();
+  });
+
+</script>
+{% endblock %}
+

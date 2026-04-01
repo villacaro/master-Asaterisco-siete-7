@@ -1,0 +1,586 @@
+<!-- ═══════════════════════════════════════════════════
+     MODAL HUB — REPORTES  (botón 📊 sidebar)
+════════════════════════════════════════════════════ -->
+<div id="modal-reportes-hub" class="fixed inset-0 z-[220] bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4"
+     onclick="if(event.target===this)closeReportesModal()">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-4" style="background:linear-gradient(135deg,#059669,#0891b2);">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-white text-lg">📊</div>
+        <div>
+          <h2 class="text-white font-bold text-sm">Reportes y Análisis</h2>
+          <p class="text-emerald-200 text-xs">Seleccione el reporte a generar</p>
+        </div>
+      </div>
+      <button onclick="closeReportesModal()" class="text-white/70 hover:text-white">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="p-4 grid grid-cols-2 gap-3">
+      <button onclick="closeReportesModal();openRpt('diario')"
+        class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-emerald-100 dark:border-emerald-900/40 hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition group">
+        <span class="text-2xl">📅</span>
+        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 text-center">Análisis Diario</span>
+      </button>
+      <button onclick="closeReportesModal();openRpt('periodo')"
+        class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-blue-100 dark:border-blue-900/40 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition">
+        <span class="text-2xl">📆</span>
+        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 text-center">Análisis Período</span>
+      </button>
+      <button onclick="closeReportesModal();openRpt('caja')"
+        class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-amber-100 dark:border-amber-900/40 hover:border-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition">
+        <span class="text-2xl">🗃️</span>
+        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 text-center">Cuadre de Caja</span>
+      </button>
+      <button onclick="closeReportesModal();openRpt('tickets')"
+        class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-indigo-100 dark:border-indigo-900/40 hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition">
+        <span class="text-2xl">🎫</span>
+        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 text-center">Tickets</span>
+      </button>
+      <button onclick="closeReportesModal();openRpt('ganadores')"
+        class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-yellow-100 dark:border-yellow-900/40 hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition">
+        <span class="text-2xl">🏆</span>
+        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 text-center">Tickets Ganadores</span>
+      </button>
+      <button onclick="closeReportesModal();openRpt('resultados')"
+        class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-purple-100 dark:border-purple-900/40 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition">
+        <span class="text-2xl">🎱</span>
+        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 text-center">Resultados</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MODAL ANÁLISIS DIARIO ════════════════════════ -->
+<div id="modal-rpt-diario" class="fixed inset-0 z-[230] bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4"
+     onclick="if(event.target===this)closeRpt('diario')">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-3" style="background:linear-gradient(135deg,#059669,#0891b2);">
+      <div>
+        <h2 class="text-white font-bold text-sm">📅 Análisis Diario</h2>
+        <p class="text-emerald-200 text-xs">Ventas · Comisiones · Premios del día</p>
+      </div>
+      <button onclick="closeRpt('diario')" class="text-white/70 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="px-5 pt-4 pb-3 flex flex-wrap gap-3 border-b border-slate-100 dark:border-slate-800">
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Desde</label>
+        <input id="rpt-d-fecha" type="date" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Tipo</label>
+        <select id="rpt-d-tipo" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+          <option>General (Todos)</option><option>Lotería</option><option>Arrejuntao</option><option>Animalitos</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Filtro</label>
+        <select id="rpt-d-filtro" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none">
+          <option>Taquilla</option><option>Agencia</option>
+        </select>
+      </div>
+    </div>
+    <div id="rpt-d-body" class="p-5 font-mono text-xs text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950 min-h-[180px] overflow-y-auto max-h-60">
+      <p class="text-slate-400 italic text-center pt-8">Presiona Recargar para generar el análisis</p>
+    </div>
+    <div class="flex justify-between px-5 py-3 border-t border-slate-100 dark:border-slate-800">
+      <button onclick="generarAnalisisDiario()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs uppercase flex items-center gap-2">🔄 Recargar</button>
+      <div class="flex gap-2">
+        <button onclick="imprimirRpt('diario')" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold text-xs uppercase">🖨 Imprimir</button>
+        <button onclick="closeRpt('diario')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ MODAL ANÁLISIS PERÍODO ═══════════════════════ -->
+<div id="modal-rpt-periodo" class="fixed inset-0 z-[230] bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4"
+     onclick="if(event.target===this)closeRpt('periodo')">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-3" style="background:linear-gradient(135deg,#4f46e5,#0ea5e9);">
+      <div>
+        <h2 class="text-white font-bold text-sm">📆 Análisis Período</h2>
+        <p class="text-blue-200 text-xs">Ventas · Comisiones · Premios por rango</p>
+      </div>
+      <button onclick="closeRpt('periodo')" class="text-white/70 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="px-5 pt-4 pb-3 flex flex-wrap gap-3 border-b border-slate-100 dark:border-slate-800">
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Desde</label>
+        <input id="rpt-p-desde" type="date" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Hasta</label>
+        <input id="rpt-p-hasta" type="date" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Tipo</label>
+        <select id="rpt-p-tipo" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+          <option>General (Todos)</option><option>Lotería</option><option>Arrejuntao</option><option>Animalitos</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Filtro</label>
+        <select id="rpt-p-filtro" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+          <option>Taquilla</option><option>Agencia</option>
+        </select>
+      </div>
+    </div>
+    <div id="rpt-p-body" class="p-5 font-mono text-xs text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950 min-h-[180px] overflow-y-auto max-h-60">
+      <p class="text-slate-400 italic text-center pt-8">Presiona Recargar para generar el análisis</p>
+    </div>
+    <div class="flex justify-between px-5 py-3 border-t border-slate-100 dark:border-slate-800">
+      <button onclick="generarAnalisisPeriodo()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs uppercase flex items-center gap-2">🔄 Recargar</button>
+      <div class="flex gap-2">
+        <button onclick="imprimirRpt('periodo')" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold text-xs uppercase">🖨 Imprimir</button>
+        <button onclick="closeRpt('periodo')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MODAL CUADRE DE CAJA ════════════════════════ -->
+<div id="modal-rpt-caja" class="fixed inset-0 z-[230] bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4"
+     onclick="if(event.target===this)closeRpt('caja')">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-3" style="background:linear-gradient(135deg,#d97706,#b45309);">
+      <div>
+        <h2 class="text-white font-bold text-sm">🗃️ Cuadre de Caja</h2>
+        <p class="text-amber-200 text-xs">Reporte diario filtrado por Taquilla o Agencia</p>
+      </div>
+      <button onclick="closeRpt('caja')" class="text-white/70 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="px-5 pt-4 pb-3 flex flex-wrap gap-3 border-b border-slate-100 dark:border-slate-800">
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Fecha</label>
+        <input id="rpt-c-fecha" type="date" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Filtro</label>
+        <select id="rpt-c-filtro" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+          <option>Taquilla</option><option>Agencia</option>
+        </select>
+      </div>
+    </div>
+    <div id="rpt-c-body" class="p-5 font-mono text-xs text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-950 min-h-[180px] overflow-y-auto max-h-60">
+      <p class="text-slate-400 italic text-center pt-8">Presiona Recargar para generar el cuadre</p>
+    </div>
+    <div class="flex justify-between px-5 py-3 border-t border-slate-100 dark:border-slate-800">
+      <button onclick="generarCuadreCaja()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-bold text-xs uppercase">🔄 Recargar</button>
+      <div class="flex gap-2">
+        <button onclick="imprimirRpt('caja')" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold text-xs uppercase">🖨 Imprimir</button>
+        <button onclick="closeRpt('caja')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ MODAL TICKETS ════════════════════════════ -->
+<div id="modal-rpt-tickets" class="fixed inset-0 z-[230] bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4"
+     onclick="if(event.target===this)closeRpt('tickets')">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-3" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);">
+      <div>
+        <h2 class="text-white font-bold text-sm">🎫 Tickets</h2>
+        <p class="text-indigo-200 text-xs">Reporte por fecha · Todos, Activos, Anulados, Premiados, Pagados</p>
+      </div>
+      <button onclick="closeRpt('tickets')" class="text-white/70 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="px-5 pt-4 pb-3 flex flex-wrap gap-3 border-b border-slate-100 dark:border-slate-800">
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Fecha</label>
+        <input id="rpt-t-fecha" type="date" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Ticket</label>
+        <select id="rpt-t-tipo" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+          <option value="">Todos</option><option value="Aprobado">Activos</option><option value="Anulado">Anulados</option><option value="Ganador">Premiados</option><option value="Pagado">Pagados</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Tipo</label>
+        <select id="rpt-t-filtro" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+          <option>Taquilla</option><option>Agencia</option>
+        </select>
+      </div>
+    </div>
+    <div class="overflow-auto max-h-64">
+      <table class="w-full text-xs">
+        <thead class="sticky top-0 bg-slate-100 dark:bg-slate-800">
+          <tr>
+            <th class="px-3 py-2 text-left font-bold text-slate-600 dark:text-slate-300 uppercase">#</th>
+            <th class="px-3 py-2 text-left font-bold text-slate-600 dark:text-slate-300 uppercase">Ticket</th>
+            <th class="px-3 py-2 text-left font-bold text-slate-600 dark:text-slate-300 uppercase">Fecha</th>
+            <th class="px-3 py-2 text-left font-bold text-slate-600 dark:text-slate-300 uppercase">Status</th>
+            <th class="px-3 py-2 text-right font-bold text-slate-600 dark:text-slate-300 uppercase">Venta</th>
+            <th class="px-3 py-2 text-right font-bold text-slate-600 dark:text-slate-300 uppercase">Premio</th>
+          </tr>
+        </thead>
+        <tbody id="rpt-t-tbody">
+          <tr><td colspan="6" class="px-3 py-8 text-center text-slate-400 italic">Presiona Recargar</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="flex justify-between px-5 py-3 border-t border-slate-100 dark:border-slate-800">
+      <button onclick="generarRptTickets()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs uppercase">🔄 Recargar</button>
+      <button onclick="closeRpt('tickets')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MODAL TICKETS GANADORES ══════════════════════ -->
+<div id="modal-rpt-ganadores" class="fixed inset-0 z-[230] bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4"
+     onclick="if(event.target===this)closeRpt('ganadores')">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-3xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-3" style="background:linear-gradient(135deg,#b45309,#d97706);">
+      <div>
+        <h2 class="text-white font-bold text-sm">🏆 Tickets Ganadores</h2>
+        <p class="text-amber-200 text-xs">Listado o Reporte · N° Ticket · Hora · Sorteo · Taquilla · Usuario · Número · Precio</p>
+      </div>
+      <button onclick="closeRpt('ganadores')" class="text-white/70 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="px-5 pt-4 pb-3 flex flex-wrap gap-4 border-b border-slate-100 dark:border-slate-800 items-end">
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Fecha</label>
+        <input id="rpt-g-fecha" type="date" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Filtro</label>
+        <select id="rpt-g-filtro" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+          <option>Taquilla</option><option>Agencia</option>
+        </select>
+      </div>
+      <div class="flex gap-3 items-center">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="rpt-g-modo" value="listado" checked class="accent-amber-500">
+          <span class="text-xs font-bold text-amber-600 dark:text-amber-400">Listado</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="radio" name="rpt-g-modo" value="reporte" class="accent-amber-500">
+          <span class="text-xs font-bold text-amber-600 dark:text-amber-400">Reporte</span>
+        </label>
+      </div>
+    </div>
+    <div class="overflow-auto max-h-64">
+      <table class="w-full text-xs">
+        <thead class="sticky top-0 bg-slate-100 dark:bg-slate-800">
+          <tr>
+            <th class="px-3 py-2 text-left font-bold text-slate-600 dark:text-slate-300 uppercase">#</th>
+            <th class="px-3 py-2 text-left font-bold text-slate-600 dark:text-slate-300 uppercase">Ticket</th>
+            <th class="px-3 py-2 text-left font-bold text-slate-600 dark:text-slate-300 uppercase">Hora</th>
+            <th class="px-3 py-2 text-left font-bold text-slate-600 dark:text-slate-300 uppercase">Sorteo</th>
+            <th class="px-3 py-2 text-left font-bold text-slate-600 dark:text-slate-300 uppercase">Taq.</th>
+            <th class="px-3 py-2 text-left font-bold text-slate-600 dark:text-slate-300 uppercase">Usuario</th>
+            <th class="px-3 py-2 text-right font-bold text-slate-600 dark:text-slate-300 uppercase">Número</th>
+            <th class="px-3 py-2 text-right font-bold text-slate-600 dark:text-slate-300 uppercase">Precio</th>
+          </tr>
+        </thead>
+        <tbody id="rpt-g-tbody">
+          <tr><td colspan="8" class="px-3 py-8 text-center text-slate-400 italic">Presiona Recargar</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="flex justify-between px-5 py-3 border-t border-slate-100 dark:border-slate-800">
+      <button onclick="generarRptGanadores()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-bold text-xs uppercase">🔄 Recargar</button>
+      <div class="flex gap-2">
+        <button onclick="imprimirRpt('ganadores')" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold text-xs uppercase">🖨 Imprimir</button>
+        <button onclick="closeRpt('ganadores')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ MODAL RESULTADOS ═════════════════════════ -->
+<div id="modal-rpt-resultados" class="fixed inset-0 z-[230] bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4"
+     onclick="if(event.target===this)closeRpt('resultados')">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-3" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
+      <div>
+        <h2 class="text-white font-bold text-sm">🎱 Resultados de Sorteos</h2>
+        <p class="text-purple-200 text-xs">Todos los sorteos · Todos los juegos autorizados</p>
+      </div>
+      <button onclick="closeRpt('resultados')" class="text-white/70 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="px-5 pt-4 pb-3 flex flex-wrap gap-3 border-b border-slate-100 dark:border-slate-800">
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Fecha</label>
+        <input id="rpt-r-fecha" type="date" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none">
+      </div>
+    </div>
+    <div id="rpt-r-body" class="p-4 overflow-auto max-h-72 grid grid-cols-2 gap-3">
+      <p class="col-span-2 text-slate-400 italic text-center text-xs pt-8">Presiona Recargar para ver los resultados</p>
+    </div>
+    <div class="flex justify-between px-5 py-3 border-t border-slate-100 dark:border-slate-800">
+      <button onclick="generarResultados()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold text-xs uppercase">🔄 Recargar</button>
+      <button onclick="closeRpt('resultados')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MODAL UTILIDADES ════════════════════════════ -->
+<div id="modal-utilidades" class="fixed inset-0 z-[220] bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4"
+     onclick="if(event.target===this)closeUtilidadesModal()">
+  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-4" style="background:linear-gradient(135deg,#b45309,#92400e);">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-white text-lg">🔧</div>
+        <div>
+          <h2 class="text-white font-bold text-sm">Utilidades del Sistema</h2>
+          <p class="text-amber-200 text-xs">Cambio de clave y opciones avanzadas</p>
+        </div>
+      </div>
+      <button onclick="closeUtilidadesModal()" class="text-white/70 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <!-- Cambio de Clave -->
+    <div class="px-6 py-5 space-y-4">
+      <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">🔐 Cambio de Clave</h3>
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Clave Actual</label>
+        <input id="util-clave-actual" type="password" placeholder="Ingrese clave actual"
+          class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Clave Nueva</label>
+        <input id="util-clave-nueva" type="password" placeholder="Nueva clave"
+          class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Confirmar Clave Nueva</label>
+        <input id="util-clave-confirm" type="password" placeholder="Confirme nueva clave"
+          class="w-full px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+      </div>
+      <p id="util-clave-msg" class="text-xs hidden"></p>
+      <div class="flex gap-3 pt-1">
+        <button onclick="ejecutarCambioClave()"
+          class="flex-1 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition">✔ Cambiar Clave</button>
+        <button onclick="closeUtilidadesModal()"
+          class="flex-1 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-white rounded-xl font-bold text-xs uppercase tracking-wider transition">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ JS — Reportes y Utilidades ═══════════ -->
+<script>
+(function(){
+  const today = () => new Date().toISOString().split('T')[0];
+
+  /* ── helpers ── */
+  window.openReportesModal = function(){
+    document.getElementById('modal-reportes-hub').classList.remove('hidden');
+  };
+  window.closeReportesModal = function(){
+    document.getElementById('modal-reportes-hub').classList.add('hidden');
+  };
+  window.openRpt = function(name){
+    const el = document.getElementById('modal-rpt-'+name);
+    if(!el) return;
+    // set today on date inputs
+    el.querySelectorAll('input[type=date]').forEach(i => { if(!i.value) i.value = today(); });
+    el.classList.remove('hidden');
+  };
+  window.closeRpt = function(name){
+    const el = document.getElementById('modal-rpt-'+name);
+    if(el) el.classList.add('hidden');
+  };
+  window.openUtilidadesModal = function(){
+    ['util-clave-actual','util-clave-nueva','util-clave-confirm'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+    const msg=document.getElementById('util-clave-msg'); if(msg) msg.classList.add('hidden');
+    document.getElementById('modal-utilidades').classList.remove('hidden');
+  };
+  window.closeUtilidadesModal = function(){
+    document.getElementById('modal-utilidades').classList.add('hidden');
+  };
+
+  /* ── análisis helper ── */
+  function calcTotales(txList){
+    let venta=0, premio=0;
+    txList.forEach(t => {
+      venta += (t.total||0);
+      if(t.status==='Pagado'||t.status==='Ganador') premio += (t.prizeValue||0);
+    });
+    const comision = venta * 0.15;
+    const saldo = venta - comision - premio;
+    return {venta, comision, premio, saldo};
+  }
+  function renderAnalisis(el, txList, titulo){
+    const {venta,comision,premio,saldo} = calcTotales(txList);
+    el.innerHTML = `<div style="text-align:center;font-weight:bold;margin-bottom:4px">${titulo}</div>
+<div>Todos los Productos</div>
+<hr style="border:none;border-top:1px dashed #999;margin:4px 0">
+<div style="display:flex;justify-content:space-between"><span>LOTERÍA</span></div>
+<div style="display:flex;justify-content:space-between"><span>VENTA  = Ref</span><span style="color:#166534;font-weight:bold">${venta.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>COMIS  = Ref</span><span>${comision.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>PREMIO = Ref</span><span>${premio.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>SALDO  = Ref</span><span style="font-weight:bold">${saldo.toFixed(2)}</span></div>
+<hr style="border:none;border-top:1px dashed #999;margin:4px 0">
+<div style="display:flex;justify-content:space-between"><span>TOTAL VEN = Ref</span><span style="color:#166534;font-weight:bold">${venta.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>TOTAL COM = Ref</span><span>${comision.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>TOTAL PRE = Ref</span><span>${premio.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between;font-weight:bold;margin-top:4px"><span>SALDO = Ref</span><span>${saldo.toFixed(2)}</span></div>`;
+  }
+
+  /* ── Análisis Diario ── */
+  window.generarAnalisisDiario = function(){
+    const fecha  = document.getElementById('rpt-d-fecha').value;
+    const el     = document.getElementById('rpt-d-body');
+    if(typeof allTransactions==='undefined'){ el.innerHTML='<p class="text-red-500 text-center pt-8">Sin datos</p>'; return; }
+    const txList = allTransactions.filter(t => !fecha || t.dateOnly===fecha);
+    renderAnalisis(el, txList, `Análisis Diario — ${fecha||today()}`);
+  };
+
+  /* ── Análisis Período ── */
+  window.generarAnalisisPeriodo = function(){
+    const desde = document.getElementById('rpt-p-desde').value;
+    const hasta = document.getElementById('rpt-p-hasta').value;
+    const el    = document.getElementById('rpt-p-body');
+    if(typeof allTransactions==='undefined'){ el.innerHTML='<p class="text-red-500 text-center pt-8">Sin datos</p>'; return; }
+    const txList = allTransactions.filter(t => {
+      const d = t.dateOnly||'';
+      return (!desde||d>=desde) && (!hasta||d<=hasta);
+    });
+    renderAnalisis(el, txList, `Análisis Período ${desde||'inicio'} → ${hasta||today()}`);
+  };
+
+  /* ── Cuadre de Caja ── */
+  window.generarCuadreCaja = function(){
+    const fecha = document.getElementById('rpt-c-fecha').value;
+    const el    = document.getElementById('rpt-c-body');
+    if(typeof allTransactions==='undefined'){ el.innerHTML='<p class="text-slate-400 italic text-center pt-8">No hay nada que imprimir</p>'; return; }
+    const txList = allTransactions.filter(t => !fecha||t.dateOnly===fecha);
+    if(txList.length===0){ el.innerHTML='<p class="text-slate-400 italic text-center pt-8">No hay nada que imprimir</p>'; return; }
+    const {venta,comision,premio,saldo} = calcTotales(txList);
+    el.innerHTML = `<div style="font-weight:bold;text-align:center;margin-bottom:4px">CUADRE DE CAJA — ${fecha||today()}</div>
+<hr style="border:none;border-top:1px dashed #999;margin:4px 0">
+<div style="display:flex;justify-content:space-between"><span>Total Ventas:</span><span style="font-weight:bold;color:#166534">Bs ${venta.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>Comisiones (15%):</span><span>Bs ${comision.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>Premios:</span><span>Bs ${premio.toFixed(2)}</span></div>
+<hr style="border:none;border-top:1px dashed #999;margin:4px 0">
+<div style="display:flex;justify-content:space-between;font-weight:bold"><span>SALDO CAJA:</span><span style="color:${saldo>=0?'#166534':'#dc2626'}">Bs ${saldo.toFixed(2)}</span></div>
+<div style="margin-top:8px">Tickets del día: ${txList.length}</div>`;
+  };
+
+  /* ── Reporte Tickets ── */
+  window.generarRptTickets = function(){
+    const fecha  = document.getElementById('rpt-t-fecha').value;
+    const tipo   = document.getElementById('rpt-t-tipo').value;
+    const tbody  = document.getElementById('rpt-t-tbody');
+    if(typeof allTransactions==='undefined'){ tbody.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">Sin datos</td></tr>'; return; }
+    let list = allTransactions.filter(t => (!fecha||t.dateOnly===fecha) && (!tipo||t.status===tipo));
+    if(list.length===0){ tbody.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400 italic">No hay registros</td></tr>'; return; }
+    const totalVenta = list.reduce((s,t)=>s+(t.total||0),0);
+    const totalPremio = list.reduce((s,t)=>s+(t.prizeValue||0),0);
+    const sColor = s => s==='Anulado'?'color:#dc2626':s==='Pagado'||s==='Ganador'?'color:#166534':'color:#4f46e5';
+    tbody.innerHTML = list.map((t,i)=>`
+      <tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+        <td class="px-3 py-1.5">${i+1}</td>
+        <td class="px-3 py-1.5 font-mono font-bold">#${t.id}</td>
+        <td class="px-3 py-1.5 text-slate-500">${t.dateOnly}</td>
+        <td class="px-3 py-1.5 font-bold" style="${sColor(t.status)}">${t.status}</td>
+        <td class="px-3 py-1.5 text-right">Bs ${(t.total||0).toFixed(2)}</td>
+        <td class="px-3 py-1.5 text-right">${t.prizeValue?'Bs '+t.prizeValue.toFixed(2):'—'}</td>
+      </tr>`).join('')+
+      `<tr class="bg-slate-100 dark:bg-slate-800 font-bold">
+        <td colspan="3" class="px-3 py-1.5 text-right">TOTAL</td><td></td>
+        <td class="px-3 py-1.5 text-right">Bs ${totalVenta.toFixed(2)}</td>
+        <td class="px-3 py-1.5 text-right">Bs ${totalPremio.toFixed(2)}</td>
+      </tr>`;
+  };
+
+  /* ── Tickets Ganadores ── */
+  window.generarRptGanadores = function(){
+    const fecha  = document.getElementById('rpt-g-fecha').value;
+    const tbody  = document.getElementById('rpt-g-tbody');
+    if(typeof allTransactions==='undefined'){ tbody.innerHTML='<tr><td colspan="8" class="text-center py-6 text-slate-400">Sin datos</td></tr>'; return; }
+    const list = allTransactions.filter(t=>(!fecha||t.dateOnly===fecha)&&(t.status==='Ganador'||t.status==='Pagado'));
+    if(list.length===0){ tbody.innerHTML='<tr><td colspan="8" class="text-center py-6 text-slate-400 italic">No hay ganadores</td></tr>'; return; }
+    const taqName = typeof sessionStorage!=='undefined'?sessionStorage.getItem('ast7_taquilla')||'T-1':'T-1';
+    const usr = typeof sessionStorage!=='undefined'?sessionStorage.getItem('ast7_user')||'—':'—';
+    let rows=''; let n=0;
+    list.forEach(t=>{
+      (t.items||[]).forEach(item=>{
+        n++;
+        rows+=`<tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+          <td class="px-3 py-1.5">${n}</td>
+          <td class="px-3 py-1.5 font-mono font-bold">#${t.id}</td>
+          <td class="px-3 py-1.5 text-slate-500">${t.timeOnly||'—'}</td>
+          <td class="px-3 py-1.5">${item.lottery||'—'}</td>
+          <td class="px-3 py-1.5">${taqName}</td>
+          <td class="px-3 py-1.5">${usr}</td>
+          <td class="px-3 py-1.5 text-right font-mono font-bold">${item.number||'—'}</td>
+          <td class="px-3 py-1.5 text-right">Bs ${(item.amount||0).toFixed(2)}</td>
+        </tr>`;
+      });
+    });
+    tbody.innerHTML = rows;
+  };
+
+  /* ── Resultados ── */
+  window.generarResultados = function(){
+    const el  = document.getElementById('rpt-r-body');
+    const fecha = document.getElementById('rpt-r-fecha').value || today();
+    const sorteos = [
+      {name:'Triple La Granjita',   numero:'---'},
+      {name:'Triple Caracas',       numero:'---'},
+      {name:'Triple Zulia',         numero:'---'},
+      {name:'Triple Tachira',       numero:'---'},
+      {name:'Lotería de Táchira',   numero:'----'},
+      {name:'Lotería del Zulia',    numero:'----'},
+      {name:'Animalitos RIFA',      numero:'--'},
+    ];
+    // Intentar usar datos reales de allTransactions
+    el.innerHTML = `<div class="col-span-2 font-mono text-[10px] font-bold text-center text-slate-500 dark:text-slate-400 mb-2">RESULTADOS — ${fecha}</div>`+
+      sorteos.map(s=>`
+        <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-3 border border-slate-200 dark:border-slate-700 flex flex-col items-center">
+          <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 text-center leading-tight mb-2">${s.name}</span>
+          <span class="font-mono font-black text-2xl text-indigo-600 dark:text-indigo-400">${s.numero}</span>
+        </div>`).join('');
+  };
+
+  /* ── Imprimir ── */
+  window.imprimirRpt = function(name){
+    const bodyEl = document.getElementById('rpt-'+(name[0])+'-body') ||
+                   document.getElementById('rpt-'+name+'-body');
+    const tableEl = document.getElementById('rpt-'+(name==='tickets'?'t':'g')+'-tbody');
+    const win = window.open('','_blank','width=500,height=700');
+    win.document.write(`<html><head><title>Reporte ${name}</title>
+      <style>body{font-family:'Courier New',monospace;font-size:11px;padding:15px}
+      table{border-collapse:collapse;width:100%}td,th{padding:3px 6px;border-bottom:1px solid #ddd;text-align:left}
+      </style></head><body>`);
+    if(bodyEl) win.document.write(bodyEl.innerHTML);
+    if(tableEl) win.document.write('<table>'+tableEl.closest('table').outerHTML+'</table>');
+    win.document.write('</body></html>');
+    win.document.close(); win.print();
+  };
+
+  /* ── Cambio de Clave ── */
+  window.ejecutarCambioClave = function(){
+    const actual   = document.getElementById('util-clave-actual').value;
+    const nueva    = document.getElementById('util-clave-nueva').value;
+    const confirm  = document.getElementById('util-clave-confirm').value;
+    const msg      = document.getElementById('util-clave-msg');
+    msg.className  = 'text-xs';
+
+    const sysPin = typeof sysConfig!=='undefined' ? (sysConfig.securityPin||'1234') : '1234';
+    if(actual !== sysPin){
+      msg.textContent='⚠ Clave actual incorrecta'; msg.classList.add('text-red-500'); msg.classList.remove('hidden'); return;
+    }
+    if(!nueva || nueva.length < 4){
+      msg.textContent='⚠ La clave nueva debe tener al menos 4 caracteres'; msg.classList.add('text-red-500'); msg.classList.remove('hidden'); return;
+    }
+    if(nueva !== confirm){
+      msg.textContent='⚠ Las claves nuevas no coinciden'; msg.classList.add('text-red-500'); msg.classList.remove('hidden'); return;
+    }
+    if(typeof sysConfig!=='undefined') sysConfig.securityPin = nueva;
+    if(typeof saveData==='function') saveData();
+    msg.textContent='✅ Clave actualizada correctamente';
+    msg.classList.remove('hidden','text-red-500'); msg.classList.add('text-emerald-600');
+    document.getElementById('util-clave-actual').value='';
+    document.getElementById('util-clave-nueva').value='';
+    document.getElementById('util-clave-confirm').value='';
+    if(typeof showToast==='function') showToast('🔐 Clave actualizada','success');
+  };
+
+})();
+</script>
+<!-- FIN REPORTES Y UTILIDADES -->

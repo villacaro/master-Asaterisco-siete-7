@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-home"></i> Inicio</h1>
+                            <p class="subtitle">Bienvenidos al sistema de apuestas deportivas <strong>{{ info_system.name }}</strong></p>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><i class="icon-home"></i> Inicio</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-body panel-body-border panel-head-border panel-shadow bg_muestra" style="background-image:url({% if info_user.sistema %}'{{MEDIA_URL}}{{info_user.sistema.banner}}'{% else %}{% static "images/imagen_phone.jpg" %}{% endif %});">
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+{% endblock %}

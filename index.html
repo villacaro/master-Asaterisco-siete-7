@@ -1,0 +1,3117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EL ARREJUNTAO</title>
+  <meta name="description" content="App de resultados de lotería y gestión de apuestas – EL ARREJUNTAO" />
+  <meta name="theme-color" content="#1a0533" />
+  <link rel="manifest" href="manifest.json" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet" />
+  <!-- Firebase Auth Module -->
+  <script type="module" src="./firebase-auth.js"></script>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            forest: '#042114',
+            gold: '#facc15',
+          },
+          fontFamily: {
+            outfit: ['Outfit', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background-color: #1a0533;
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(250,204,21,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 90%, rgba(120,40,200,0.2) 0%, transparent 60%);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      color: #fff;
+    }
+    .glass {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 1.25rem;
+    }
+    .glass-gold {
+      background: rgba(250,204,21,0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(250,204,21,0.3);
+      border-radius: 1.25rem;
+    }
+    .digit-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.8rem;
+      height: 3.5rem;
+      background: rgba(250,204,21,0.15);
+      border: 1.5px solid #facc15;
+      border-radius: 0.6rem;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #facc15;
+      letter-spacing: 0;
+      box-shadow: 0 0 12px rgba(250,204,21,0.3);
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, #facc15, #f59e0b);
+      color: #042114;
+      font-weight: 900;
+      border-radius: 0.9rem;
+      padding: 0.75rem 1.25rem;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+    }
+    .btn-gold:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(250,204,21,0.4); }
+    .btn-green {
+      background: linear-gradient(135deg, #a855f7, #7c3aed);
+      color: #fff;
+      font-weight: 900;
+      border-radius: 0.9rem;
+      padding: 0.75rem 1.25rem;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+    }
+    .btn-green:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(168,85,247,0.4); }
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: #fff;
+      font-weight: 700;
+      border-radius: 0.9rem;
+      padding: 0.5rem 1rem;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+    }
+    .btn-danger:hover { filter: brightness(1.1); }
+    input, select {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 0.75rem;
+      color: #fff;
+      padding: 0.7rem 1rem;
+      width: 100%;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+    input:focus, select:focus { border-color: #facc15; }
+    select option { background: #042114; color: #fff; }
+    .tab-btn { transition: all 0.2s; border-radius: 0.75rem; padding: 0.5rem 1.1rem; font-weight: 700; font-size: 0.85rem; border: none; cursor: pointer; }
+    .tab-btn.active { background: #facc15; color: #042114; }
+    .tab-btn:not(.active) { background: rgba(255,255,255,0.08); color: #fff; }
+    .tab-btn:not(.active):hover { background: rgba(255,255,255,0.15); }
+    .animal-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 1rem;
+      padding: 0.9rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .animal-card:hover, .animal-card.selected {
+      border-color: #facc15;
+      background: rgba(250,204,21,0.1);
+      transform: translateY(-2px);
+    }
+    .badge {
+      background: rgba(250,204,21,0.15);
+      border: 1px solid rgba(250,204,21,0.4);
+      border-radius: 9999px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.75rem;
+      color: #facc15;
+      font-weight: 700;
+    }
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #facc15;
+      color: #042114;
+      border-radius: 9999px;
+      padding: 0.7rem 1.5rem;
+      font-weight: 900;
+      font-size: 0.9rem;
+      z-index: 9999;
+      box-shadow: 0 4px 24px rgba(250,204,21,0.5);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { background: #ef4444; color: #fff; box-shadow: 0 4px 24px rgba(239,68,68,0.5); }
+    .scrollbar-thin::-webkit-scrollbar { width: 4px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(250,204,21,0.3); border-radius: 9999px; }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 8px rgba(250,204,21,0.3); }
+      50% { box-shadow: 0 0 24px rgba(250,204,21,0.8); }
+    }
+    .glow { animation: pulse-glow 2.5s ease-in-out infinite; }
+    .section { display: none; }
+    .section.active { display: block; }
+    #logo-text {
+      background: linear-gradient(135deg, #facc15 30%, #fff 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .horario-btn {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 0.6rem;
+      padding: 0.45rem 0.9rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .horario-btn:hover { background: rgba(255,255,255,0.18); }
+    .horario-btn.selected { background: #facc15; color: #1a0533; border-color: #facc15; }
+    .cat-btn {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 0.6rem;
+      padding: 0.4rem 0.8rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .cat-btn:hover { background: rgba(255,255,255,0.15); }
+    .cat-btn.cat-active { background: rgba(250,204,21,0.18); border-color: #facc15; color: #facc15; }
+    .cat-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.1rem;
+      height: 1.1rem;
+      border-radius: 0.2rem;
+      font-size: 0.65rem;
+      font-weight: 900;
+      color: #fff;
+    }
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      z-index: 5000; display: flex; align-items: center; justify-content: center;
+      padding: 1rem; backdrop-filter: blur(4px);
+    }
+    .modal-box {
+      background: #1a0533;
+      border: 1px solid rgba(250,204,21,0.3);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      width: 100%; max-width: 440px;
+      max-height: 90vh; overflow-y: auto;
+    }
+  </style>
+</head>
+<body class="pb-10">
+
+<!-- ═══════════════════════════════════════════════════
+     PANTALLA DE LOGIN
+     Visible cuando el usuario NO está autenticado
+═══════════════════════════════════════════════════ -->
+<div id="login-screen" style="
+  position:fixed;inset:0;z-index:9999;
+  background:#1a0533;
+  background-image:radial-gradient(ellipse at 20% 10%,rgba(250,204,21,0.10) 0%,transparent 60%),
+                   radial-gradient(ellipse at 80% 90%,rgba(120,40,200,0.25) 0%,transparent 60%);
+  display:flex;align-items:center;justify-content:center;padding:1rem;
+">
+  <div style="width:100%;max-width:400px;">
+
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:2rem;">
+      <p style="font-size:0.7rem;color:rgba(250,204,21,0.8);text-transform:uppercase;letter-spacing:0.2em;margin-bottom:0.5rem;">🎰 Sorteos &amp; Apuestas</p>
+      <h1 style="font-family:'Outfit',sans-serif;font-size:2.6rem;font-weight:900;font-style:italic;
+                 background:linear-gradient(135deg,#f5d020 0%,#f97316 50%,#e9d5ff 100%);
+                 -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+                 margin:0;line-height:1;">EL ARREJUNTAO</h1>
+      <p style="font-size:0.75rem;color:rgba(255,255,255,0.4);margin-top:0.4rem;">Asterisco Siete (*7)</p>
+    </div>
+
+    <!-- Card de login -->
+    <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);
+                border:1px solid rgba(250,204,21,0.25);border-radius:1.25rem;padding:1.75rem;
+                box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+
+      <h2 style="font-family:'Outfit',sans-serif;font-weight:900;font-size:1rem;
+                 color:#facc15;margin:0 0 1.25rem;text-align:center;letter-spacing:0.04em;">INICIAR SESIÓN</h2>
+
+      <!-- Error -->
+      <div id="login-error" style="display:none;background:rgba(239,68,68,0.15);
+           border:1px solid rgba(239,68,68,0.4);border-radius:0.6rem;padding:0.6rem 0.9rem;
+           font-size:0.82rem;color:#fca5a5;margin-bottom:1rem;"></div>
+
+      <!-- Email -->
+      <div style="margin-bottom:0.75rem;">
+        <label style="font-size:0.7rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:0.35rem;">Correo electrónico</label>
+        <input id="login-email" type="email" placeholder="tu@correo.com"
+          style="width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);
+                 border-radius:0.7rem;color:#fff;padding:0.75rem 1rem;
+                 font-family:'Outfit',sans-serif;font-size:0.92rem;outline:none;transition:border 0.2s;"
+          onfocus="this.style.borderColor='#facc15'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'"
+          onkeydown="if(event.key==='Enter')loginConEmail()" />
+      </div>
+
+      <!-- Contraseña -->
+      <div style="margin-bottom:1.25rem;">
+        <label style="font-size:0.7rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em;display:block;margin-bottom:0.35rem;">Contraseña</label>
+        <input id="login-pass" type="password" placeholder="••••••••"
+          style="width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.15);
+                 border-radius:0.7rem;color:#fff;padding:0.75rem 1rem;
+                 font-family:'Outfit',sans-serif;font-size:0.92rem;outline:none;transition:border 0.2s;"
+          onfocus="this.style.borderColor='#facc15'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'"
+          onkeydown="if(event.key==='Enter')loginConEmail()" />
+      </div>
+
+      <!-- Botón Login -->
+      <button class="auth-btn" onclick="loginConEmail()"
+        style="width:100%;background:linear-gradient(135deg,#facc15,#f59e0b);color:#042114;
+               font-weight:900;font-family:'Outfit',sans-serif;font-size:0.95rem;
+               border:none;border-radius:0.9rem;padding:0.85rem;cursor:pointer;
+               transition:all 0.2s;margin-bottom:0.6rem;
+               box-shadow:0 4px 20px rgba(250,204,21,0.35);"
+        onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''"
+      >🔐 ENTRAR</button>
+
+      <!-- Registrarse -->
+      <button class="auth-btn" onclick="registrarse()"
+        style="width:100%;background:rgba(168,85,247,0.15);color:#c084fc;
+               font-weight:700;font-family:'Outfit',sans-serif;font-size:0.85rem;
+               border:1px solid rgba(168,85,247,0.35);border-radius:0.9rem;
+               padding:0.7rem;cursor:pointer;transition:all 0.2s;margin-bottom:1rem;"
+        onmouseover="this.style.background='rgba(168,85,247,0.25)'" onmouseout="this.style.background='rgba(168,85,247,0.15)'"
+      >✉️ Registrarse con este correo</button>
+
+      <!-- Separador -->
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.12);"></div>
+        <span style="font-size:0.7rem;color:rgba(255,255,255,0.35);">o continúa con</span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.12);"></div>
+      </div>
+
+      <!-- Botón Google -->
+      <button class="auth-btn" onclick="loginConGoogle()"
+        style="width:100%;background:rgba(255,255,255,0.07);color:#fff;
+               font-weight:700;font-family:'Outfit',sans-serif;font-size:0.88rem;
+               border:1px solid rgba(255,255,255,0.18);border-radius:0.9rem;
+               padding:0.75rem;cursor:pointer;transition:all 0.2s;
+               display:flex;align-items:center;justify-content:center;gap:0.6rem;"
+        onmouseover="this.style.background='rgba(255,255,255,0.13)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"
+      >
+        <svg width="18" height="18" viewBox="0 0 18 18">
+          <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
+          <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/>
+          <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/>
+          <path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/>
+        </svg>
+        Continuar con Google
+      </button>
+
+      <!-- Spinner -->
+      <div id="login-spinner" style="display:none;justify-content:center;align-items:center;gap:0.5rem;margin-top:1rem;">
+        <div style="width:1.2rem;height:1.2rem;border:2px solid rgba(250,204,21,0.3);
+                    border-top-color:#facc15;border-radius:9999px;
+                    animation:spin 0.7s linear infinite;"></div>
+        <span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">Conectando...</span>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:0.68rem;color:rgba(255,255,255,0.25);margin-top:1.25rem;">
+      Al ingresar aceptas los términos de uso de EL ARREJUNTAO.
+    </p>
+  </div>
+</div>
+<style>
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .sueno-tag {
+    background: rgba(167,139,250,0.12);
+    border: 1px solid rgba(167,139,250,0.25);
+    border-radius: 9999px;
+    padding: 0.28rem 0.75rem;
+    color: rgba(255,255,255,0.75);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.15s;
+  }
+  .sueno-tag:hover {
+    background: rgba(167,139,250,0.25);
+    color: #fff;
+  }
+</style>
+
+<!-- ─── TOAST ─── -->
+<div id="toast" class="toast"></div>
+
+<!-- ─── MODAL EDITAR CLIENTE ─── -->
+<div id="modal-cliente" class="modal-overlay" style="display:none;" onclick="cerrarModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()" style="padding:0;overflow:hidden;">
+
+    <!-- TABS -->
+    <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.12);">
+      <button id="tab-info-btn" onclick="switchTab('info')"
+        style="flex:1;padding:0.9rem;font-family:'Outfit',sans-serif;font-weight:900;font-size:0.85rem;border:none;cursor:pointer;background:#a855f7;color:#fff;border-radius:1.25rem 0 0 0;">
+        ✏️ DATOS
+      </button>
+      <button id="tab-saldo-btn" onclick="switchTab('saldo')"
+        style="flex:1;padding:0.9rem;font-family:'Outfit',sans-serif;font-weight:900;font-size:0.85rem;border:none;cursor:pointer;background:rgba(255,255,255,0.06);color:#fff;border-radius:0 1.25rem 0 0;">
+        💳 RECARGAR SALDO
+      </button>
+    </div>
+
+    <!-- ══ TAB: DATOS DEL CLIENTE ══ -->
+    <div id="tab-info" style="padding:1.25rem;" class="space-y-3">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+        <h3 class="text-yellow-400 font-black text-base">✏️ Editar Cliente</h3>
+        <button onclick="document.getElementById('modal-cliente').style.display='none'; editIdx=-1;"
+          style="background:none;border:none;color:#fff;font-size:1.4rem;cursor:pointer;">✕</button>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Nombre <span class="text-red-400">*</span></label>
+          <input id="ed-nombre" type="text" placeholder="Nombre" />
+        </div>
+        <div>
+          <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Apellido <span class="text-red-400">*</span></label>
+          <input id="ed-apellido" type="text" placeholder="Apellido" />
+        </div>
+      </div>
+      <div>
+        <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Teléfono <span class="text-red-400">*</span></label>
+        <input id="ed-telefono" type="tel" placeholder="04141234567" />
+      </div>
+      <div>
+        <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Correo Electrónico <span class="text-white/30">(opcional)</span></label>
+        <input id="ed-correo" type="email" placeholder="correo@email.com" />
+      </div>
+      <div>
+        <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Cédula de Identidad <span class="text-white/30">(opcional)</span></label>
+        <input id="ed-cedula" type="text" placeholder="V-12345678" />
+      </div>
+      <div class="flex gap-3 pt-1">
+        <button class="btn-danger" style="flex:1" onclick="document.getElementById('modal-cliente').style.display='none'; editIdx=-1;">Cancelar</button>
+        <button class="btn-gold" style="flex:2;font-weight:900;" onclick="guardarCliente()">💾 GUARDAR CAMBIOS</button>
+      </div>
+    </div>
+
+    <!-- ══ TAB: RECARGAR SALDO ══ -->
+    <div id="tab-saldo" style="display:none;flex-direction:column;max-height:85vh;overflow:hidden;">
+
+      <!-- Cabecera fija (no scrollea) -->
+      <div style="background:linear-gradient(135deg,#1e40af,#2563eb);padding:0.9rem 1.25rem;flex-shrink:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.2rem;">
+          <button onclick="document.getElementById('modal-cliente').style.display='none'; editIdx=-1;"
+            style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:1.3rem;cursor:pointer;line-height:1;">✕</button>
+          <span style="font-size:0.65rem;color:rgba(255,255,255,0.6);letter-spacing:0.1em;">💳 PAGO MÓVIL</span>
+        </div>
+        <div style="text-align:center;padding:0.3rem 0 0.5rem;">
+          <p style="font-size:0.68rem;color:rgba(255,255,255,0.7);margin-bottom:0.2rem;">Pago total:</p>
+          <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;">
+            <span style="font-size:1.7rem;font-weight:900;color:#fff;" id="pm-total-display">Bs. 0,00</span>
+            <button onclick="copiarTotal()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:0.4rem;padding:0.25rem 0.45rem;cursor:pointer;font-size:0.8rem;" title="Copiar monto">📋</button>
+          </div>
+          <p style="font-size:0.7rem;color:rgba(255,255,255,0.75);margin-top:0.3rem;">Debes hacer el pago del <strong>monto exacto</strong></p>
+          <p style="font-size:0.65rem;color:rgba(255,255,255,0.5);margin-top:0.15rem;" id="pm-cliente-nombre-display">—</p>
+        </div>
+      </div>
+
+      <!-- Contenido con scroll -->
+      <div style="padding:1rem;overflow-y:auto;flex:1;" class="space-y-3">
+
+        <!-- PASO 1 -->
+        <div style="border:1px solid rgba(255,255,255,0.12);border-radius:0.9rem;overflow:hidden;">
+          <div style="display:flex;align-items:center;gap:0.6rem;padding:0.7rem 1rem;background:rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.08);">
+            <span style="width:1.7rem;height:1.7rem;border-radius:9999px;background:#2563eb;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:900;color:#fff;flex-shrink:0;">1</span>
+            <p style="font-weight:700;font-size:0.82rem;">Datos para realizar el pago móvil</p>
+          </div>
+          <div style="padding:0.85rem 1rem;background:rgba(0,0,0,0.25);" class="space-y-2">
+            <div>
+              <p style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:0.3rem;font-weight:600;">Banco destino</p>
+              <select id="pm-banco-dest" style="font-size:0.85rem;" onchange="actualizarDatosBanco()">
+                <option value="BDV">Banco de Venezuela (BDV)</option>
+                <option value="Banesco">Banesco</option>
+                <option value="Mercantil">Mercantil</option>
+                <option value="Bicentenario">Bicentenario</option>
+                <option value="BOD">BOD</option>
+                <option value="Bancamiga">Bancamiga</option>
+              </select>
+            </div>
+
+            <!-- RIF editable -->
+            <div style="display:flex;align-items:center;gap:0.5rem;padding-top:0.5rem;border-top:1px solid rgba(255,255,255,0.08);">
+              <span style="font-size:0.8rem;font-weight:700;color:rgba(255,255,255,0.65);flex-shrink:0;width:4.5rem;">RIF:</span>
+              <input id="pm-rif-txt" type="text" value="J-000202001"
+                style="flex:1;font-size:0.9rem;font-weight:900;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:0.5rem;padding:0.35rem 0.6rem;color:#fff;text-align:right;" />
+              <button onclick="copiar('pm-rif-txt')" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:0.35rem;padding:0.3rem 0.5rem;cursor:pointer;font-size:0.85rem;flex-shrink:0;" title="Copiar">📋</button>
+            </div>
+
+            <!-- Teléfono editable -->
+            <div style="display:flex;align-items:center;gap:0.5rem;border-top:1px solid rgba(255,255,255,0.08);padding-top:0.5rem;">
+              <span style="font-size:0.8rem;font-weight:700;color:rgba(255,255,255,0.65);flex-shrink:0;width:4.5rem;">Tel:</span>
+              <input id="pm-tel-txt" type="tel" value="0414-115 00 78"
+                style="flex:1;font-size:0.9rem;font-weight:900;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:0.5rem;padding:0.35rem 0.6rem;color:#fff;text-align:right;" />
+              <button onclick="copiar('pm-tel-txt')" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);border-radius:0.35rem;padding:0.3rem 0.5rem;cursor:pointer;font-size:0.85rem;flex-shrink:0;" title="Copiar">📋</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monto prominente -->
+        <div style="background:rgba(37,99,235,0.12);border:1px solid rgba(37,99,235,0.4);border-radius:0.9rem;padding:0.85rem 1rem;">
+          <p style="font-size:0.7rem;color:rgba(255,255,255,0.6);margin-bottom:0.4rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Monto a recargar (Bs)</p>
+          <input id="ed-agregar-saldo" type="number" placeholder="0.00" step="0.01" min="0.01"
+            style="font-size:1.5rem;font-weight:900;text-align:center;background:transparent;border:none;border-bottom:2px solid rgba(37,99,235,0.6);border-radius:0;padding:0.3rem 0;color:#fff;width:100%;outline:none;"
+            oninput="actualizarTotalRecarga()" />
+        </div>
+
+        <!-- PASO 2 -->
+        <div style="border:1px solid rgba(255,255,255,0.12);border-radius:0.9rem;overflow:hidden;">
+          <div style="display:flex;align-items:center;gap:0.6rem;padding:0.7rem 1rem;background:rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.08);">
+            <span style="width:1.7rem;height:1.7rem;border-radius:9999px;background:#2563eb;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:900;color:#fff;flex-shrink:0;">2</span>
+            <p style="font-weight:700;font-size:0.82rem;">Datos de tu cuenta pagadora</p>
+          </div>
+
+          <div style="background:rgba(0,0,0,0.2);padding:0.85rem 1rem;" class="space-y-2">
+
+            <!-- Tipo de contribuyente -->
+            <div>
+              <p style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:0.4rem;font-weight:600;">Tipo de titular</p>
+              <div style="display:flex;gap:0.5rem;">
+                <button id="btn-persona" onclick="selTipoTitular('persona')"
+                  style="flex:1;padding:0.55rem;border-radius:0.6rem;font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;border:1px solid #2563eb;background:#2563eb;color:#fff;transition:all 0.2s;">
+                  👤 Persona Natural
+                </button>
+                <button id="btn-empresa" onclick="selTipoTitular('empresa')"
+                  style="flex:1;padding:0.55rem;border-radius:0.6rem;font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);transition:all 0.2s;">
+                  🏢 Empresa
+                </button>
+              </div>
+            </div>
+
+            <!-- Banco origen -->
+            <div>
+              <p style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:0.3rem;">Banco origen</p>
+              <select id="pm-banco-orig" style="font-size:0.84rem;"
+                onchange="document.getElementById('pm-banco-orig-display').textContent = this.options[this.selectedIndex].text || '— Selecciona tu banco —'">
+                <option value="">— Seleccionar banco —</option>
+                <option value="BDV">Banco de Venezuela (BDV)</option>
+                <option value="Banesco">Banesco</option>
+                <option value="Mercantil">Mercantil</option>
+                <option value="Bicentenario">Bicentenario</option>
+                <option value="BOD">BOD</option>
+                <option value="Bancamiga">Bancamiga</option>
+                <option value="Banco del Tesoro">Banco del Tesoro</option>
+                <option value="Banplus">Banplus</option>
+                <option value="Bancoex">Bancoex</option>
+              </select>
+            </div>
+
+            <!-- Cédula / RIF dinámico -->
+            <div>
+              <p style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:0.3rem;" id="pm-doc-label">Cédula de Identidad</p>
+              <div style="display:flex;gap:0.5rem;">
+                <select id="pm-tipo-doc" style="width:88px;font-size:0.84rem;flex-shrink:0;">
+                  <option value="V">CI-V</option>
+                  <option value="E">CI-E</option>
+                </select>
+                <input id="pm-doc" type="text" placeholder="Ej: 12345678"
+                  style="flex:1;font-size:0.84rem;" />
+              </div>
+            </div>
+
+            <!-- Teléfono pagador -->
+            <div>
+              <p style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:0.3rem;">Teléfono (+58)</p>
+              <div style="display:flex;gap:0.5rem;">
+                <select id="pm-pref" style="width:72px;font-size:0.82rem;flex-shrink:0;">
+                  <option>0414</option>
+                  <option>0424</option>
+                  <option>0412</option>
+                  <option>0416</option>
+                  <option>0426</option>
+                </select>
+                <input id="pm-tel-pag" type="tel" placeholder="7654321"
+                  style="flex:1;font-size:0.84rem;" maxlength="7" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Aviso amarillo -->
+        <div style="background:rgba(234,179,8,0.12);border:1px solid rgba(234,179,8,0.4);border-radius:0.75rem;padding:0.75rem;display:flex;gap:0.6rem;align-items:flex-start;">
+          <span style="font-size:1.1rem;flex-shrink:0;">⚠️</span>
+          <p style="font-size:0.75rem;color:rgba(255,255,255,0.8);line-height:1.45;">Si el pago fue rechazado o el monto es incorrecto, el saldo <strong>no será acreditado</strong>. Verifica antes de confirmar.</p>
+        </div>
+
+        <!-- Botón confirmar -->
+        <button onclick="confirmarRecarga()"
+          style="width:100%;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:0.9rem;padding:1rem;font-family:'Outfit',sans-serif;font-weight:900;font-size:1rem;cursor:pointer;box-shadow:0 4px 20px rgba(37,99,235,0.45);letter-spacing:0.02em;">
+          ✅ Ya realicé el pago
+        </button>
+
+        <!-- Link corrección -->
+        <p style="text-align:center;padding-bottom:0.5rem;">
+          <a href="#" onclick="document.getElementById('ed-agregar-saldo').focus();return false;"
+            style="font-size:0.78rem;color:#60a5fa;text-decoration:underline;">
+            Me equivoqué en el monto ingresado
+          </a>
+        </p>
+
+      </div><!-- /scroll -->
+    </div><!-- /tab-saldo -->
+
+  </div>
+</div>
+
+
+<!-- ─── PANTALLA DE LOGIN ─── -->
+<div id="login-screen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;background:linear-gradient(145deg,#0d0221 0%,#1e0a3c 60%,#150730 100%);">
+  <div style="width:100%;max-width:400px;">
+
+    <!-- Logo -->
+    <div style="text-align:center;margin-bottom:1.75rem;">
+      <h1 style="font-family:'Outfit',sans-serif;font-size:2.6rem;font-weight:900;font-style:italic;background:linear-gradient(135deg,#f5d020 0%,#f97316 50%,#e9d5ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:0.25rem;">EL ARREJUNTAO</h1>
+      <p style="font-size:0.78rem;color:rgba(255,255,255,0.38);letter-spacing:0.1em;text-transform:uppercase;">Sorteos &amp; Apuestas</p>
+    </div>
+
+    <!-- AVISO LOCALHOST -->
+    <div id="localhost-warning" style="display:none;background:rgba(234,179,8,0.12);border:1px solid rgba(234,179,8,0.4);border-radius:0.75rem;padding:0.75rem 1rem;margin-bottom:1rem;">
+      <p style="font-size:0.78rem;color:#fde047;font-weight:700;">⚠️ Modo local detectado</p>
+      <p style="font-size:0.72rem;color:rgba(255,255,255,0.65);margin-top:0.25rem;line-height:1.45;">Google Sign-In requiere un dominio autorizado. Usa <strong>email/contraseña</strong> en local, o accede desde <a href="https://app-el-arrejuntao.web.app" target="_blank" style="color:#f5d020;">app-el-arrejuntao.web.app</a> para usar Google.</p>
+    </div>
+
+    <!-- Card -->
+    <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:1.25rem;padding:1.75rem;backdrop-filter:blur(12px);">
+
+      <!-- Tabs: Entrar / Crear cuenta -->
+      <div style="display:flex;border-radius:0.6rem;overflow:hidden;border:1px solid rgba(255,255,255,0.12);margin-bottom:1.25rem;">
+        <button id="tab-login" onclick="authTab('login')"
+          style="flex:1;padding:0.6rem;font-family:'Outfit',sans-serif;font-weight:700;font-size:0.88rem;border:none;cursor:pointer;background:rgba(124,58,237,0.8);color:#fff;transition:all 0.2s;">
+          Iniciar sesión
+        </button>
+        <button id="tab-register" onclick="authTab('register')"
+          style="flex:1;padding:0.6rem;font-family:'Outfit',sans-serif;font-weight:700;font-size:0.88rem;border:none;cursor:pointer;background:transparent;color:rgba(255,255,255,0.5);transition:all 0.2s;">
+          Crear cuenta
+        </button>
+      </div>
+
+      <!-- BOTÓN GOOGLE -->
+      <button onclick="loginConGoogle()" id="btn-google" class="auth-btn"
+        style="width:100%;display:flex;align-items:center;justify-content:center;gap:0.75rem;background:#fff;color:#1f1f1f;border:none;border-radius:0.75rem;padding:0.85rem 1.2rem;font-family:'Outfit',sans-serif;font-weight:800;font-size:0.97rem;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.3);transition:all 0.2s;margin-bottom:1.1rem;"
+        onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,0.4)';this.style.transform='scale(1.01)'"
+        onmouseout="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.3)';this.style.transform='scale(1)'">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continuar con Google
+      </button>
+
+      <!-- Separador -->
+      <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1.1rem;">
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>
+        <span style="font-size:0.7rem;color:rgba(255,255,255,0.28);">o con correo electrónico</span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>
+      </div>
+
+      <!-- Email -->
+      <input id="login-email" type="email" placeholder="correo@ejemplo.com" autocomplete="email"
+        style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.16);border-radius:0.6rem;padding:0.7rem 1rem;color:#fff;font-family:'Outfit',sans-serif;font-size:0.92rem;margin-bottom:0.65rem;box-sizing:border-box;outline:none;"
+        onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='rgba(255,255,255,0.16)'" />
+
+      <!-- Contraseña -->
+      <input id="login-pass" type="password" placeholder="Contraseña (mín. 6 caracteres)" autocomplete="current-password"
+        style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.16);border-radius:0.6rem;padding:0.7rem 1rem;color:#fff;font-family:'Outfit',sans-serif;font-size:0.92rem;margin-bottom:0.9rem;box-sizing:border-box;outline:none;"
+        onfocus="this.style.borderColor='#7c3aed'" onblur="this.style.borderColor='rgba(255,255,255,0.16)'"
+        onkeydown="if(event.key==='Enter') document.getElementById('btn-email-action').click()" />
+
+      <!-- Error -->
+      <div id="login-error" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:0.5rem;padding:0.55rem 0.85rem;color:#fca5a5;font-size:0.8rem;margin-bottom:0.8rem;text-align:center;"></div>
+
+      <!-- Spinner -->
+      <div id="login-spinner" style="display:none;justify-content:center;margin-bottom:0.7rem;">
+        <div style="width:1.4rem;height:1.4rem;border:3px solid rgba(255,255,255,0.15);border-top-color:#7c3aed;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+      </div>
+
+      <!-- Botón principal acción -->
+      <button id="btn-email-action" onclick="loginConEmail()" class="auth-btn"
+        style="width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;border-radius:0.65rem;padding:0.82rem;font-family:'Outfit',sans-serif;font-weight:900;font-size:0.97rem;cursor:pointer;letter-spacing:0.02em;transition:opacity 0.2s;"
+        onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
+        Iniciar sesión
+      </button>
+
+      <!-- Link olvidé contraseña (solo en login) -->
+      <p id="link-forgot" style="text-align:center;margin-top:0.75rem;">
+        <a href="#" onclick="olvideClave();return false;" style="font-size:0.75rem;color:rgba(255,255,255,0.4);text-decoration:underline;">Olvidé mi contraseña</a>
+      </p>
+    </div>
+  </div>
+</div>
+<style>
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #login-screen input::placeholder{color:rgba(255,255,255,0.3);}
+</style>
+<script>
+  // Tabs login / registro
+  function authTab(tab) {
+    const isReg = tab === 'register';
+    document.getElementById('tab-login').style.background    = isReg ? 'transparent' : 'rgba(124,58,237,0.8)';
+    document.getElementById('tab-login').style.color         = isReg ? 'rgba(255,255,255,0.5)' : '#fff';
+    document.getElementById('tab-register').style.background = isReg ? 'rgba(124,58,237,0.8)' : 'transparent';
+    document.getElementById('tab-register').style.color      = isReg ? '#fff' : 'rgba(255,255,255,0.5)';
+    const btn = document.getElementById('btn-email-action');
+    const forgot = document.getElementById('link-forgot');
+    btn.textContent = isReg ? 'Crear cuenta' : 'Iniciar sesión';
+    btn.onclick = isReg ? registrarse : loginConEmail;
+    if (forgot) forgot.style.display = isReg ? 'none' : 'block';
+    // Ajustar autocomplete
+    document.getElementById('login-pass').autocomplete = isReg ? 'new-password' : 'current-password';
+  }
+  // Aviso localhost
+  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+    document.addEventListener('DOMContentLoaded', function(){
+      const w = document.getElementById('localhost-warning');
+      if (w) w.style.display = 'block';
+    });
+  }
+  // Olvide clave
+  function olvideClave() {
+    const email = document.getElementById('login-email')?.value.trim();
+    if (!email) { alert('Escribe tu correo primero'); return; }
+    import('./firebase-auth.js').then(m => {
+      // resetPassword se exporta si existe
+      if (typeof m.resetPassword === 'function') m.resetPassword(email);
+      else alert('Funcionalidad en desarrollo. Contacta al administrador.');
+    }).catch(() => alert('Funcionalidad en desarrollo.'));
+  }
+</script>
+
+
+<!-- ─── APP SHELL ─── -->
+<div id="app-content" class="max-w-lg mx-auto px-4 pt-6" style="display:none;">
+
+  <!-- HEADER -->
+  <header class="text-center mb-6">
+    <div class="inline-block glass px-6 py-4 glow">
+      <p class="text-xs text-yellow-300 tracking-widest uppercase mb-0.5">🎰 Sorteos &amp; Apuestas</p>
+      <img src="elarrejuntao.png" alt="" id="logo-img"
+           style="max-height:80px; max-width:260px; object-fit:contain; margin:0 auto; display:block; mix-blend-mode:multiply;"
+           onerror="this.style.display='none';" />
+      <h1 style="font-family:'Outfit',sans-serif;font-size:2.4rem;font-weight:900;font-style:italic;letter-spacing:-0.02em;text-align:center;margin-top:0.2rem;background:linear-gradient(135deg,#f5d020 0%,#f97316 50%,#e9d5ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;">EL ARREJUNTAO</h1>
+      <p class="text-xs text-white/50 mt-1">Asterisco Siete (*7)</p>
+      <!-- Usuario + Logout -->
+      <div style="margin-top:0.6rem;display:flex;align-items:center;justify-content:center;gap:0.6rem;">
+        <span id="user-badge" style="font-size:0.7rem;color:rgba(255,255,255,0.45);background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:9999px;padding:0.2rem 0.7rem;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+        <button onclick="cerrarSesion()"
+          style="font-family:'Outfit',sans-serif;font-size:0.68rem;font-weight:700;cursor:pointer;
+                 background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);
+                 color:#fca5a5;border-radius:9999px;padding:0.2rem 0.65rem;transition:all 0.2s;"
+          onmouseover="this.style.background='rgba(239,68,68,0.3)'" onmouseout="this.style.background='rgba(239,68,68,0.15)'"
+        >⏻ Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAV TABS -->
+  <nav class="glass flex gap-2 p-2 mb-5" style="justify-content:center;">
+    <button class="tab-btn active" onclick="showTab('resultados')" style="flex:1;text-align:center;">🎰 Genera tu Suerte</button>
+    <button class="tab-btn" onclick="showTab('apuestas')" style="flex:1;text-align:center;">🎯 Apuesta</button>
+    <button class="tab-btn" onclick="showTab('animalitos')" style="flex:1;text-align:center;">🐾 Animalitos</button>
+    <button class="tab-btn" onclick="showTab('clientes')" style="flex:1;text-align:center;">👥 Clientes</button>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECCIÓN 1: RESULTADOS -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="sec-resultados" class="section active space-y-4">
+
+    <!-- Triple A y Triple B · Premium -->
+    <div style="background:linear-gradient(145deg,#0d0221 0%,#1e0a3c 60%,#150730 100%);border-radius:1.25rem;padding:1.25rem;border:1px solid rgba(167,139,250,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);">
+
+      <!-- Header -->
+      <p style="color:#facc15;font-weight:900;font-size:1rem;letter-spacing:0.06em;text-align:center;margin-bottom:1rem;">Gana con el <span style="color:#fff;">Triple</span> · El Arrejuntao</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;text-align:center;">
+
+        <!-- ══ TRIPLE A ══ -->
+        <div>
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;justify-content:center;">
+            <span style="background:#ef4444;border-radius:9999px;width:1.4rem;height:1.4rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:900;color:#fff;flex-shrink:0;">A</span>
+            <p style="font-size:0.72rem;font-weight:800;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.08em;">Triple A</p>
+          </div>
+          <!-- Digit cards -->
+          <div style="display:flex;gap:0.4rem;justify-content:center;margin-bottom:0.75rem;">
+            <div class="triple-slot" id="sA1" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('tripleA-d1').focus()">?</div>
+            <div class="triple-slot" id="sA2" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('tripleA-d2').focus()">?</div>
+            <div class="triple-slot" id="sA3" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('tripleA-d3').focus()">?</div>
+          </div>
+          <!-- Hidden inputs -->
+          <div style="display:flex;gap:0.3rem;opacity:0;height:0;overflow:hidden;">
+            <input id="tripleA-d1" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);autoFocusNext(this,'tripleA-d2');updateTripleSlot('A',1,this.value)" />
+            <input id="tripleA-d2" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);autoFocusNext(this,'tripleA-d3');updateTripleSlot('A',2,this.value)" />
+            <input id="tripleA-d3" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);autoFocusNext(this,'tripleB-d1');updateTripleSlot('A',3,this.value)" />
+          </div>
+          <!-- Generar button A -->
+          <button onclick="generarTriple('A')" style="width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:9999px;padding:0.5rem 0;font-family:'Outfit',sans-serif;font-weight:800;font-size:0.8rem;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.4rem;transition:all 0.2s;box-shadow:0 4px 15px rgba(124,58,237,0.35);" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+            Generar
+          </button>
+        </div>
+
+        <!-- ══ TRIPLE B ══ -->
+        <div>
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;justify-content:center;">
+            <span style="background:#3b82f6;border-radius:9999px;width:1.4rem;height:1.4rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:900;color:#fff;flex-shrink:0;">B</span>
+            <p style="font-size:0.72rem;font-weight:800;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.08em;">Triple B</p>
+          </div>
+          <div style="display:flex;gap:0.4rem;justify-content:center;margin-bottom:0.75rem;">
+            <div class="triple-slot" id="sB1" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('tripleB-d1').focus()">?</div>
+            <div class="triple-slot" id="sB2" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('tripleB-d2').focus()">?</div>
+            <div class="triple-slot" id="sB3" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('tripleB-d3').focus()">?</div>
+          </div>
+          <div style="display:flex;gap:0.3rem;opacity:0;height:0;overflow:hidden;">
+            <input id="tripleB-d1" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);autoFocusNext(this,'tripleB-d2');updateTripleSlot('B',1,this.value)" />
+            <input id="tripleB-d2" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);autoFocusNext(this,'tripleB-d3');updateTripleSlot('B',2,this.value)" />
+            <input id="tripleB-d3" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);updateTripleSlot('B',3,this.value)" />
+          </div>
+          <button onclick="generarTriple('B')" style="width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:9999px;padding:0.5rem 0;font-family:'Outfit',sans-serif;font-weight:800;font-size:0.8rem;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.4rem;transition:all 0.2s;box-shadow:0 4px 15px rgba(124,58,237,0.35);" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+            Generar
+          </button>
+        </div>
+      </div>
+
+      <!-- Legado oculto para compatibilidad -->
+      <div style="display:none;">
+        <input id="arrimao-d1"/><input id="arrimao-d2"/><input id="arrimao-d3"/>
+        <div id="arrimao-display"><span id="arrimao-r1"></span><span id="arrimao-r2"></span><span id="arrimao-r3"></span></div>
+        <div id="tripleA-display"><p id="tripleA-result"></p></div>
+        <div id="tripleB-display"><p id="tripleB-result"></p></div>
+      </div>
+
+      <!-- Publicar -->
+      <button class="btn-gold w-full" onclick="setResultadoTriples(); showTab('apuestas')" style="margin-top:0.25rem;font-size:1.1rem;font-weight:900;letter-spacing:0.04em;">
+        🎮 Jugar Ahora
+      </button>
+    </div>
+
+
+
+
+    <!-- Triple + Signo · Premium -->
+    <div style="background:linear-gradient(145deg,#0d0221 0%,#1e0a3c 60%,#150730 100%);border-radius:1.25rem;padding:1.25rem;border:1px solid rgba(167,139,250,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);">
+
+      <!-- Header -->
+      <p style="color:#facc15;font-weight:900;font-size:1rem;letter-spacing:0.06em;text-align:center;margin-bottom:1rem;">Triple + <span style="color:#fff;">Signo</span> · El Arrejuntao</p>
+
+      <!-- 3 DIGIT SLOTS + ZODIAC display in one row -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:1.2rem;margin-bottom:1rem;">
+
+        <!-- Digit Slots -->
+        <div style="display:flex;gap:0.4rem;justify-content:center;">
+          <div class="triple-slot" id="sTS1" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;">?</div>
+          <div class="triple-slot" id="sTS2" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;">?</div>
+          <div class="triple-slot" id="sTS3" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;">?</div>
+        </div>
+
+        <!-- Zodiac display circle -->
+        <div id="tripleSigno-display" style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+          <div style="width:4.5rem;height:4.5rem;border-radius:50%;background:linear-gradient(145deg,#b45309,#d97706,#fbbf24);border:3px solid rgba(251,191,36,0.6);display:flex;align-items:center;justify-content:center;font-size:2.2rem;box-shadow:0 4px 16px rgba(251,191,36,0.35);">
+            <span id="tripleSigno-emoji">♈</span>
+          </div>
+          <p id="tripleSigno-nombre" style="color:#facc15;font-weight:800;font-size:0.8rem;text-align:center;">Aries</p>
+        </div>
+      </div>
+
+      <!-- Hidden inputs -->
+      <div style="display:flex;gap:0.3rem;opacity:0;height:0;overflow:hidden;">
+        <input id="tripleSigno-d1" type="number" min="0" max="9" maxlength="1" />
+        <input id="tripleSigno-d2" type="number" min="0" max="9" maxlength="1" />
+        <input id="tripleSigno-d3" type="number" min="0" max="9" maxlength="1" />
+      </div>
+
+      <!-- Generar -->
+      <button onclick="generarTripleSigno()" style="width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:9999px;padding:0.6rem 0;font-family:'Outfit',sans-serif;font-weight:800;font-size:0.9rem;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.2s;box-shadow:0 4px 15px rgba(124,58,237,0.35);margin-bottom:0.75rem;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+        Generar
+      </button>
+
+      <!-- Jugar Ahora -->
+      <button class="btn-gold w-full" onclick="showTab('apuestas')" style="font-size:1.1rem;font-weight:900;letter-spacing:0.04em;">
+        🎮 Jugar Ahora
+      </button>
+    </div>
+
+<!-- ¿Qué Soñaste? · Dream Interpreter -->
+    <div style="background:linear-gradient(145deg,#0d0221 0%,#1e0a3c 60%,#150730 100%);border-radius:1.25rem;padding:1.25rem;border:1px solid rgba(167,139,250,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);">
+
+      <!-- Header -->
+      <p style="color:#fff;font-weight:900;font-size:1.1rem;letter-spacing:0.02em;margin-bottom:1rem;">
+        🌙 <span style="color:#facc15;">¿Qué Soñaste?</span>
+      </p>
+
+      <!-- Search Row -->
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;">
+        <input id="sueno-input" type="text" placeholder="Escribe lo que soñaste..."
+          style="flex:1;background:rgba(255,255,255,0.07);border:1px solid rgba(167,139,250,0.25);border-radius:0.75rem;padding:0.7rem 1rem;color:#fff;font-size:0.95rem;font-family:'Outfit',sans-serif;outline:none;"
+          oninput="buscarSueno(this.value)"
+          onkeydown="if(event.key==='Enter') buscarSueno(document.getElementById('sueno-input').value)"
+        />
+        <button onclick="buscarSueno(document.getElementById('sueno-input').value)"
+          style="background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:0.75rem;width:3rem;height:3rem;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 4px 12px rgba(124,58,237,0.4);">
+          <svg width="20" height="20" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+      </div>
+
+      <!-- Result area -->
+      <div id="sueno-result" style="display:none;background:rgba(255,255,255,0.05);border-radius:0.9rem;padding:0.85rem 1rem;margin-bottom:0.75rem;border:1px solid rgba(167,139,250,0.15);">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div id="sueno-nums" style="display:flex;gap:0.35rem;flex-shrink:0;"></div>
+          <div>
+            <p id="sueno-significado" style="color:#fff;font-weight:700;font-size:0.9rem;"></p>
+            <p id="sueno-animal-label" style="color:rgba(167,139,250,0.9);font-size:0.78rem;font-weight:600;margin-top:0.15rem;"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- No result -->
+      <div id="sueno-noresult" style="display:none;color:rgba(255,255,255,0.45);font-size:0.85rem;text-align:center;margin-bottom:0.75rem;">
+        No encontré ese sueño. Prueba con otra palabra.
+      </div>
+
+      <!-- Popular tags -->
+      <div>
+        <p style="font-size:0.7rem;font-weight:800;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">Populares:</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
+          <button onclick="setSearchSueno('Perro')"   class="sueno-tag">Perro</button>
+          <button onclick="setSearchSueno('Agua')"    class="sueno-tag">Agua</button>
+          <button onclick="setSearchSueno('Dinero')"  class="sueno-tag">Dinero</button>
+          <button onclick="setSearchSueno('Serpiente')" class="sueno-tag">Serpiente</button>
+          <button onclick="setSearchSueno('Fuego')"   class="sueno-tag">Fuego</button>
+          <button onclick="setSearchSueno('Nino')"   class="sueno-tag">Niño</button>
+          <button onclick="setSearchSueno('Casa')"    class="sueno-tag">Casa</button>
+          <button onclick="setSearchSueno('Caballo')" class="sueno-tag">Caballo</button>
+        </div>
+      </div>
+    </div>
+
+<!-- El Pegadito · Premium -->
+    <div style="background:linear-gradient(145deg,#0d0221 0%,#1e0a3c 60%,#150730 100%);border-radius:1.25rem;padding:1.25rem;border:1px solid rgba(167,139,250,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);">
+
+      <!-- Header -->
+      <p style="color:#facc15;font-weight:900;font-size:1rem;letter-spacing:0.06em;text-align:center;margin-bottom:1.1rem;">Gana con el <span style="color:#fff;">Arrimao</span> · El Arrejuntao</p>
+
+      <!-- 4 Digit Slots -->
+      <div style="display:flex;gap:0.5rem;justify-content:center;margin-bottom:1rem;">
+        <div class="triple-slot" id="sPeg1" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('peg-d1').focus()">?</div>
+        <div class="triple-slot" id="sPeg2" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('peg-d2').focus()">?</div>
+        <div class="triple-slot" id="sPeg3" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('peg-d3').focus()">?</div>
+        <div class="triple-slot" id="sPeg4" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:3.2rem;height:3.8rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('peg-d4').focus()">?</div>
+      </div>
+
+      <!-- Hidden inputs (legacy compat) -->
+      <div style="display:flex;gap:0.3rem;opacity:0;height:0;overflow:hidden;">
+        <input id="peg-d1" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);autoFocusNext(this,'peg-d2');updatePegSlot(1,this.value)" />
+        <input id="peg-d2" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);autoFocusNext(this,'peg-d3');updatePegSlot(2,this.value)" />
+        <input id="peg-d3" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);autoFocusNext(this,'peg-d4');updatePegSlot(3,this.value)" />
+        <input id="peg-d4" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);updatePegSlot(4,this.value)" />
+      </div>
+      <!-- Legacy display (hidden) -->
+      <div id="pegadito-display" style="display:none!important;">
+        <span id="peg-r1"></span><span id="peg-r2"></span><span id="peg-r3"></span><span id="peg-r4"></span>
+      </div>
+
+      <!-- Generar button -->
+      <button onclick="generarPegadito()" style="width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:9999px;padding:0.6rem 0;font-family:'Outfit',sans-serif;font-weight:800;font-size:0.9rem;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.2s;box-shadow:0 4px 15px rgba(124,58,237,0.35);margin-bottom:0.75rem;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+        Generar
+      </button>
+
+      <!-- Jugar Ahora -->
+      <button class="btn-gold w-full" onclick="setResultado('pegadito'); showTab('apuestas')" style="font-size:1.1rem;font-weight:900;letter-spacing:0.04em;">
+        🎮 Jugar Ahora
+      </button>
+    </div>
+
+    
+    <!-- Pirámide de la Suerte · Premium -->
+    <div style="background:linear-gradient(145deg,#0d0221 0%,#1e0a3c 60%,#150730 100%);border-radius:1.25rem;padding:1.25rem;border:1px solid rgba(167,139,250,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);">
+
+      <!-- Header -->
+      <p style="color:#facc15;font-weight:900;font-size:1rem;letter-spacing:0.04em;text-align:center;margin-bottom:0.9rem;">
+        ✨ <span style="color:#fff;">Pirámide de la Suerte</span> ✨
+      </p>
+
+      <!-- Date inputs -->
+      <div style="display:flex;gap:0.5rem;justify-content:center;margin-bottom:0.75rem;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0.25rem;">
+          <label style="font-size:0.65rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.08em;">Día</label>
+          <input id="pir-dd" type="number" min="1" max="31" placeholder="DD"
+            style="width:3.5rem;background:rgba(255,255,255,0.07);border:1px solid rgba(167,139,250,0.3);border-radius:0.6rem;padding:0.5rem;color:#fff;font-size:1rem;font-family:'Outfit',sans-serif;font-weight:700;text-align:center;outline:none;" />
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0.25rem;">
+          <label style="font-size:0.65rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.08em;">Mes</label>
+          <input id="pir-mm" type="number" min="1" max="12" placeholder="MM"
+            style="width:3.5rem;background:rgba(255,255,255,0.07);border:1px solid rgba(167,139,250,0.3);border-radius:0.6rem;padding:0.5rem;color:#fff;font-size:1rem;font-family:'Outfit',sans-serif;font-weight:700;text-align:center;outline:none;" />
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0.25rem;">
+          <label style="font-size:0.65rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.08em;">Año</label>
+          <input id="pir-yyyy" type="number" min="2000" max="2099" placeholder="AAAA"
+            style="width:5rem;background:rgba(255,255,255,0.07);border:1px solid rgba(167,139,250,0.3);border-radius:0.6rem;padding:0.5rem;color:#fff;font-size:1rem;font-family:'Outfit',sans-serif;font-weight:700;text-align:center;outline:none;" />
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:0.25rem;">
+          <label style="font-size:0.65rem;color:transparent;">btn</label>
+          <button onclick="buildPiramide()"
+            style="background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:0.6rem;padding:0.5rem 0.9rem;color:#fff;font-family:'Outfit',sans-serif;font-weight:800;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;gap:0.35rem;box-shadow:0 4px 12px rgba(124,58,237,0.4);"
+            onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+            Generar
+          </button>
+        </div>
+      </div>
+
+      <!-- Pyramid grid -->
+      <div id="piramide-grid" style="display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:1rem;overflow-x:auto;padding-bottom:4px;">
+        <div style="color:rgba(255,255,255,0.3);font-size:0.8rem;">Ingresa una fecha y pulsa Generar</div>
+      </div>
+
+      <!-- Legend -->
+      <div style="display:flex;gap:1rem;justify-content:center;margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:0.35rem;">
+          <div style="width:1rem;height:1rem;border-radius:4px;background:linear-gradient(135deg,#7c3aed,#a855f7);"></div>
+          <span style="font-size:0.7rem;color:rgba(255,255,255,0.6);">Caliente (5-9)</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.35rem;">
+          <div style="width:1rem;height:1rem;border-radius:4px;background:#facc15;"></div>
+          <span style="font-size:0.7rem;color:rgba(255,255,255,0.6);">Frío (0-4)</span>
+        </div>
+      </div>
+
+      <!-- Jugar Ahora -->
+      <button class="btn-gold w-full" onclick="showTab('apuestas')" style="font-size:1.1rem;font-weight:900;letter-spacing:0.04em;">
+        🎮 Jugar Ahora
+      </button>
+    </div>
+
+<!-- El Pegadito · 5 Dígitos · Premium -->
+    <div style="background:linear-gradient(145deg,#0d0221 0%,#1e0a3c 60%,#150730 100%);border-radius:1.25rem;padding:1.25rem;border:1px solid rgba(167,139,250,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.05);">
+
+      <!-- Header -->
+      <p style="color:#facc15;font-weight:900;font-size:1rem;letter-spacing:0.06em;text-align:center;margin-bottom:1.1rem;">Gana con el <span style="color:#fff;">Pegadito</span> · El Arrejuntao</p>
+
+      <!-- 5 Digit Slots -->
+      <div style="display:flex;gap:0.4rem;justify-content:center;margin-bottom:1rem;flex-wrap:nowrap;">
+        <div class="triple-slot" id="sPeg5-1" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:2.9rem;height:3.6rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('peg5-d1').focus()">?</div>
+        <div class="triple-slot" id="sPeg5-2" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:2.9rem;height:3.6rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('peg5-d2').focus()">?</div>
+        <div class="triple-slot" id="sPeg5-3" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:2.9rem;height:3.6rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('peg5-d3').focus()">?</div>
+        <div class="triple-slot" id="sPeg5-4" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:2.9rem;height:3.6rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('peg5-d4').focus()">?</div>
+        <div class="triple-slot" id="sPeg5-5" style="background:rgba(0,0,0,0.4);border:1px solid rgba(167,139,250,0.2);border-radius:0.7rem;width:2.9rem;height:3.6rem;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:900;color:#fff;cursor:pointer;transition:all 0.15s;" onclick="document.getElementById('peg5-d5').focus()">?</div>
+      </div>
+
+      <!-- Hidden inputs -->
+      <div style="display:flex;gap:0.3rem;opacity:0;height:0;overflow:hidden;">
+        <input id="peg5-d1" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);autoFocusNext(this,'peg5-d2');updatePeg5Slot(1,this.value)" />
+        <input id="peg5-d2" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);autoFocusNext(this,'peg5-d3');updatePeg5Slot(2,this.value)" />
+        <input id="peg5-d3" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);autoFocusNext(this,'peg5-d4');updatePeg5Slot(3,this.value)" />
+        <input id="peg5-d4" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);autoFocusNext(this,'peg5-d5');updatePeg5Slot(4,this.value)" />
+        <input id="peg5-d5" type="number" min="0" max="9" maxlength="1" oninput="limitDigit(this,1);updatePeg5Slot(5,this.value)" />
+      </div>
+
+      <!-- Generar -->
+      <button onclick="generarPegadito5()" style="width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:9999px;padding:0.6rem 0;font-family:'Outfit',sans-serif;font-weight:800;font-size:0.9rem;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.2s;box-shadow:0 4px 15px rgba(124,58,237,0.35);margin-bottom:0.75rem;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+        Generar
+      </button>
+
+      <!-- Jugar Ahora -->
+      <button class="btn-gold w-full" onclick="setResultadoPegadito5(); showTab('apuestas')" style="font-size:1.1rem;font-weight:900;letter-spacing:0.04em;">
+        🎮 Jugar Ahora
+      </button>
+    </div>
+
+<!-- Animalito · Premium -->
+    <div style="background:linear-gradient(145deg,#1a0533 0%,#2d0d4e 60%,#1a0533 100%);border-radius:1.25rem;padding:1.25rem;border:1px solid rgba(167,139,250,0.25);box-shadow:0 8px 32px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.05);">
+
+      <!-- Header -->
+      <p style="color:#facc15;font-weight:900;font-size:1rem;letter-spacing:0.06em;text-align:center;margin-bottom:1rem;">Gana con el <span style="color:#fff;">Animalito</span> · El Arrejuntao</p>
+
+      <!-- Animal display slot -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;margin-bottom:1rem;">
+        <div id="ani-result-slot" style="background:rgba(0,0,0,0.45);border:2px solid rgba(167,139,250,0.3);border-radius:1.2rem;width:9rem;height:9rem;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;margin-bottom:0.6rem;box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+          <span id="ani-res-icono" style="font-size:5rem;line-height:1;user-select:none;">🐾</span>
+          <span id="ani-res-num" style="font-size:0.75rem;font-weight:900;color:rgba(250,204,21,0.85);margin-top:0.3rem;"></span>
+        </div>
+        <p id="ani-res-nombre" style="font-size:0.9rem;font-weight:800;color:rgba(255,255,255,0.75);text-align:center;min-height:1.4rem;letter-spacing:0.03em;"></p>
+      </div>
+
+      <!-- Hidden legacy fields -->
+      <div style="display:none;">
+        <span class="badge" id="animalito-badge">Sin resultado</span>
+        <div id="animalito-display" class="glass-gold p-3 text-center mb-3 hidden">
+          <span id="ani-icon" class="text-4xl">🐾</span>
+          <p class="text-yellow-400 font-black text-lg" id="ani-nombre">-</p>
+          <p class="text-white/70 text-sm" id="ani-num">Número: -</p>
+        </div>
+        <div class="grid grid-cols-4 gap-2 mb-3 max-h-60 overflow-y-auto scrollbar-thin" id="animal-grid"></div>
+      </div>
+
+      <!-- Generar -->
+      <button onclick="generarAnimalito()" style="width:100%;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:9999px;padding:0.6rem 0;font-family:'Outfit',sans-serif;font-weight:800;font-size:0.9rem;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.2s;box-shadow:0 4px 15px rgba(124,58,237,0.4);margin-bottom:0.75rem;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+        Generar
+      </button>
+
+      <!-- Jugar Ahora -->
+      <button class="btn-gold w-full" onclick="confirmarAniResultado(); showTab('animalitos')" style="font-size:1.1rem;font-weight:900;letter-spacing:0.04em;">
+        🎮 Jugar Ahora
+      </button>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECCIÓN 2: APUESTAS -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="sec-apuestas" class="section space-y-3 pb-24">
+
+    <!-- Seleccionar cliente -->
+    <div class="glass p-4">
+      <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">👤 Cliente</label>
+      <select id="apuesta-cliente" onchange="updateClienteInfo()">
+        <option value="">— Seleccionar cliente —</option>
+      </select>
+      <div id="cliente-info" class="mt-2 glass p-3 text-sm hidden">
+        <p class="text-white/60 text-xs">Crédito disponible:</p>
+        <p class="text-yellow-400 font-black text-2xl" id="cliente-saldo">$0.00</p>
+      </div>
+    </div>
+
+    <!-- PASO 1: Horario -->
+    <div class="glass p-4">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-black">1</span>
+        <p class="text-xs font-black uppercase tracking-wider text-white/80">Seleccione Horario del Sorteo</p>
+      </div>
+      <div class="flex flex-wrap gap-2" id="horarios-btns">
+        <button class="horario-btn" onclick="selHorario(this,'10:00 AM')">10:00 AM</button>
+        <button class="horario-btn" onclick="selHorario(this,'01:00 PM')">01:00 PM</button>
+        <button class="horario-btn" onclick="selHorario(this,'04:00 PM')">04:00 PM</button>
+        <button class="horario-btn" onclick="selHorario(this,'07:00 PM')">07:00 PM</button>
+        <button class="horario-btn" onclick="selHorario(this,'11:00 PM')">11:00 PM</button>
+      </div>
+    </div>
+
+    <!-- PASO 2: Categoría Principal -->
+    <div class="glass p-4">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-black">2</span>
+        <p class="text-xs font-black uppercase tracking-wider text-white/80">Categoría de Apuesta Principal</p>
+      </div>
+      <div class="flex flex-wrap gap-2" id="categoria-btns">
+        <button class="cat-btn cat-active" onclick="selCategoria(this,'todos')">✔ TODOS</button>
+        <button class="cat-btn" onclick="selCategoria(this,'triple_a')"><span class="cat-badge" style="background:#ef4444">A</span> TRIPLE A</button>
+        <button class="cat-btn" onclick="selCategoria(this,'triple_b')"><span class="cat-badge" style="background:#3b82f6">B</span> TRIPLE B</button>
+        <button class="cat-btn" onclick="selCategoria(this,'triple_signo')">✨ TRIPLE+SIGNO</button>
+        <button class="cat-btn" onclick="selCategoria(this,'arrimao')">🎯 EL ARRIMAO</button>
+        <button class="cat-btn" onclick="selCategoria(this,'pegadito')">🔥 EL PEGADITO</button>
+      </div>
+
+      <!-- Signos zodiacales en grid 2x6 -->
+      <div style="margin-top:0.75rem;">
+        <p style="font-size:0.68rem;color:rgba(255,255,255,0.4);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">Signo zodiacal</p>
+        <div id="signos-fila" style="display:grid;grid-template-columns:repeat(6,1fr);gap:0.35rem;">
+          <button class="signo-btn" onclick="selSigno(this,'aries')"      style="padding:0.4rem 0.2rem;border-radius:0.45rem;font-size:0.68rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);text-align:center;">♈<br/>Aries</button>
+          <button class="signo-btn" onclick="selSigno(this,'tauro')"      style="padding:0.4rem 0.2rem;border-radius:0.45rem;font-size:0.68rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);text-align:center;">♉<br/>Tauro</button>
+          <button class="signo-btn" onclick="selSigno(this,'geminis')"    style="padding:0.4rem 0.2rem;border-radius:0.45rem;font-size:0.68rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);text-align:center;">♊<br/>Géminis</button>
+          <button class="signo-btn" onclick="selSigno(this,'cancer')"     style="padding:0.4rem 0.2rem;border-radius:0.45rem;font-size:0.68rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);text-align:center;">♋<br/>Cáncer</button>
+          <button class="signo-btn" onclick="selSigno(this,'leo')"        style="padding:0.4rem 0.2rem;border-radius:0.45rem;font-size:0.68rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);text-align:center;">♌<br/>Leo</button>
+          <button class="signo-btn" onclick="selSigno(this,'virgo')"      style="padding:0.4rem 0.2rem;border-radius:0.45rem;font-size:0.68rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);text-align:center;">♍<br/>Virgo</button>
+          <button class="signo-btn" onclick="selSigno(this,'libra')"      style="padding:0.4rem 0.2rem;border-radius:0.45rem;font-size:0.68rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);text-align:center;">♎<br/>Libra</button>
+          <button class="signo-btn" onclick="selSigno(this,'escorpio')"   style="padding:0.4rem 0.2rem;border-radius:0.45rem;font-size:0.68rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);text-align:center;">♏<br/>Escorpio</button>
+          <button class="signo-btn" onclick="selSigno(this,'sagitario')"  style="padding:0.4rem 0.2rem;border-radius:0.45rem;font-size:0.68rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);text-align:center;">♐<br/>Sagitario</button>
+          <button class="signo-btn" onclick="selSigno(this,'capricornio')" style="padding:0.4rem 0.2rem;border-radius:0.45rem;font-size:0.68rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);text-align:center;">♑<br/>Capric.</button>
+          <button class="signo-btn" onclick="selSigno(this,'acuario')"    style="padding:0.4rem 0.2rem;border-radius:0.45rem;font-size:0.68rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);text-align:center;">♒<br/>Acuario</button>
+          <button class="signo-btn" onclick="selSigno(this,'piscis')"     style="padding:0.4rem 0.2rem;border-radius:0.45rem;font-size:0.68rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);text-align:center;">♓<br/>Piscis</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- PASO 3: Apuestas Adicionales -->
+    <div class="glass p-4">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-black">3</span>
+        <p class="text-xs font-black uppercase tracking-wider text-white/80">Apuestas Adicionales</p>
+      </div>
+      <div class="flex flex-wrap gap-2" id="adicional-btns">
+        <button class="cat-btn cat-active" onclick="selAdicional(this,'todos')">✔ TODOS</button>
+        <button class="cat-btn" onclick="selAdicional(this,'terminal_a')"><span class="cat-badge" style="background:#3b82f6">A</span> TERMINAL A</button>
+        <button class="cat-btn" onclick="selAdicional(this,'terminal_b')"><span class="cat-badge" style="background:#ef4444">B</span> TERMINAL B</button>
+        <button class="cat-btn" onclick="selAdicional(this,'term_signo')">✨ TERM+SIGNO</button>
+        <button class="cat-btn" onclick="selAdicional(this,'permuta_a')">🔀 PERMUTA A</button>
+        <button class="cat-btn" onclick="selAdicional(this,'permuta_b')">🔀 PERMUTA B</button>
+        <button class="cat-btn" onclick="selAdicional(this,'serie_a')">📊 SERIE A</button>
+        <button class="cat-btn" onclick="selAdicional(this,'serie_b')">📊 SERIE B</button>
+      </div>
+
+    <!-- Cierre paso 3 -->
+    </div>
+
+    <!-- PASO 4: Números y Monto -->
+    <div class="glass p-4 space-y-3">
+      <div class="flex items-center gap-3 mb-1">
+        <span class="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-black">4</span>
+        <p class="text-xs font-black uppercase tracking-wider text-white/80">Números y Monto</p>
+      </div>
+
+      <!-- Input multi-número -->
+      <div>
+        <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Número (hasta 3 cifras)</label>
+        <div class="flex gap-2">
+          <input id="apuesta-numero" type="number" placeholder="Ej: 852" class="text-center text-2xl font-black tracking-widest"
+            style="flex:1;" maxlength="3"
+            oninput="if(this.value.length>3)this.value=this.value.slice(0,3);"
+            onkeydown="if(event.key==='Enter'){agregarNumeroApuesta();}" />
+          <button onclick="agregarNumeroApuesta()"
+            style="background:#7c3aed;color:#fff;border:none;border-radius:0.6rem;padding:0.5rem 1rem;font-family:'Outfit',sans-serif;font-weight:900;font-size:0.9rem;cursor:pointer;">
+            + AÑADIR
+          </button>
+        </div>
+        <!-- Chips de números añadidos -->
+        <div id="numeros-chips" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;min-height:1.8rem;"></div>
+      </div>
+
+      <!-- Monto -->
+      <div>
+        <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Monto <span class="text-yellow-400">Bs</span> por número</label>
+        <input id="apuesta-monto" type="number" placeholder="Bs" step="0.01" min="0.01" />
+      </div>
+
+      <button class="btn-gold w-full text-base py-3 font-black" onclick="agregarApuestaAlTicket()">
+        🎯 AGREGAR AL TICKET
+      </button>
+    </div>
+
+
+    <!-- Historial de apuestas -->
+    <div class="glass p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-black text-yellow-400 text-sm">📋 Historial de Apuestas</h3>
+        <button class="btn-danger" onclick="limpiarApuestas()">Limpiar</button>
+      </div>
+      <div id="historial-list" class="space-y-2 max-h-64 overflow-y-auto scrollbar-thin">
+        <p class="text-white/30 text-sm text-center py-4">No hay apuestas registradas</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECCIÓN: ANIMALITOS EL ARREJUNTAO           -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="sec-animalitos" class="section space-y-4">
+
+    <div class="glass p-4">
+      <div class="flex items-center gap-2 mb-3">
+        <span style="font-size:1.4rem;">🐾</span>
+        <div>
+          <h2 class="font-black text-yellow-400 italic text-lg leading-none">Animalitos</h2>
+          <p class="text-white/40 text-xs">El Arrejuntao · 76 animales</p>
+        </div>
+      </div>
+
+      <!-- Horario -->
+      <p class="text-xs text-white/50 uppercase tracking-wider mb-2 font-bold">Horario del sorteo</p>
+      <div class="flex flex-wrap gap-2 mb-4" id="ani-horarios-btns">
+        <button class="horario-btn" onclick="selAniHorario(this,'10:00 AM')">10:00 AM</button>
+        <button class="horario-btn" onclick="selAniHorario(this,'01:00 PM')">01:00 PM</button>
+        <button class="horario-btn" onclick="selAniHorario(this,'04:00 PM')">04:00 PM</button>
+        <button class="horario-btn" onclick="selAniHorario(this,'07:00 PM')">07:00 PM</button>
+        <button class="horario-btn" onclick="selAniHorario(this,'11:00 PM')">11:00 PM</button>
+      </div>
+
+      <!-- Monto + buscador -->
+      <div class="flex gap-2 mb-3 items-center">
+        <input id="ani-monto" type="number" placeholder="Monto Bs" step="0.01" min="0.01"
+          style="flex:1;font-size:1rem;font-weight:900;" />
+        <input id="ani-filtro" type="text" placeholder="🔍 Buscar..."
+          style="flex:1;font-size:0.85rem;" oninput="filtrarAnimalitos()" />
+      </div>
+
+      <!-- Grid de animalitos (se llena por JS) -->
+      <div id="ani-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.4rem;max-height:58vh;overflow-y:auto;padding-right:2px;" class="scrollbar-thin"></div>
+    </div>
+
+    <!-- Historial animalitos -->
+    <div class="glass p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-black text-yellow-400 text-sm">🐾 Historial Animalitos</h3>
+        <button class="btn-danger" onclick="limpiarAniHistorial()">Limpiar</button>
+      </div>
+      <div id="ani-historial-list" class="space-y-2 max-h-60 overflow-y-auto scrollbar-thin">
+        <p class="text-white/30 text-sm text-center py-4">Sin apuestas registradas</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- FAB ANIMALITOS - APOSTAR -->
+  <div id="ani-fab" style="position:fixed;bottom:1.5rem;left:1.5rem;z-index:999;display:none;">
+    <button onclick="abrirTicketAni()"
+      style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;border-radius:9999px;padding:0.85rem 1.4rem;font-family:'Outfit',sans-serif;font-weight:900;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 24px rgba(22,163,74,0.5);display:flex;align-items:center;gap:0.6rem;">
+      🐾
+      <div style="text-align:left;line-height:1.1;">
+        <div style="font-size:0.65rem;opacity:0.85;">VER TICKET</div>
+        <div id="ani-fab-total">Bs 0.00</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- MODAL TICKET ANIMALITOS -->
+  <div id="ani-ticket-modal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.8);overflow-y:auto;padding:1rem;">
+    <div style="max-width:420px;margin:0 auto;background:#0f0f1a;border-radius:1rem;overflow:hidden;box-shadow:0 8px 48px rgba(0,0,0,0.7);">
+
+      <!-- Cabecera ticket -->
+      <div style="background:#111827;padding:1.2rem 1.4rem 0.8rem;text-align:center;border-bottom:2px dashed rgba(255,255,255,0.12);">
+        <p style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-bottom:0.25rem;">TICKET EN CURSO</p>
+        <h2 style="font-family:'Outfit',sans-serif;font-weight:900;font-size:1rem;color:#f5d020;letter-spacing:0.05em;">EL ARREJUNTAO</h2>
+        <p style="font-size:0.65rem;color:rgba(255,255,255,0.4);">🐾 Animalitos El Arrejuntao</p>
+        <div style="border-top:1px dashed rgba(255,255,255,0.15);margin:0.6rem 0;"></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:rgba(255,255,255,0.5);">
+          <span id="ani-ticket-fecha"></span>
+          <span id="ani-ticket-hora"></span>
+        </div>
+        <div style="border-bottom:1px dashed rgba(255,255,255,0.15);margin:0.5rem 0 0;"></div>
+      </div>
+
+      <!-- Detalle apuestas -->
+      <div style="padding:0.8rem 1.2rem;">
+        <div style="display:flex;justify-content:space-between;font-size:0.65rem;font-weight:900;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:0.5rem;">
+          <span>TICKET DETALLE</span><span>MONTO</span>
+        </div>
+        <div id="ani-ticket-lista" class="space-y-2"></div>
+      </div>
+
+      <!-- Total -->
+      <div style="padding:0.8rem 1.2rem;border-top:2px dashed rgba(255,255,255,0.12);">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-weight:900;font-size:0.95rem;letter-spacing:0.04em;">TOTAL A PAGAR:</span>
+          <span id="ani-ticket-total-modal" style="font-weight:900;font-size:1.4rem;color:#22c55e;">Bs 0.00</span>
+        </div>
+        <p style="font-size:0.6rem;color:rgba(255,255,255,0.3);text-align:center;margin-top:0.6rem;">*** GRACIAS POR SU PREFERENCIA ***<br>Revise su ticket antes de retirarse.</p>
+      </div>
+
+      <!-- Botones -->
+      <div style="display:flex;gap:0;border-top:1px solid rgba(255,255,255,0.08);">
+        <button onclick="cancelarTicketAni()"
+          style="flex:1;padding:1rem;background:#7f1d1d;color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:0.9rem;border:none;cursor:pointer;border-radius:0 0 0 1rem;transition:background 0.15s;"
+          onmouseover="this.style.background='#991b1b'" onmouseout="this.style.background='#7f1d1d'">
+          🗑️ CANCELAR
+        </button>
+        <button onclick="verificarTicketAni()"
+          style="flex:1;padding:1rem;background:#16a34a;color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:0.9rem;border:none;cursor:pointer;border-radius:0 0 1rem 0;transition:background 0.15s;"
+          onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">
+          ✅ CONFIRMAR
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAB APUESTAS -->
+  <div id="ticket-fab" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;display:none;">
+    <button onclick="abrirModalTicket()"
+      style="background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border:none;border-radius:9999px;padding:0.85rem 1.4rem;font-family:'Outfit',sans-serif;font-weight:900;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 24px rgba(249,115,22,0.5);display:flex;align-items:center;gap:0.6rem;">
+      🎯
+      <div style="text-align:left;line-height:1.1;">
+        <div style="font-size:0.65rem;opacity:0.85;">VER TICKET</div>
+        <div id="ticket-total">Bs 0.00</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- MODAL TICKET APUESTAS -->
+  <div id="apuesta-ticket-modal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.85);overflow-y:auto;padding:1rem;">
+    <div style="max-width:420px;margin:0 auto;background:#0d0d1a;border-radius:1rem;overflow:hidden;box-shadow:0 8px 48px rgba(0,0,0,0.8);font-family:'Courier New',monospace;">
+
+      <!-- Encabezado tipo recibo -->
+      <div style="background:#111827;padding:1.3rem 1.5rem 0.9rem;text-align:center;">
+        <p style="font-size:0.6rem;color:rgba(255,255,255,0.35);letter-spacing:0.1em;text-transform:uppercase;">TICKET EN CURSO</p>
+        <h2 style="font-size:1rem;font-weight:900;color:#f5d020;letter-spacing:0.08em;margin:0.2rem 0;">EL ARREJUNTAO</h2>
+        <p style="font-size:0.62rem;color:rgba(255,255,255,0.35);">🎯 Apuestas</p>
+        <div style="border-top:1px dashed rgba(255,255,255,0.2);margin:0.7rem 0 0.4rem;"></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:rgba(255,255,255,0.45);">
+          <span id="ap-ticket-fecha"></span>
+          <span id="ap-ticket-hora"></span>
+        </div>
+        <div style="border-bottom:1px dashed rgba(255,255,255,0.2);margin:0.4rem 0 0;"></div>
+      </div>
+
+      <!-- Detalle -->
+      <div style="padding:0.8rem 1.2rem;">
+        <div style="display:flex;justify-content:space-between;font-size:0.62rem;font-weight:900;letter-spacing:0.08em;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:0.5rem;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:0.3rem;">
+          <span>TICKET DETALLE</span><span>MONTO</span>
+        </div>
+        <div id="ap-ticket-lista"></div>
+      </div>
+
+      <!-- Total -->
+      <div style="padding:0.6rem 1.2rem 1rem;border-top:2px dashed rgba(255,255,255,0.15);">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-weight:900;font-size:0.9rem;letter-spacing:0.05em;">TOTAL A PAGAR:</span>
+          <span id="ap-ticket-total" style="font-weight:900;font-size:1.5rem;color:#f97316;">Bs 0.00</span>
+        </div>
+        <p style="font-size:0.58rem;color:rgba(255,255,255,0.25);text-align:center;margin-top:0.6rem;line-height:1.5;">
+          *** GRACIAS POR SU PREFERENCIA ***<br>Revise su ticket antes de retirarse.<br>Caduca a los 3 días.
+        </p>
+      </div>
+
+      <!-- Botones -->
+      <div style="display:flex;border-top:1px solid rgba(255,255,255,0.08);">
+        <button onclick="cancelarTicketApuesta()"
+          style="flex:1;padding:1rem;background:#7f1d1d;color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:0.9rem;border:none;cursor:pointer;border-radius:0 0 0 1rem;"
+          onmouseover="this.style.background='#991b1b'" onmouseout="this.style.background='#7f1d1d'">
+          🗑️ CANCELAR
+        </button>
+        <button onclick="confirmarTicketApuesta()"
+          style="flex:1;padding:1rem;background:#ea580c;color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:0.9rem;border:none;cursor:pointer;border-radius:0 0 1rem 0;"
+          onmouseover="this.style.background='#c2410c'" onmouseout="this.style.background='#ea580c'">
+          ✅ CONFIRMAR (F10)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SECCIÓN 3: CLIENTES (CSV) -->
+  <!-- ═══════════════════════════════════════════ -->
+  <section id="sec-clientes" class="section space-y-4">
+
+    <div class="glass p-5">
+      <h2 class="text-yellow-400 font-black italic text-xl mb-1">📂 Panel de Administración</h2>
+      <p class="text-white/50 text-sm mb-4">Carga tu base de clientes desde un archivo <span class="text-yellow-400">.csv</span></p>
+
+      <div class="glass-gold p-4 mb-4 text-sm text-white/70">
+        <p class="font-bold text-yellow-400 mb-1">Formato requerido del CSV:</p>
+        <code class="text-xs">Nombre,Telefono,Credito_Disponible</code><br/>
+        <code class="text-xs">Juan Pérez,04141234567,50.00</code>
+      </div>
+
+      <label for="csv-input" class="btn-gold w-full flex items-center justify-center gap-2 cursor-pointer mb-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+        Cargar Archivo CSV
+      </label>
+      <input id="csv-input" type="file" accept=".csv" class="hidden" onchange="procesarCSV(event)" />
+
+      <div id="csv-stats" class="hidden">
+        <div class="flex items-center gap-3 glass p-3 mb-4">
+          <div class="text-3xl font-black text-yellow-400" id="csv-count">0</div>
+          <div>
+            <p class="text-white font-bold text-sm">Clientes cargados</p>
+            <p class="text-white/50 text-xs" id="csv-filename">—</p>
+          </div>
+        </div>
+        <button class="btn-danger w-full mb-4" onclick="limpiarClientes()">🗑️ Eliminar todos los clientes</button>
+      </div>
+    </div>
+
+    <!-- ── FORMULARIO NUEVO CLIENTE MANUAL ── -->
+    <div class="glass p-5">
+      <div class="flex items-center justify-between mb-4 cursor-pointer" onclick="toggleFormCliente()">
+        <h3 class="font-black text-yellow-400">➕ Nuevo Cliente</h3>
+        <span id="form-cliente-arrow" class="text-yellow-400 text-lg transition-transform">▾</span>
+      </div>
+      <div id="form-cliente-body" class="space-y-3">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Nombre <span class="text-red-400">*</span></label>
+            <input id="nc-nombre" type="text" placeholder="Ej: Juan" />
+          </div>
+          <div>
+            <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Apellido <span class="text-red-400">*</span></label>
+            <input id="nc-apellido" type="text" placeholder="Ej: Pérez" />
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Teléfono <span class="text-red-400">*</span></label>
+          <input id="nc-telefono" type="tel" placeholder="Ej: 04141234567" />
+        </div>
+
+        <div>
+          <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Correo Electrónico <span class="text-white/30">(opcional)</span></label>
+          <input id="nc-correo" type="email" placeholder="Ej: juan@email.com" />
+        </div>
+
+        <div>
+          <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Cédula de Identidad <span class="text-white/30">(opcional)</span></label>
+          <input id="nc-cedula" type="text" placeholder="Ej: V-12345678" />
+        </div>
+
+        <div>
+          <label class="text-xs text-white/60 uppercase tracking-wider mb-1 block">Crédito Inicial (Bs)</label>
+          <input id="nc-credito" type="number" placeholder="0.00" step="0.01" min="0" />
+        </div>
+
+        <button class="btn-gold w-full font-black py-3" onclick="crearClienteManual()">✅ GUARDAR CLIENTE</button>
+      </div>
+    </div>
+
+    <!-- Tabla de clientes -->
+    <div class="glass p-4">
+      <h3 class="font-black text-yellow-400 mb-3">👥 Lista de Clientes</h3>
+      <div id="clientes-list" class="space-y-2 max-h-96 overflow-y-auto scrollbar-thin">
+        <p class="text-white/30 text-sm text-center py-6">Sin clientes cargados</p>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <!-- ── SOCIAL MEDIA BAR (footer) ─────────────────────── -->
+  <div style="padding:1rem 0 2rem 0;display:flex;gap:0.75rem;justify-content:center;margin-top:1rem;">
+
+    <!-- WhatsApp -->
+    <a href="https://wa.me/" target="_blank" rel="noopener"
+       style="background:#25D366;border-radius:1rem;width:3.8rem;height:3.2rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(37,211,102,0.4);transition:transform 0.18s,box-shadow 0.18s;text-decoration:none;"
+       onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="white">
+        <path d="M16 3C8.82 3 3 8.82 3 16c0 2.41.65 4.67 1.78 6.62L3 29l6.55-1.72A12.95 12.95 0 0016 29c7.18 0 13-5.82 13-13S23.18 3 16 3zm6.49 18.41c-.27.77-1.58 1.48-2.17 1.54-.56.06-1.09.26-3.66-.77-3.07-1.24-5.03-4.37-5.18-4.57-.15-.2-1.22-1.62-1.22-3.09s.77-2.19 1.04-2.49c.27-.3.59-.38.79-.38l.57.01c.18 0 .42-.07.66.5.25.59.85 2.08.92 2.23.08.15.13.33.03.53-.1.2-.15.32-.3.5-.15.17-.31.39-.44.52-.14.14-.29.29-.12.57.17.28.74 1.22 1.59 1.97 1.09.97 2.01 1.27 2.29 1.41.28.14.44.12.6-.07.17-.2.71-.83.9-1.12.19-.29.38-.24.64-.14.26.1 1.64.77 1.92.91.28.14.47.21.54.33.07.12.07.7-.2 1.47z"/>
+      </svg>
+    </a>
+
+    <!-- Instagram -->
+    <a href="https://instagram.com/ELArrejuntao" target="_blank" rel="noopener"
+       style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);border-radius:1rem;width:3.8rem;height:3.2rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(220,39,67,0.35);transition:transform 0.18s;text-decoration:none;"
+       onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+      </svg>
+    </a>
+
+    <!-- X / Twitter -->
+    <a href="https://x.com/ELArrejuntao" target="_blank" rel="noopener"
+       style="background:#000;border-radius:1rem;width:3.8rem;height:3.2rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.12);transition:transform 0.18s;text-decoration:none;"
+       onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+    </a>
+
+    <!-- Facebook -->
+    <a href="https://facebook.com/" target="_blank" rel="noopener"
+       style="background:#1877F2;border-radius:1rem;width:3.8rem;height:3.2rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(24,119,242,0.4);transition:transform 0.18s;text-decoration:none;"
+       onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+      </svg>
+    </a>
+
+    <!-- TikTok -->
+    <a href="https://tiktok.com/@ELArrejuntao" target="_blank" rel="noopener"
+       style="background:#010101;border-radius:1rem;width:3.8rem;height:3.2rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);transition:transform 0.18s;text-decoration:none;"
+       onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+        <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.76a4.85 4.85 0 01-1-.07z"/>
+      </svg>
+    </a>
+  </div>
+</div><!-- /max-w-lg -->
+
+<!-- ─── SCRIPTS ─── -->
+<script>
+// ═══════════════════════════════════
+// ESTADO GLOBAL
+// ═══════════════════════════════════
+const STORAGE_KEY_CLIENTES = 'arrejuntao_clientes';
+const STORAGE_KEY_APUESTAS = 'arrejuntao_apuestas';
+const STORAGE_KEY_RESULTADOS = 'arrejuntao_resultados';
+
+let clientes = JSON.parse(localStorage.getItem(STORAGE_KEY_CLIENTES) || '[]');
+let apuestas = JSON.parse(localStorage.getItem(STORAGE_KEY_APUESTAS) || '[]');
+let resultados = JSON.parse(localStorage.getItem(STORAGE_KEY_RESULTADOS) || '{"arrimao":"---","pegadito":"----","animalito":{"icono":"🐾","nombre":"Sin resultado","numero":"-"}}');
+
+
+
+// ═══════════════════════════════════
+// NAVEGACIÓN
+// ═══════════════════════════════════
+function showTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  if(tab === 'apuestas') populateClienteSelect('apuesta-cliente');
+
+}
+
+// ═══════════════════════════════════
+// UTILIDADES
+// ═══════════════════════════════════
+function toast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function saveClientes(omitFirestore) {
+  localStorage.setItem(STORAGE_KEY_CLIENTES, JSON.stringify(clientes));
+  if (!omitFirestore && typeof window.saveClientesFirestore === 'function') {
+    window.saveClientesFirestore(clientes).catch(e => console.warn('Firestore clientes:', e));
+  }
+}
+function saveApuestas(apuesta) {
+  localStorage.setItem(STORAGE_KEY_APUESTAS, JSON.stringify(apuestas));
+  if (apuesta && typeof window.saveApuestaFirestore === 'function') {
+    window.saveApuestaFirestore(apuesta).catch(e => console.warn('Firestore apuesta:', e));
+  }
+}
+function saveResultados(tipo, datos) {
+  localStorage.setItem(STORAGE_KEY_RESULTADOS, JSON.stringify(resultados));
+  if (tipo && typeof window.saveResultadoFirestore === 'function') {
+    window.saveResultadoFirestore(tipo, datos).catch(e => console.warn('Firestore resultado:', e));
+  }
+}
+
+
+function autoFocusNext(el, nextId) {
+  if (el.value.toString().length >= 1) {
+    var next = document.getElementById(nextId);
+    if (next) next.focus();
+  }
+}
+function limitDigit(el, max) {
+  const v = el.value.toString();
+  if(v.length > max) el.value = v.slice(0, max);
+}
+
+function formatMoney(n) {
+  return parseFloat(n || 0).toFixed(2);
+}
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+function init() {
+  buildAnimalGrid();
+  buildPiramide();
+  renderClientes();
+  renderHistorial();
+  restoreResultados();
+
+}
+
+// ═══════════════════════════════════
+// ANIMALITOS GRID
+// ═══════════════════════════════════
+function buildAnimalGrid() {
+  const grid = document.getElementById('animal-grid');
+  grid.innerHTML = ANIMALITOS.map((a,i) => `
+    <div class="animal-card" id="ani-card-${i}" onclick="selectAnimal(${i})">
+      <div class="text-2xl">${a.icono}</div>
+      <div class="text-xs font-bold mt-1">${a.nombre}</div>
+      <div class="text-yellow-400 text-xs font-black">${a.num}</div>
+    </div>
+  `).join('');
+}
+
+function selectAnimal(i) {
+  document.querySelectorAll('.animal-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('ani-card-' + i).classList.add('selected');
+  selectedAnimal = ANIMALITOS[i];
+  document.getElementById('animalito-display').classList.remove('hidden');
+  document.getElementById('ani-icon').textContent = selectedAnimal.icono;
+  document.getElementById('ani-nombre').textContent = selectedAnimal.nombre;
+  document.getElementById('ani-num').textContent = 'Número: ' + selectedAnimal.num;
+}
+
+function confirmarAnimalito() {
+  if(!selectedAnimal) { toast('Selecciona un animalito primero', true); return; }
+  resultados.animalito = { icono: selectedAnimal.icono, nombre: selectedAnimal.nombre, numero: selectedAnimal.num };
+  saveResultados('animalito', { animalito: resultados.animalito });
+  document.getElementById('animalito-badge').textContent = selectedAnimal.icono + ' ' + selectedAnimal.nombre + ' #' + selectedAnimal.num;
+  toast('✅ Animalito ' + selectedAnimal.nombre + ' publicado!');
+}
+
+// ═══════════════════════════════════
+// RESULTADOS
+// ═══════════════════════════════════
+
+
+// ─── TRIPLE GENERATOR & SLOT ANIMATION ────────────────────────────────────────
+function updateTripleSlot(letter, pos, val) {
+  var el = document.getElementById('s' + letter + pos);
+  if (!el) return;
+  if (val === '' || val === null || val === undefined) {
+    el.textContent = '?';
+    el.style.background = 'rgba(0,0,0,0.35)';
+    el.style.border = '1px solid rgba(74,222,128,0.2)';
+    el.style.color = '#fff';
+  } else {
+    el.textContent = val;
+    el.style.background = 'rgba(124,58,237,0.15)';
+    el.style.border = '1px solid rgba(167,139,250,0.5)';
+    el.style.color = '#c4b5fd';
+  }
+}
+
+function animateSlot(slotId, finalValue, delay, cb) {
+  var el = document.getElementById(slotId);
+  if (!el) { if(cb) cb(); return; }
+  var count = 0, maxSpins = 6;
+  el.style.background = 'rgba(250,204,21,0.1)';
+  el.style.border = '1px solid rgba(250,204,21,0.4)';
+  el.style.color = '#fbbf24';
+  var iv = setInterval(function() {
+    el.textContent = Math.floor(Math.random() * 10);
+    count++;
+    if (count >= maxSpins) {
+      clearInterval(iv);
+      setTimeout(function() {
+        el.textContent = finalValue;
+        el.style.background = 'rgba(124,58,237,0.18)';
+        el.style.border = '1px solid rgba(167,139,250,0.6)';
+        el.style.color = '#c4b5fd';
+        el.style.transform = 'scale(1.12)';
+        setTimeout(function(){ el.style.transform = 'scale(1)'; }, 150);
+        if (cb) cb();
+      }, 40);
+    }
+  }, 35);
+}
+
+function generarTriple(letter) {
+  var d1 = Math.floor(Math.random() * 10);
+  var d2 = Math.floor(Math.random() * 10);
+  var d3 = Math.floor(Math.random() * 10);
+
+  // Reset slots to spinning state
+  ['s'+letter+'1','s'+letter+'2','s'+letter+'3'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.textContent = '?'; el.style.transform = 'scale(1)'; }
+  });
+
+  // Animate each slot with staggered delay
+  animateSlot('s'+letter+'1', d1, 0, function() {
+    animateSlot('s'+letter+'2', d2, 0, function() {
+      animateSlot('s'+letter+'3', d3, 0, function() {
+        // Set hidden inputs
+        var inp1 = document.getElementById('triple'+letter+'-d1');
+        var inp2 = document.getElementById('triple'+letter+'-d2');
+        var inp3 = document.getElementById('triple'+letter+'-d3');
+        if (inp1) inp1.value = d1;
+        if (inp2) inp2.value = d2;
+        if (inp3) inp3.value = d3;
+      });
+    });
+  });
+}
+
+
+// ─── PEGADITO GENERATOR ────────────────────────────────────────────────────────
+function updatePegSlot(pos, val) {
+  var el = document.getElementById('sPeg' + pos);
+  if (!el) return;
+  if (val === '' || val === null || val === undefined) {
+    el.textContent = '?';
+    el.style.background = 'rgba(0,0,0,0.35)';
+    el.style.border = '1px solid rgba(74,222,128,0.2)';
+    el.style.color = '#fff';
+  } else {
+    el.textContent = val;
+    el.style.background = 'rgba(124,58,237,0.15)';
+    el.style.border = '1px solid rgba(167,139,250,0.5)';
+    el.style.color = '#c4b5fd';
+  }
+}
+
+function generarPegadito() {
+  var digits = [
+    Math.floor(Math.random()*10),
+    Math.floor(Math.random()*10),
+    Math.floor(Math.random()*10),
+    Math.floor(Math.random()*10)
+  ];
+  var ids = ['peg-d1','peg-d2','peg-d3','peg-d4'];
+  var slotIds = ['sPeg1','sPeg2','sPeg3','sPeg4'];
+
+  // Reset
+  slotIds.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.textContent = '?'; el.style.transform = 'scale(1)'; }
+  });
+
+  // Animate each slot sequentially
+  animateSlot(slotIds[0], digits[0], 0, function() {
+    animateSlot(slotIds[1], digits[1], 0, function() {
+      animateSlot(slotIds[2], digits[2], 0, function() {
+        animateSlot(slotIds[3], digits[3], 0, function() {
+          digits.forEach(function(d, i) {
+            var inp = document.getElementById(ids[i]);
+            if (inp) inp.value = d;
+          });
+        });
+      });
+    });
+  });
+}
+
+
+// ─── PEGADITO 5 DÍGITOS ────────────────────────────────────────────────────────
+function updatePeg5Slot(pos, val) {
+  var el = document.getElementById('sPeg5-' + pos);
+  if (!el) return;
+  if (val === '' || val === null || val === undefined) {
+    el.textContent = '?';
+    el.style.background = 'rgba(0,0,0,0.35)';
+    el.style.border = '1px solid rgba(74,222,128,0.2)';
+    el.style.color = '#fff';
+  } else {
+    el.textContent = val;
+    el.style.background = 'rgba(124,58,237,0.15)';
+    el.style.border = '1px solid rgba(167,139,250,0.5)';
+    el.style.color = '#c4b5fd';
+  }
+}
+
+function generarPegadito5() {
+  var slotIds  = ['sPeg5-1','sPeg5-2','sPeg5-3','sPeg5-4','sPeg5-5'];
+  var inputIds = ['peg5-d1','peg5-d2','peg5-d3','peg5-d4','peg5-d5'];
+  var digits   = slotIds.map(function(){ return Math.floor(Math.random()*10); });
+
+  // Reset all slots
+  slotIds.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.textContent = '?';
+      el.style.background = 'rgba(250,204,21,0.1)';
+      el.style.border = '1px solid rgba(250,204,21,0.4)';
+      el.style.color = '#fbbf24';
+    }
+  });
+
+  // Reveal each slot with delay
+  slotIds.forEach(function(id, i) {
+    var spin = 0, maxSpin = 5;
+    var iv = setInterval(function() {
+      var el = document.getElementById(id);
+      if (!el) { clearInterval(iv); return; }
+      el.textContent = Math.floor(Math.random()*10);
+      spin++;
+      if (spin >= maxSpin + i * 1) {
+        clearInterval(iv);
+        setTimeout(function() {
+          var el2 = document.getElementById(id);
+          if (el2) {
+            el2.textContent = digits[i];
+            el2.style.background = 'rgba(34,197,94,0.18)';
+            el2.style.border = '1px solid rgba(34,197,94,0.6)';
+            el2.style.color = '#4ade80';
+            el2.style.transform = 'scale(1.12)';
+            setTimeout(function(){ el2.style.transform = 'scale(1)'; }, 180);
+          }
+          var inp = document.getElementById(inputIds[i]);
+          if (inp) inp.value = digits[i];
+        }, 60);
+      }
+    }, 35 + i * 10);
+  });
+}
+
+function setResultadoPegadito5() {
+  var digits = ['peg5-d1','peg5-d2','peg5-d3','peg5-d4','peg5-d5'].map(function(id){
+    var el = document.getElementById(id); return el ? el.value : '';
+  });
+  if (digits.some(function(d){ return d===''; })) { toast('Genera o ingresa los 5 digitos del Pegadito', true); return; }
+  var num = digits.join('');
+  if (typeof saveResultados === 'function') saveResultados('pegadito5', { numero: num });
+  toast('Pegadito: ' + num + ' publicado!');
+}
+
+
+// ─── ANIMALITO GENERATOR ───────────────────────────────────────────────────────
+var _aniLast = null;
+
+function generarAnimalito() {
+  // Emoji map by animal name
+  var EMOJI_MAP = {
+    'Ballena':'🐋','Delfin':'🐬','Delfín':'🐬','Carnero':'🐏','Toro':'🐂',
+    'Ciempies':'🐛','Ciempiés':'🐛','Alacran':'🦂','Alacrán':'🦂','Leon':'🦁','León':'🦁',
+    'Rana':'🐸','Perico':'🦜','Raton':'🐭','Ratón':'🐭','Aguila':'🦅','Águila':'🦅',
+    'Tigre':'🐯','Gato':'🐱','Caballo':'🐴','Mono':'🐒','Paloma':'🕊️',
+    'Zorro':'🦊','Oso':'🐻','Pavo':'🦃','Burro':'🐴','Chivo':'🐐',
+    'Cochino':'🐷','Gallo':'🐓','Camello':'🐪','Cebra':'🦓','Iguana':'🦎',
+    'Gallina':'🐔','Vaca':'🐄','Perro':'🐕','Zamuro':'🦅','Elefante':'🐘',
+    'Caiman':'🐊','Caimán':'🐊','Lapa':'🦀','Ardilla':'🐿️','Pez':'🐟',
+    'Venado':'🦌','Jirafa':'🦒','Conejo':'🐇','Tortuga':'🐢','Serpiente':'🐍',
+    'Cangrejo':'🦀','Loro':'🦜','Buho':'🦉','Búho':'🦉','Mariposa':'🦋',
+    'Pulpo':'🐙','Tiburon':'🦈','Tiburón':'🦈','Cocodrilo':'🐊','Hipopotamo':'🦛',
+    'Hipopótamo':'🦛','Rinoceronte':'🦏','Gorila':'🦍','Lobo':'🐺','Ciervo':'🦌',
+    'Flamenco':'🦩','Pinguino':'🐧','Pingüino':'🐧','Pelicano':'🦤','Pelícano':'🦤',
+    'Colibri':'🦅','Colibrí':'🦅','Aguila Harpia':'🦅','Pavon':'🦚','Pabon':'🦚',
+    'Pabón':'🦚','Papagayo':'🦜','Guacamayo':'🦜','Tucán':'🦜','Tucan':'🦜',
+    'Gaviota':'🕊️','Pato':'🦆','Ganso':'🦢','Cisne':'🦢','Grillo':'🦗',
+    'Culebra':'🐍','Escarabajo':'🪲','Avispa':'🐝','Abeja':'🐝','Hormiga':'🐜',
+    'Mantis':'🪳','Babosa':'🐌','Caracol':'🐌','Almeja':'🦪','Estrella de Mar':'⭐',
+    'Pulga':'🦟','Mosquito':'🦟','Libelula':'🪲','Libélula':'🪲',
+    'Canguro':'🦘','Koala':'🐨','Panda':'🐼','Marmota':'🦫','Castor':'🦫',
+    'Nutria':'🦦','Morsa':'🦭','Foca':'🦭','Delfin Nariz':'🐬','Bufalo':'🦬',
+    'Búfalo':'🦬','Reno':'🦌','Alce':'🫎','Toro Bravo':'🐂','Jabali':'🐗',
+    'Jabalí':'🐗','Murcielago':'🦇','Murciélago':'🦇','Erizo':'🦔','Topo':'🐭'
+  };
+  function getEmoji(nombre) {
+    return EMOJI_MAP[nombre] || EMOJI_MAP[nombre.split(' ')[0]] || '🐾';
+  }
+
+  if (typeof ANIMALITOS === 'undefined' || !ANIMALITOS.length) { toast('Lista de animales no cargada', true); return; }
+  var slot    = document.getElementById('ani-result-slot');
+  var icono   = document.getElementById('ani-res-icono');
+  var nombre  = document.getElementById('ani-res-nombre');
+  var numEl   = document.getElementById('ani-res-num');
+  if (!slot) return;
+
+  // Spin styling
+  slot.style.border = '2px solid rgba(250,204,21,0.5)';
+  slot.style.background = 'rgba(250,204,21,0.06)';
+  nombre.textContent  = '';
+  numEl.textContent   = '';
+
+  var chosen = ANIMALITOS[Math.floor(Math.random() * ANIMALITOS.length)];
+  var ticks = 0, maxTicks = 12;
+
+  var iv = setInterval(function() {
+    var rnd = ANIMALITOS[Math.floor(Math.random() * ANIMALITOS.length)];
+    if (icono) icono.textContent = getEmoji(rnd.nombre);
+    ticks++;
+    if (ticks >= maxTicks) {
+      clearInterval(iv);
+      setTimeout(function() {
+        var chosenEmoji = getEmoji(chosen.nombre);
+        if (icono)  icono.textContent  = chosenEmoji;
+        if (nombre) nombre.textContent = chosen.nombre + ' #' + chosen.num;
+        if (numEl)  numEl.textContent  = '#' + chosen.num;
+        slot.style.border     = '2px solid rgba(167,139,250,0.7)';
+        slot.style.background = 'rgba(124,58,237,0.2)';
+        slot.style.transform  = 'scale(1.06)';
+        setTimeout(function(){ slot.style.transform='scale(1)'; }, 220);
+        _aniLast = chosen;
+        // Update legacy badge & hidden fields
+        var badge = document.getElementById('animalito-badge');
+        if (badge) badge.textContent = chosenEmoji + ' ' + chosen.nombre + ' #' + chosen.num;
+        var legIco = document.getElementById('ani-icon');  if (legIco) legIco.textContent = chosenEmoji;
+        var legNom = document.getElementById('ani-nombre'); if (legNom) legNom.textContent = chosen.nombre;
+        var legNum = document.getElementById('ani-num');   if (legNum) legNum.textContent = 'Numero: ' + chosen.num;
+      }, 80);
+    }
+  }, 55);
+}
+
+function confirmarAniResultado() {
+  if (!_aniLast) { toast('Genera un animalito primero', true); return; }
+  resultados.animalito = { icono: _aniLast.icono, nombre: _aniLast.nombre, numero: _aniLast.num };
+  saveResultados('animalito', { animalito: resultados.animalito });
+  toast('Animalito ' + _aniLast.nombre + ' publicado!');
+}
+
+function setResultadoTriples() {
+  // Read Triple A
+  var a1 = document.getElementById('tripleA-d1').value;
+  var a2 = document.getElementById('tripleA-d2').value;
+  var a3 = document.getElementById('tripleA-d3').value;
+  // Read Triple B
+  var b1 = document.getElementById('tripleB-d1').value;
+  var b2 = document.getElementById('tripleB-d2').value;
+  var b3 = document.getElementById('tripleB-d3').value;
+
+  if (a1===''||a2===''||a3==='') { toast('Completa los 3 digitos del Triple A', true); return; }
+  if (b1===''||b2===''||b3==='') { toast('Completa los 3 digitos del Triple B', true); return; }
+
+  var numA = a1 + a2 + a3;
+  var numB = b1 + b2 + b3;
+
+  // Show results
+  var dispA = document.getElementById('tripleA-display');
+  var resA  = document.getElementById('tripleA-result');
+  if (dispA) { dispA.classList.remove('hidden'); resA.textContent = numA; }
+
+  var dispB = document.getElementById('tripleB-display');
+  var resB  = document.getElementById('tripleB-result');
+  if (dispB) { dispB.classList.remove('hidden'); resB.textContent = numB; }
+
+  // Also update legacy arrimao fields for backward compatibility
+  document.getElementById('arrimao-d1').value = a1;
+  document.getElementById('arrimao-d2').value = a2;
+  document.getElementById('arrimao-d3').value = a3;
+
+  // Save to localStorage
+  if (typeof saveResultados === 'function') {
+    saveResultados('triple_a', { numero: numA });
+    saveResultados('triple_b', { numero: numB });
+  }
+
+  toast('Triple A: ' + numA + ' | Triple B: ' + numB + ' publicados!');
+}
+function setResultado(tipo) {
+  if(tipo === 'arrimao') {
+    const d1 = document.getElementById('arrimao-d1').value;
+    const d2 = document.getElementById('arrimao-d2').value;
+    const d3 = document.getElementById('arrimao-d3').value;
+    if(d1===''||d2===''||d3==='') { toast('Completa los 3 dígitos', true); return; }
+    const num = d1+d2+d3;
+    resultados.arrimao = num;
+    saveResultados();
+    ['r1','r2','r3'].forEach((id,i)=>document.getElementById('arrimao-'+id).textContent=[d1,d2,d3][i]);
+    document.getElementById('arrimao-display').classList.remove('hidden');
+    toast('🎱 Triple El Arrimao: ' + num + ' publicado!');
+  } else {
+    const d1 = document.getElementById('peg-d1').value;
+    const d2 = document.getElementById('peg-d2').value;
+    const d3 = document.getElementById('peg-d3').value;
+    const d4 = document.getElementById('peg-d4').value;
+    if(d1===''||d2===''||d3===''||d4==='') { toast('Completa los 4 dígitos', true); return; }
+    const num = d1+d2+d3+d4;
+    resultados.pegadito = num;
+    saveResultados('pegadito', { numero: num });
+    ['r1','r2','r3','r4'].forEach((id,i)=>document.getElementById('peg-'+id).textContent=[d1,d2,d3,d4][i]);
+    /* pegadito-display kept hidden - slots updated via updatePegSlot */ if(typeof updatePegSlot==='function'){ [d1,d2,d3,d4].forEach(function(d,i){ updatePegSlot(i+1,d); }); }
+    toast('🃏 El Pegadito: ' + num + ' publicado!');
+  }
+
+}
+
+function restoreResultados() {
+  // Arrimao
+  if(resultados.arrimao && resultados.arrimao !== '---') {
+    const n = resultados.arrimao;
+    ['arrimao-r1','arrimao-r2','arrimao-r3'].forEach((id,i)=>document.getElementById(id).textContent=n[i]||'-');
+    document.getElementById('arrimao-display').classList.remove('hidden');
+  }
+  // Pegadito
+  if(resultados.pegadito && resultados.pegadito !== '----') {
+    const n = resultados.pegadito;
+    ['peg-r1','peg-r2','peg-r3','peg-r4'].forEach((id,i)=>document.getElementById(id).textContent=n[i]||'-');
+    document.getElementById('pegadito-display').style.display='none'; /* new UI uses slot cards */ if(typeof updatePegSlot==='function' && res.pegadito){ var pegNum=(res.pegadito.numero||'')+''; pegNum.split('').forEach(function(d,i){ updatePegSlot(i+1,d); }); }
+  }
+  // Animalito
+  const a = resultados.animalito;
+  if(a && a.nombre !== 'Sin resultado') {
+    document.getElementById('animalito-badge').textContent = a.icono + ' ' + a.nombre + ' #' + a.numero;
+    document.getElementById('animalito-display').classList.remove('hidden');
+    document.getElementById('ani-icon').textContent = a.icono;
+    document.getElementById('ani-nombre').textContent = a.nombre;
+    document.getElementById('ani-num').textContent = 'Número: ' + a.numero;
+  }
+}
+
+// ═══════════════════════════════════
+// CSV / CLIENTES
+// ═══════════════════════════════════
+function procesarCSV(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+    // Skip header
+    const start = lines[0].toLowerCase().includes('nombre') ? 1 : 0;
+    const parsed = [];
+    for(let i = start; i < lines.length; i++) {
+      const cols = lines[i].split(',');
+      if(cols.length < 2) continue;
+      const nombre = (cols[0]||'').trim();
+      const telefono = (cols[1]||'').trim().replace(/\s/g,'');
+      const credito = parseFloat((cols[2]||'0').trim()) || 0;
+      if(!nombre) continue;
+      parsed.push({ id: Date.now() + i, nombre, telefono, credito });
+    }
+    // Merge: avoid duplicates by phone
+    parsed.forEach(p => {
+      const existing = clientes.findIndex(c => c.telefono === p.telefono && p.telefono !== '');
+      if(existing >= 0) {
+        clientes[existing].nombre = p.nombre;
+        clientes[existing].credito = p.credito;
+      } else {
+        clientes.push(p);
+      }
+    });
+    saveClientes();
+    renderClientes();
+    document.getElementById('csv-filename').textContent = file.name;
+    toast('✅ ' + parsed.length + ' clientes cargados correctamente');
+  };
+  reader.readAsText(file);
+}
+
+function renderClientes() {
+  const list = document.getElementById('clientes-list');
+  const stats = document.getElementById('csv-stats');
+  const count = document.getElementById('csv-count');
+  if(clientes.length === 0) {
+    list.innerHTML = '<p class="text-white/30 text-sm text-center py-6">Sin clientes cargados</p>';
+    stats.classList.add('hidden');
+    return;
+  }
+  stats.classList.remove('hidden');
+  count.textContent = clientes.length;
+  list.innerHTML = clientes.map((c, i) => `
+    <div class="glass p-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="font-bold text-sm">${c.nombre}${c.apellido ? ' ' + c.apellido : ''}</p>
+          <p class="text-white/50 text-xs">📞 ${c.telefono}</p>
+          ${c.cedula ? `<p class="text-white/40 text-xs">🪪 ${c.cedula}</p>` : ''}
+          ${c.correo ? `<p class="text-white/40 text-xs">✉️ ${c.correo}</p>` : ''}
+        </div>
+        <div class="text-right flex items-center gap-2">
+          <span class="text-yellow-400 font-black text-sm">Bs ${formatMoney(c.credito)}</span>
+          <button style="background:rgba(168,85,247,0.2);border:1px solid #a855f7;color:#a855f7;border-radius:0.6rem;padding:0.35rem 0.6rem;cursor:pointer;font-size:0.85rem;" onclick="abrirModal(${i})" title="Editar">✏️</button>
+          <button class="btn-danger" onclick="eliminarCliente(${i})" title="Eliminar">✕</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function eliminarCliente(i) {
+  clientes.splice(i, 1);
+  saveClientes();
+  renderClientes();
+  toast('Cliente eliminado');
+}
+
+function limpiarClientes() {
+  if(!confirm('¿Eliminar TODOS los clientes?')) return;
+  clientes = [];
+  saveClientes();
+  renderClientes();
+  toast('Clientes eliminados');
+}
+
+
+
+
+function populateClienteSelect(selectId) {
+  const sel = document.getElementById(selectId);
+  const current = sel.value;
+  sel.innerHTML = '<option value="">— Seleccionar cliente —</option>';
+  clientes.forEach((c, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = c.nombre + ' ($' + formatMoney(c.credito) + ')';
+    sel.appendChild(opt);
+  });
+  if(current !== '') sel.value = current;
+}
+
+// ═══════════════════════════════════
+// APUESTAS
+// ═══════════════════════════════════
+function updateClienteInfo() {
+  const idx = document.getElementById('apuesta-cliente').value;
+  const info = document.getElementById('cliente-info');
+  if(idx === '' || !clientes[idx]) { info.classList.add('hidden'); return; }
+  info.classList.remove('hidden');
+  document.getElementById('cliente-saldo').textContent = '$' + formatMoney(clientes[idx].credito);
+}
+
+function sellarApuesta() {
+  const idxStr = document.getElementById('apuesta-cliente').value;
+  const numero = document.getElementById('apuesta-numero').value;
+  const montoStr = document.getElementById('apuesta-monto').value;
+
+  if(idxStr === '') { toast('Selecciona un cliente', true); return; }
+  if(!apuestaHorario) { toast('Selecciona un horario', true); return; }
+  if(!numero || numero.toString().length < 1) { toast('Ingresa el número', true); return; }
+  if(!montoStr || parseFloat(montoStr) <= 0) { toast('Ingresa un monto válido', true); return; }
+
+  const idx = parseInt(idxStr);
+  const monto = parseFloat(montoStr);
+  const cliente = clientes[idx];
+
+  if(monto > cliente.credito) {
+    toast('❌ Crédito insuficiente ($' + formatMoney(cliente.credito) + ')', true);
+    return;
+  }
+
+  // Descontar crédito
+  clientes[idx].credito = parseFloat((cliente.credito - monto).toFixed(2));
+  saveClientes();
+
+  // Etiqueta del sorteo
+  const catLabels = {
+    todos:'TODOS', triple_a:'Triple A', triple_b:'Triple B',
+    triple_signo:'Triple+Signo', arrimao:'El Arrimao', pegadito:'El Pegadito'
+  };
+  const sorteoLabel = (catLabels[apuestaCategoria] || apuestaCategoria) + ' · ' + apuestaHorario;
+
+  const apuesta = {
+    id: Date.now(),
+    fecha: new Date().toLocaleString('es-VE'),
+    cliente: cliente.nombre,
+    sorteo: sorteoLabel,
+    numero,
+    monto,
+    saldoRestante: clientes[idx].credito
+  };
+  apuestas.unshift(apuesta);
+  saveApuestas();
+
+  // UI feedback
+  document.getElementById('cliente-saldo').textContent = '$' + formatMoney(clientes[idx].credito);
+  renderHistorial();
+  populateClienteSelect('apuesta-cliente');
+
+  // Reset campos
+  document.getElementById('apuesta-numero').value = '';
+  document.getElementById('apuesta-monto').value = '';
+
+  actualizarTicket();
+  toast('✅ Apuesta agregada! Saldo: $' + formatMoney(clientes[idx].credito));
+}
+
+
+function renderHistorial() {
+  const list = document.getElementById('historial-list');
+  if(apuestas.length === 0) {
+    list.innerHTML = '<p class="text-white/30 text-sm text-center py-4">No hay apuestas registradas</p>';
+    return;
+  }
+  list.innerHTML = apuestas.slice(0, 50).map(a => `
+    <div class="glass p-3">
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="font-bold text-sm text-yellow-400">${a.cliente}</p>
+          <p class="text-white/60 text-xs">${a.sorteo} · Nº ${a.numero}</p>
+          <p class="text-white/40 text-xs">${a.fecha}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-red-400 font-black text-sm">-$${formatMoney(a.monto)}</p>
+          <p class="text-white/50 text-xs">Saldo: $${formatMoney(a.saldoRestante)}</p>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function limpiarApuestas() {
+  if(!confirm('¿Limpiar todo el historial?')) return;
+  apuestas = [];
+  saveApuestas();
+  renderHistorial();
+  toast('Historial limpiado');
+}
+
+// ═══════════════════════════════════
+// APUESTAS – CONTROLES NUEVOS
+// ═══════════════════════════════════
+let apuestaHorario = '';
+// categorías como array multi-toggle
+let apuestaCategoria = 'todos';         // compatibilidad
+let categoriasSeleccionadas = [];
+const CATEGORIA_LABELS = {
+  todos:'Táchira', triple_a:'Triple A', triple_b:'Triple B',
+  triple_signo:'Triple+Signo', arrimao:'El Arrimao', pegadito:'El Pegadito'
+};
+function selCategoria(btn, valor) {
+  const idx = categoriasSeleccionadas.indexOf(valor);
+  if (idx === -1) {
+    if (valor === 'todos') categoriasSeleccionadas = [];
+    else categoriasSeleccionadas = categoriasSeleccionadas.filter(v => v !== 'todos');
+    categoriasSeleccionadas.push(valor);
+    btn.classList.add('cat-active');
+  } else {
+    categoriasSeleccionadas.splice(idx, 1);
+    btn.classList.remove('cat-active');
+  }
+}
+let apuestaAdicional = 'todos';
+
+function selHorario(btn, valor) {
+  document.querySelectorAll('#horarios-btns .horario-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  apuestaHorario = valor;
+}
+
+
+
+function selAdicional(btn, valor) {
+  document.querySelectorAll('#adicional-btns .cat-btn').forEach(b => b.classList.remove('cat-active'));
+  btn.classList.add('cat-active');
+  apuestaAdicional = valor;
+}
+
+
+
+
+
+function verTicket() {
+  if(apuestas.length === 0) { toast('No hay apuestas en el ticket', true); return; }
+  const total = apuestas.reduce((s, a) => s + a.monto, 0);
+  const lineas = apuestas.slice(0, 10).map(a =>
+    `• ${a.cliente} | ${a.sorteo} | Nº ${a.numero} | Bs ${a.monto.toFixed(2)}`
+  ).join('\n');
+  alert(`🎟️ TICKET EL ARREJUNTAO\n\n${lineas}\n\n─────────────────\nTOTAL: Bs ${total.toFixed(2)}`);
+}
+
+
+
+// MODAL EDITAR CLIENTE
+let editIdx = -1;
+
+function switchTab(tab) {
+  const isInfo = tab === 'info';
+  const tabInfo  = document.getElementById('tab-info');
+  const tabSaldo = document.getElementById('tab-saldo');
+  tabInfo.style.display  = isInfo ? '' : 'none';
+  tabSaldo.style.display = isInfo ? 'none' : 'flex';
+  tabSaldo.style.flexDirection = 'column';
+  document.getElementById('tab-info-btn').style.background  = isInfo ? '#a855f7' : 'rgba(255,255,255,0.06)';
+  document.getElementById('tab-saldo-btn').style.background = isInfo ? 'rgba(255,255,255,0.06)' : '#2563eb';
+}
+
+function copiar(id) {
+  const el = document.getElementById(id);
+  const txt = el.tagName === 'INPUT' ? el.value : el.textContent;
+  navigator.clipboard.writeText(txt).then(() => toast('Copiado: ' + txt));
+}
+
+function actualizarTotalRecarga() {
+  const monto = parseFloat(document.getElementById('ed-agregar-saldo').value) || 0;
+  const fmt = monto.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  document.getElementById('pm-total-display').textContent = 'Bs. ' + fmt;
+}
+
+function copiarTotal() {
+  const txt = document.getElementById('pm-total-display').textContent;
+  navigator.clipboard.writeText(txt).then(() => toast('Copiado: ' + txt));
+}
+
+function actualizarDatosBanco() {
+  // Personaliza RIF y teléfono según el banco si lo deseas
+}
+
+function selTipoTitular(tipo) {
+  const esEmpresa = tipo === 'empresa';
+  const btnP = document.getElementById('btn-persona');
+  const btnE = document.getElementById('btn-empresa');
+  const sel  = document.getElementById('pm-tipo-doc');
+  const lbl  = document.getElementById('pm-doc-label');
+
+  // Botones
+  btnP.style.background = esEmpresa ? 'rgba(255,255,255,0.06)' : '#2563eb';
+  btnP.style.color      = esEmpresa ? 'rgba(255,255,255,0.6)'  : '#fff';
+  btnP.style.borderColor= esEmpresa ? 'rgba(255,255,255,0.2)'  : '#2563eb';
+  btnE.style.background = esEmpresa ? '#2563eb' : 'rgba(255,255,255,0.06)';
+  btnE.style.color      = esEmpresa ? '#fff'    : 'rgba(255,255,255,0.6)';
+  btnE.style.borderColor= esEmpresa ? '#2563eb' : 'rgba(255,255,255,0.2)';
+
+  // Opciones del selector de documento
+  sel.innerHTML = esEmpresa
+    ? '<option value="J">RIF-J</option><option value="G">RIF-G</option><option value="C">RIF-C</option>'
+    : '<option value="V">CI-V</option><option value="E">CI-E</option>';
+
+  if(lbl) lbl.textContent = esEmpresa ? 'RIF de la Empresa' : 'Cédula de Identidad';
+  const inp = document.getElementById('pm-doc');
+  if(inp) inp.placeholder = esEmpresa ? 'Ej: 12345678-9' : 'Ej: 12345678';
+}
+
+function confirmarRecarga() {
+  if(editIdx < 0) return;
+  const monto = parseFloat(document.getElementById('ed-agregar-saldo').value) || 0;
+  const banco = document.getElementById('pm-banco-orig').value;
+  const doc   = document.getElementById('pm-doc').value.trim();
+  const tel   = document.getElementById('pm-tel-pag').value.trim();
+
+  if(monto <= 0) { toast('Ingresa el monto a recargar', true); document.getElementById('ed-agregar-saldo').focus(); return; }
+  if(!banco)     { toast('Selecciona tu banco origen', true); return; }
+  if(!doc)       { toast('Ingresa tu número de cédula/RIF', true); return; }
+  if(!tel || tel.length < 7) { toast('Ingresa tu número de teléfono', true); return; }
+
+  clientes[editIdx].credito = parseFloat((clientes[editIdx].credito + monto).toFixed(2));
+  saveClientes();
+  renderClientes();
+
+  // Limpiar campos
+  document.getElementById('ed-agregar-saldo').value = '';
+  document.getElementById('pm-banco-orig').value = '';
+  document.getElementById('pm-doc').value = '';
+  document.getElementById('pm-tel-pag').value = '';
+  document.getElementById('pm-banco-orig-display').textContent = '— Elige tu banco abajo —';
+  actualizarTotalRecarga();
+
+  toast('✅ Saldo recargado: Bs ' + formatMoney(clientes[editIdx].credito));
+  document.getElementById('modal-cliente').style.display = 'none';
+  editIdx = -1;
+}
+
+function abrirModal(i) {
+  editIdx = i;
+  const c = clientes[i];
+  document.getElementById('ed-nombre').value    = c.nombre    || '';
+  document.getElementById('ed-apellido').value  = c.apellido  || '';
+  document.getElementById('ed-telefono').value  = c.telefono  || '';
+  document.getElementById('ed-correo').value    = c.correo    || '';
+  document.getElementById('ed-cedula').value    = c.cedula    || '';
+  const inputSaldo = document.getElementById('ed-agregar-saldo');
+  if(inputSaldo) inputSaldo.value = '';
+  const totalDisplay = document.getElementById('pm-total-display');
+  if(totalDisplay) totalDisplay.textContent = 'Bs. 0,00';
+  const nombreDisplay = document.getElementById('pm-cliente-nombre-display');
+  if(nombreDisplay) nombreDisplay.textContent = c.nombre + ' ' + (c.apellido || '');
+  switchTab('info');
+  document.getElementById('modal-cliente').style.display = 'flex';
+}
+
+function cerrarModal(e) {
+  if(e && e.target !== document.getElementById('modal-cliente')) return;
+  document.getElementById('modal-cliente').style.display = 'none';
+  editIdx = -1;
+}
+
+function aplicarSaldo() {
+  if(editIdx < 0) return;
+  const extra = parseFloat(document.getElementById('ed-agregar-saldo').value) || 0;
+  if(extra <= 0) { toast('Ingresa un monto válido', true); return; }
+  clientes[editIdx].credito = parseFloat((clientes[editIdx].credito + extra).toFixed(2));
+  saveClientes();
+  const inputSaldo = document.getElementById('ed-agregar-saldo');
+  if(inputSaldo) inputSaldo.value = '';
+  ['pm-banco-orig','pm-doc','pm-tel-pag'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  renderClientes();
+  toast('✅ Saldo recargado: Bs ' + formatMoney(clientes[editIdx].credito));
+}
+
+function guardarCliente() {
+  if(editIdx < 0) return;
+  const nombre   = document.getElementById('ed-nombre').value.trim();
+  const apellido = document.getElementById('ed-apellido').value.trim();
+  const telefono = document.getElementById('ed-telefono').value.trim().replace(/\s/g,'');
+  const correo   = document.getElementById('ed-correo').value.trim();
+  const cedula   = document.getElementById('ed-cedula').value.trim();
+
+  if(!nombre)   { toast('El nombre es obligatorio', true); return; }
+  if(!apellido) { toast('El apellido es obligatorio', true); return; }
+  if(!telefono) { toast('El teléfono es obligatorio', true); return; }
+
+  const dup = clientes.findIndex((c, i) => c.telefono === telefono && i !== editIdx);
+  if(dup >= 0) { toast('Ese teléfono ya existe en otro cliente', true); return; }
+
+  clientes[editIdx].nombre   = nombre;
+  clientes[editIdx].apellido = apellido;
+  clientes[editIdx].telefono = telefono;
+  clientes[editIdx].correo   = correo;
+  clientes[editIdx].cedula   = cedula;
+
+  saveClientes();
+  renderClientes();
+  document.getElementById('modal-cliente').style.display = 'none';
+  editIdx = -1;
+  toast('\u2705 Cliente actualizado correctamente');
+}
+
+function toggleFormCliente() {
+  const body  = document.getElementById('form-cliente-body');
+  const arrow = document.getElementById('form-cliente-arrow');
+  const hidden = body.style.display === 'none';
+  body.style.display = hidden ? '' : 'none';
+  arrow.textContent  = hidden ? '\u25be' : '\u25b8';
+}
+
+function crearClienteManual() {
+  const nombre   = document.getElementById('nc-nombre').value.trim();
+  const apellido = document.getElementById('nc-apellido').value.trim();
+  const telefono = document.getElementById('nc-telefono').value.trim().replace(/\s/g,'');
+  const correo   = document.getElementById('nc-correo').value.trim();
+  const cedula   = document.getElementById('nc-cedula').value.trim();
+  const credito  = parseFloat(document.getElementById('nc-credito').value) || 0;
+
+  if(!nombre)   { toast('El nombre es obligatorio', true); return; }
+  if(!apellido) { toast('El apellido es obligatorio', true); return; }
+  if(!telefono) { toast('El teléfono es obligatorio', true); return; }
+
+  if(clientes.find(c => c.telefono === telefono)) {
+    toast('Ya existe un cliente con ese teléfono', true); return;
+  }
+
+  clientes.push({ id: Date.now(), nombre, apellido, telefono, correo, cedula, credito });
+  saveClientes();
+  renderClientes();
+  ['nc-nombre','nc-apellido','nc-telefono','nc-correo','nc-cedula','nc-credito']
+    .forEach(id => document.getElementById(id).value = '');
+  toast('\u2705 Cliente ' + nombre + ' ' + apellido + ' creado!');
+}
+
+// ARRANQUE
+
+// ═══════════════════════════════════════════════════════
+// ANIMALITOS EL ARREJUNTAO
+// ═══════════════════════════════════════════════════════
+const ANIMALITOS = [
+  {num:'00', nombre:'Ballena'},    {num:'0',  nombre:'Delfín'},
+  {num:'1',  nombre:'Carnero'},   {num:'2',  nombre:'Toro'},
+  {num:'3',  nombre:'Ciempiés'}, {num:'4',  nombre:'Alacrán'},
+  {num:'5',  nombre:'León'},      {num:'6',  nombre:'Rana'},
+  {num:'7',  nombre:'Perico'},    {num:'8',  nombre:'Ratón'},
+  {num:'9',  nombre:'Águila'},    {num:'10', nombre:'Tigre'},
+  {num:'11', nombre:'Gato'},      {num:'12', nombre:'Caballo'},
+  {num:'13', nombre:'Mono'},      {num:'14', nombre:'Paloma'},
+  {num:'15', nombre:'Zorro'},     {num:'16', nombre:'Oso'},
+  {num:'17', nombre:'Pavo'},      {num:'18', nombre:'Burro'},
+  {num:'19', nombre:'Chivo'},     {num:'20', nombre:'Cochino'},
+  {num:'21', nombre:'Gallo'},     {num:'22', nombre:'Camello'},
+  {num:'23', nombre:'Cebra'},     {num:'24', nombre:'Iguana'},
+  {num:'25', nombre:'Gallina'},   {num:'26', nombre:'Vaca'},
+  {num:'27', nombre:'Perro'},     {num:'28', nombre:'Zamuro'},
+  {num:'29', nombre:'Elefante'},  {num:'30', nombre:'Caimán'},
+  {num:'31', nombre:'Lapa'},      {num:'32', nombre:'Ardilla'},
+  {num:'33', nombre:'Pez'},       {num:'34', nombre:'Venado'},
+  {num:'35', nombre:'Jirafa'},    {num:'36', nombre:'Culebra'},
+  {num:'37', nombre:'Tortuga'},   {num:'38', nombre:'Búfalo'},
+  {num:'39', nombre:'Lechuza'},   {num:'40', nombre:'Avispa'},
+  {num:'41', nombre:'Canguro'},   {num:'42', nombre:'Tucán'},
+  {num:'43', nombre:'Mariposa'},  {num:'44', nombre:'Chiguire'},
+  {num:'45', nombre:'Garza'},     {num:'46', nombre:'Puma'},
+  {num:'47', nombre:'Pavoreal'},  {num:'48', nombre:'Puercoespín'},
+  {num:'49', nombre:'Pereza'},    {num:'50', nombre:'Canario'},
+  {num:'51', nombre:'Pelícano'},  {num:'52', nombre:'Pulpo'},
+  {num:'53', nombre:'Caracol'},   {num:'54', nombre:'Grillo'},
+  {num:'55', nombre:'Oso Horm.'},{num:'56', nombre:'Tiburón'},
+  {num:'57', nombre:'Pato'},      {num:'58', nombre:'Hormiga'},
+  {num:'59', nombre:'Pantera'},   {num:'60', nombre:'Camaleón'},
+  {num:'61', nombre:'Panda'},     {num:'62', nombre:'Cachicamo'},
+  {num:'63', nombre:'Cangrejo'},  {num:'64', nombre:'Gavilán'},
+  {num:'65', nombre:'Araña'},     {num:'66', nombre:'Lobo'},
+  {num:'67', nombre:'Avestruz'},  {num:'68', nombre:'Jaguar'},
+  {num:'69', nombre:'Conejo'},    {num:'70', nombre:'Bisonte'},
+  {num:'71', nombre:'Guayama'},   {num:'72', nombre:'Gorila'},
+  {num:'73', nombre:'Hipopótamo'},{num:'74', nombre:'Turpial'},
+  {num:'75', nombre:'Bestia Gan.'}
+];
+
+let aniHorario = '';
+let apuestasAni = JSON.parse(localStorage.getItem('apuestasAni') || '[]');
+
+function saveApuestasAni() { localStorage.setItem('apuestasAni', JSON.stringify(apuestasAni)); }
+
+function selAniHorario(btn, valor) {
+  document.querySelectorAll('#ani-horarios-btns .horario-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  aniHorario = valor;
+}
+
+function renderAniGrid(lista) {
+  const grid = document.getElementById('ani-grid');
+  if (!grid) return;
+  const seleccionados = new Set(ticketAni.map(a => a.num));
+  grid.innerHTML = lista.map(a => {
+    const sel = seleccionados.has(a.num);
+    const count = ticketAni.filter(t => t.num === a.num).length;
+    const bg   = sel ? 'rgba(22,163,74,0.35)'  : 'rgba(255,255,255,0.05)';
+    const bord = sel ? '#22c55e'                : 'rgba(255,255,255,0.12)';
+    const numColor = sel ? '#86efac' : '#f5d020';
+    const badge = sel ? `<span style="position:absolute;top:2px;right:4px;font-size:0.55rem;font-weight:900;color:#22c55e;">${count > 1 ? '×'+count : '✔'}</span>` : '';
+    return `
+    <button onclick="agregarAni('${a.num}','${a.nombre}')"
+      style="position:relative;display:flex;flex-direction:column;align-items:center;padding:0.55rem 0.2rem;border-radius:0.6rem;background:${bg};border:1.5px solid ${bord};cursor:pointer;transition:all 0.15s;gap:0.15rem;"
+      onmouseover="this.style.background='rgba(124,58,237,0.4)';this.style.borderColor='#7c3aed';"
+      onmouseout="this.style.background='${bg}';this.style.borderColor='${bord}';">
+      ${badge}
+      <span style="font-size:1.1rem;font-weight:900;color:${numColor};">${a.num}</span>
+      <span style="font-size:0.6rem;color:rgba(255,255,255,0.75);font-weight:600;text-align:center;line-height:1.1;">${a.nombre}</span>
+    </button>`;
+  }).join('');
+}
+
+
+function filtrarAnimalitos() {
+  const q = (document.getElementById('ani-filtro').value || '').toLowerCase();
+  const lista = q ? ANIMALITOS.filter(a => a.nombre.toLowerCase().includes(q) || a.num.includes(q)) : ANIMALITOS;
+  renderAniGrid(lista);
+}
+
+
+
+
+function renderAniHistorial() {
+  const el = document.getElementById('ani-historial-list');
+  if (!el) return;
+  if (!apuestasAni.length) { el.innerHTML = '<p class="text-white/30 text-sm text-center py-4">Sin apuestas registradas</p>'; return; }
+  el.innerHTML = apuestasAni.map(a => `
+    <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.04);border-radius:0.6rem;padding:0.6rem 0.8rem;border:1px solid rgba(255,255,255,0.08);">
+      <div>
+        <p style="font-weight:900;font-size:0.85rem;">${a.num} · ${a.nombre}</p>
+        <p style="font-size:0.65rem;color:rgba(255,255,255,0.45);">${a.horario} · ${a.fecha}</p>
+      </div>
+      <p style="font-weight:900;color:#f5d020;font-size:0.95rem;">Bs ${formatMoney(a.monto)}</p>
+    </div>`).join('');
+}
+
+function limpiarAniHistorial() {
+  if (!confirm('¿Limpiar historial de animalitos?')) return;
+  apuestasAni = []; saveApuestasAni(); renderAniHistorial();
+  actualizarAniFab();
+  toast('Historial limpiado');
+}
+
+// ─── TICKET ANIMALITOS ───────────────────────────────
+// Ticket temporal (sesión actual, no persistido)
+let ticketAni = [];
+
+function actualizarAniFab() {
+  const total = ticketAni.reduce((s, a) => s + a.monto, 0);
+  const fab = document.getElementById('ani-fab');
+  const fabTxt = document.getElementById('ani-fab-total');
+  if (fab) fab.style.display = ticketAni.length > 0 ? 'block' : 'none';
+  if (fabTxt) fabTxt.textContent = 'Bs ' + formatMoney(total);
+}
+
+// Override agregarAni → añadir al ticket y re-pintar el grid
+function agregarAni(num, nombre) {
+  const monto = parseFloat(document.getElementById('ani-monto').value) || 0;
+  if (!aniHorario) { toast('⚠️ Selecciona el horario primero', true); return; }
+  if (monto <= 0)  { toast('⚠️ Ingresa el monto', true); return; }
+  ticketAni.push({ num, nombre, monto, horario: aniHorario });
+  actualizarAniFab();
+  // Re-renderizar grid respetando filtro actual
+  const q = (document.getElementById('ani-filtro')?.value || '').toLowerCase();
+  const lista = q ? ANIMALITOS.filter(a => a.nombre.toLowerCase().includes(q) || a.num.includes(q)) : ANIMALITOS;
+  renderAniGrid(lista);
+  toast(`🐾 ${num} - ${nombre} · Bs ${formatMoney(monto)} ✔`);
+}
+
+function abrirTicketAni() {
+  const modal = document.getElementById('ani-ticket-modal');
+  if (!modal) return;
+  const ahora = new Date();
+  document.getElementById('ani-ticket-fecha').textContent =
+    'FECHA: ' + ahora.toLocaleDateString('es-VE');
+  document.getElementById('ani-ticket-hora').textContent =
+    'HORA: ' + ahora.toLocaleTimeString('es-VE');
+
+  const lista = document.getElementById('ani-ticket-lista');
+  const total = ticketAni.reduce((s, a) => s + a.monto, 0);
+
+  lista.innerHTML = ticketAni.map((a, i) => `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:0.5rem 0;border-bottom:1px dashed rgba(255,255,255,0.07);">
+      <div style="flex:1;">
+        <p style="font-weight:900;font-size:0.85rem;">Animalitos Arrejuntao</p>
+        <p style="font-size:0.68rem;color:rgba(255,255,255,0.45);">${a.num} ${a.nombre} (${a.horario})</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <span style="font-weight:900;font-size:0.9rem;color:#22c55e;">${formatMoney(a.monto)}</span>
+        <button onclick="eliminarDeTicketAni(${i})" style="background:none;border:none;color:#ef4444;font-size:1rem;cursor:pointer;padding:0;">🗑</button>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('ani-ticket-total-modal').textContent = 'Bs ' + formatMoney(total);
+  modal.style.display = 'block';
+}
+
+function eliminarDeTicketAni(idx) {
+  ticketAni.splice(idx, 1);
+  actualizarAniFab();
+  renderAniGrid(ANIMALITOS);
+  if (ticketAni.length === 0) {
+    document.getElementById('ani-ticket-modal').style.display = 'none';
+  } else {
+    abrirTicketAni();
+  }
+}
+
+function cancelarTicketAni() {
+  if (!confirm('¿Cancelar todo el ticket de animalitos?')) return;
+  ticketAni = [];
+  actualizarAniFab();
+  renderAniGrid(ANIMALITOS);
+  document.getElementById('ani-ticket-modal').style.display = 'none';
+  toast('Ticket cancelado');
+}
+
+function verificarTicketAni() {
+  if (ticketAni.length === 0) return;
+  // Guardar en historial persistente
+  const ahora = new Date();
+  ticketAni.forEach(a => {
+    apuestasAni.unshift({
+      id: Date.now() + Math.random(),
+      fecha: ahora.toLocaleString('es-VE'),
+      num: a.num, nombre: a.nombre, monto: a.monto, horario: a.horario
+    });
+  });
+  saveApuestasAni();
+  renderAniHistorial();
+  ticketAni = [];
+  actualizarAniFab();
+  document.getElementById('ani-ticket-modal').style.display = 'none';
+  toast('✅ ¡Ticket confirmado! Apuestas guardadas.');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MÓDULO APUESTAS AVANZADO – multi-número · multi-signo · ticket
+// ═══════════════════════════════════════════════════════════════
+
+// ── Multi-signo (toggle) ──────────────────────────────────────
+let signosSeleccionados = [];   // puede tener varios signos
+
+function selSigno(btn, valor) {
+  const idx = signosSeleccionados.indexOf(valor);
+  if (idx === -1) {
+    signosSeleccionados.push(valor);
+    btn.style.background = '#7c3aed';
+    btn.style.borderColor = '#7c3aed';
+    btn.style.color = '#fff';
+  } else {
+    signosSeleccionados.splice(idx, 1);
+    btn.style.background = 'rgba(255,255,255,0.06)';
+    btn.style.borderColor = 'rgba(255,255,255,0.2)';
+    btn.style.color = 'rgba(255,255,255,0.8)';
+  }
+}
+
+// ── Multi-número (chips) ──────────────────────────────────────
+let numerosApuesta = [];
+
+function agregarNumeroApuesta() {
+  const inp = document.getElementById('apuesta-numero');
+  const val = inp.value.trim();
+  if (!val || val.length < 1 || val.length > 3) { toast('⚠️ Escribe entre 1 y 3 dígitos', true); return; }
+  numerosApuesta.push(val);
+  inp.value = '';
+  inp.focus();
+  renderChipsNumeros();
+}
+
+function eliminarNumero(idx) {
+  numerosApuesta.splice(idx, 1);
+  renderChipsNumeros();
+}
+
+function renderChipsNumeros() {
+  const cont = document.getElementById('numeros-chips');
+  if (!cont) return;
+  cont.innerHTML = numerosApuesta.map((n, i) =>
+    `<span style="display:inline-flex;align-items:center;gap:0.3rem;background:#7c3aed;color:#fff;border-radius:9999px;padding:0.25rem 0.65rem;font-size:0.8rem;font-weight:900;">
+      ${n}
+      <button onclick="eliminarNumero(${i})" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.9rem;padding:0;line-height:1;">×</button>
+    </span>`
+  ).join('');
+}
+
+// ── Ticket temporal de apuestas ───────────────────────────────
+let ticketApuestas = [];
+
+function actualizarFabApuestas() {
+  const fab = document.getElementById('ticket-fab');
+  const txt = document.getElementById('ticket-total');
+  const total = ticketApuestas.reduce((s, a) => s + a.monto, 0);
+  if (fab) fab.style.display = ticketApuestas.length > 0 ? 'block' : 'none';
+  if (txt) txt.textContent = 'Bs ' + formatMoney(total);
+}
+
+function agregarApuestaAlTicket() {
+  if (!apuestaHorario) { toast('⚠️ Selecciona el horario', true); return; }
+  if (numerosApuesta.length === 0) { toast('⚠️ Añade al menos un número', true); return; }
+  const monto = parseFloat(document.getElementById('apuesta-monto').value) || 0;
+  if (monto <= 0) { toast('⚠️ Ingresa el monto', true); return; }
+
+  const cats   = categoriasSeleccionadas.length > 0 ? [...categoriasSeleccionadas] : ['todos'];
+  const signos = signosSeleccionados.length > 0 ? [...signosSeleccionados] : ['—'];
+
+  numerosApuesta.forEach(num => {
+    cats.forEach(cat => {
+      const catLabel = CATEGORIA_LABELS[cat] || cat;
+      if (cat === 'triple_signo' || signosSeleccionados.length > 0) {
+        // Si la categoría involucra signo o el usuario eligió signos → un item por signo
+        signos.forEach(signo => {
+          const label = `${catLabel}${signo !== '—' ? ' + ' + signo : ''}`;
+          ticketApuestas.push({ num, signo, label, monto, horario: apuestaHorario });
+        });
+      } else {
+        ticketApuestas.push({ num, signo: '—', label: catLabel, monto, horario: apuestaHorario });
+      }
+    });
+  });
+
+  // Limpiar selecciones
+  numerosApuesta = [];
+  renderChipsNumeros();
+  actualizarFabApuestas();
+  toast(`✔ ${ticketApuestas.length} item(s) en el ticket`);
+}
+
+function abrirModalTicket() {
+  const modal = document.getElementById('apuesta-ticket-modal');
+  if (!modal || ticketApuestas.length === 0) return;
+  const ahora = new Date();
+  document.getElementById('ap-ticket-fecha').textContent = 'FECHA: ' + ahora.toLocaleDateString('es-VE');
+  document.getElementById('ap-ticket-hora').textContent  = 'HORA: '  + ahora.toLocaleTimeString('es-VE');
+
+  const total = ticketApuestas.reduce((s, a) => s + a.monto, 0);
+  document.getElementById('ap-ticket-total').textContent = 'Bs ' + formatMoney(total);
+
+  document.getElementById('ap-ticket-lista').innerHTML = ticketApuestas.map((a, i) => `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:0.45rem 0;border-bottom:1px dashed rgba(255,255,255,0.07);">
+      <div style="flex:1;">
+        <p style="font-weight:900;font-size:0.82rem;">${a.label || 'Apuesta'}</p>
+        <p style="font-size:0.65rem;color:rgba(255,255,255,0.4);">${a.num}${a.signo !== '—' ? ' · '+a.signo : ''} (${a.horario})</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <span style="font-weight:900;font-size:0.88rem;color:#f97316;">${formatMoney(a.monto)}</span>
+        <button onclick="eliminarDeTicketApuesta(${i})" style="background:none;border:none;color:#ef4444;font-size:0.95rem;cursor:pointer;padding:0;">🗑</button>
+      </div>
+    </div>`).join('');
+
+  modal.style.display = 'block';
+}
+
+function eliminarDeTicketApuesta(idx) {
+  ticketApuestas.splice(idx, 1);
+  actualizarFabApuestas();
+  if (ticketApuestas.length === 0) {
+    document.getElementById('apuesta-ticket-modal').style.display = 'none';
+  } else {
+    abrirModalTicket();
+  }
+}
+
+function cancelarTicketApuesta() {
+  if (!confirm('¿Cancelar todo el ticket de apuestas?')) return;
+  ticketApuestas = [];
+  actualizarFabApuestas();
+  document.getElementById('apuesta-ticket-modal').style.display = 'none';
+  toast('Ticket cancelado');
+}
+
+function confirmarTicketApuesta() {
+  if (ticketApuestas.length === 0) return;
+  const ahora = new Date();
+  ticketApuestas.forEach(a => {
+    apuestas.unshift({
+      id: Date.now() + Math.random(),
+      fecha: ahora.toLocaleString('es-VE'),
+      numero: a.num, signo: a.signo, tipo: a.label, monto: a.monto, horario: a.horario
+    });
+  });
+  saveApuestas(); renderHistorial();
+  ticketApuestas = [];
+  actualizarFabApuestas();
+  document.getElementById('apuesta-ticket-modal').style.display = 'none';
+  toast('✅ ¡Ticket confirmado! Apuestas guardadas.');
+}
+
+// ── Bloqueo de horarios 5 min antes del cierre ────────────────
+const HORARIOS_SORTEO = [
+  { label:'10:00 AM', h:10, m:0 },
+  { label:'01:00 PM', h:13, m:0 },
+  { label:'04:00 PM', h:16, m:0 },
+  { label:'07:00 PM', h:19, m:0 },
+  { label:'11:00 PM', h:23, m:0 },
+];
+
+function verificarBloqueoHorarios() {
+  const ahora = new Date();
+  const min_actual = ahora.getHours() * 60 + ahora.getMinutes();
+
+  // Aplica para apuestas y animalitos
+  ['horarios-btns','ani-horarios-btns'].forEach(id => {
+    const cont = document.getElementById(id);
+    if (!cont) return;
+    cont.querySelectorAll('.horario-btn').forEach(btn => {
+      const texto = btn.textContent.trim();
+      const sorteo = HORARIOS_SORTEO.find(s => s.label === texto);
+      if (!sorteo) return;
+      const min_sorteo = sorteo.h * 60 + sorteo.m;
+      const diff = min_sorteo - min_actual;
+      // Bloquear si faltan ≤5 min O ya pasó el horario
+      const bloqueado = diff <= 5 && diff > -60;
+      btn.disabled = bloqueado;
+      btn.style.opacity   = bloqueado ? '0.35' : '';
+      btn.style.cursor    = bloqueado ? 'not-allowed' : 'pointer';
+      btn.title = bloqueado ? '⛔ Cierre en menos de 5 min' : '';
+    });
+  });
+}
+
+// Verificar al cargar y cada 30 segundos
+verificarBloqueoHorarios();
+setInterval(verificarBloqueoHorarios, 30000);
+
+
+
+// ─── ¿QUÉ SOÑASTE? ────────────────────────────────────────────────────────────
+var SUENOS_DB = {
+  // Animals directly
+  'perro':['Perro','Fidelidad y protección'],
+  'gato':['Gato','Intuición y misterio'],
+  'caballo':['Caballo','Libertad y poder'],
+  'pez':['Pez','Abundancia y fluidez'],
+  'vaca':['Vaca','Prosperidad y trabajo'],
+  'toro':['Toro','Fuerza y coraje'],
+  'gallinagallo':['Gallo','Nuevo amanecer'],
+  'gallo':['Gallo','Nuevo amanecer'],
+  'gallina':['Gallina','Familia y hogar'],
+  'elefante':['Elefante','Suerte y memoria'],
+  'leon':['León','Liderazgo y victoria'],
+  'tigre':['Tigre','Passión y energia'],
+  'mono':['Mono','Inteligencia y juego'],
+  'rana':['Rana','Transformación'],
+  'serpiente':['Serpiente','Trueno: ver número de serpiente'],
+  'culebra':['Serpiente','Traición o renovación'],
+  'aguila':['Águila','Visión elevada y victoria'],
+  'raton':['Ratón','Ahorro y pequeños detalles'],
+  'paloma':['Paloma','Paz y buenas noticias'],
+  'perico':['Perico','Comunicación y alegría'],
+  'loro':['Perico','Comunicación e imitación'],
+  'jirafa':['Jirafa','Perspectiva y elegancia'],
+  'zorro':['Zorro','Astucia y estrategia'],
+  'oso':['Oso','Fuerza y protección'],
+  'alacran':['Alacrán','Precaución y advertencia'],
+  'escorpion':['Alacrán','Cuidado con enemigos'],
+  'caimán':['Caimán','Paciencia y peligro'],
+  'caiman':['Caimán','Paciencia y peligro'],
+  'delfin':['Delfín','Alegría y comunicación'],
+  'ballena':['Ballena','Grandes oportunidades'],
+  'burro':['Burro','Trabajo y perseverancia'],
+  'chivo':['Chivo','Terquedad y obstáculos'],
+  'cochino':['Cochino','Abundancia y dinero'],
+  'cerdo':['Cochino','Dinero y prosperidad'],
+  'pavo':['Pavo','Vanidad y celebración'],
+  'cebra':['Cebra','Balance entre blanco y negro'],
+  'camello':['Camello','Resistencia y viaje'],
+  'iguana':['Iguana','Adaptación y paciencia'],
+  'ardilla':['Ardilla','Ahorro y previsión'],
+  'venado':['Venado','Gracia y velocidad'],
+  'periquito':['Perico','Chismes y noticias'],
+  // Dream words
+  'agua':['Pez','Emociones y flujo de vida'],
+  'rio':['Delfín','Cambios y oportunidades'],
+  'mar':['Ballena','Riqueza y lo desconocido'],
+  'lluvia':['Rana','Bendiciones que llegan'],
+  'fuego':['León','Pasión y transformación'],
+  'dinero':['Cochino','Prosperidad económica'],
+  'oro':['Cochino','Riquezas próximas'],
+  'casa':['Gato','Hogar y seguridad'],
+  'bebe':['Paloma','Nuevos comienzos'],
+  'nino':['Paloma','Inocencia y nueva etapa'],
+  'mujer':['Gallina','Fertilidad y cuidado'],
+  'hombre':['Toro','Trabajo y responsabilidad'],
+  'muerte':['Zamuro','Cambio radical o herencia'],
+  'muerto':['Zamuro','Mensajes del más allá'],
+  'sangre':['Caimán','Fuerza vital o peligro'],
+  'vuelo':['Águila','Libertad y éxito próximo'],
+  'cielo':['Paloma','Paz y transcendencia'],
+  'luna':['Gato','Intuición y misterio nocturno'],
+  'sol':['León','Claridad y poder'],
+  'arbol':['Mono','Crecimiento y familia'],
+  'flores':['Perico','Alegría y celebración'],
+  'anillo':['Vaca','Compromiso y fidelidad'],
+  'boda':['Paloma','Unión y amor'],
+  'pelea':['Tigre','Conflicto que se resuelve'],
+  'perseguir':['Caballo','Huir de tus miedos'],
+  'caer':['Ratón','Inseguridad: cuidado con los pasos'],
+  'volar':['Águila','Altura y éxito'],
+};
+
+function setSearchSueno(word) {
+  var inp = document.getElementById('sueno-input');
+  if (inp) { inp.value = word; buscarSueno(word); }
+}
+
+function buscarSueno(query) {
+  if (!query || query.trim().length < 2) {
+    document.getElementById('sueno-result').style.display = 'none';
+    document.getElementById('sueno-noresult').style.display = 'none';
+    return;
+  }
+  var key = query.toLowerCase().trim()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z]/g,'');
+
+  var match = null;
+  // Direct lookup
+  if (SUENOS_DB[key]) { match = SUENOS_DB[key]; }
+  else {
+    // Partial lookup
+    for (var k in SUENOS_DB) {
+      if (k.indexOf(key) === 0 || key.indexOf(k) === 0) { match = SUENOS_DB[k]; break; }
+    }
+  }
+
+  var resDiv  = document.getElementById('sueno-result');
+  var noRes   = document.getElementById('sueno-noresult');
+  var numsDiv = document.getElementById('sueno-nums');
+  var sigEl   = document.getElementById('sueno-significado');
+  var anmEl   = document.getElementById('sueno-animal-label');
+
+  if (!match) {
+    resDiv.style.display = 'none';
+    noRes.style.display = 'block';
+    return;
+  }
+
+  noRes.style.display = 'none';
+
+  // Find the animal in ANIMALITOS
+  var animalNombre = match[0];
+  var significado  = match[1];
+  var animalEntry  = (typeof ANIMALITOS !== 'undefined') ?
+    ANIMALITOS.find(function(a){ return a.nombre.toLowerCase() === animalNombre.toLowerCase(); }) : null;
+  var numStr = animalEntry ? String(animalEntry.num).padStart(2,'0') : '??';
+
+  // Build number circles
+  numsDiv.innerHTML = numStr.split('').map(function(d){
+    return '<div style="width:2.2rem;height:2.2rem;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#a855f7);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;color:#fff;box-shadow:0 2px 8px rgba(124,58,237,0.4);">'+d+'</div>';
+  }).join('');
+
+  sigEl.innerHTML  = '✨ ' + significado;
+  anmEl.innerHTML  = 'Animalito: <strong>' + animalNombre + (animalEntry?' #'+animalEntry.num:'') + '</strong>';
+  resDiv.style.display = 'block';
+}
+
+
+// ─── TRIPLE + SIGNO ────────────────────────────────────────────────────────────
+var ZODIACOS = [
+  {emoji:'♈',nombre:'Aries'},     {emoji:'♉',nombre:'Tauro'},
+  {emoji:'♊',nombre:'Géminis'}, {emoji:'♋',nombre:'Cáncer'},
+  {emoji:'♌',nombre:'Leo'},       {emoji:'♍',nombre:'Virgo'},
+  {emoji:'♎',nombre:'Libra'},     {emoji:'♏',nombre:'Escorpio'},
+  {emoji:'♐',nombre:'Sagitario'}, {emoji:'♑',nombre:'Capricornio'},
+  {emoji:'♒',nombre:'Acuario'},   {emoji:'♓',nombre:'Piscis'}
+];
+
+function generarTripleSigno() {
+  // Generate 3 random digits using animateSlot
+  var digits = [
+    Math.floor(Math.random()*10),
+    Math.floor(Math.random()*10),
+    Math.floor(Math.random()*10)
+  ];
+  // Animate digit slots sequentially
+  animateSlot('sTS1', digits[0], 0, function() {
+    document.getElementById('tripleSigno-d1').value = digits[0];
+    animateSlot('sTS2', digits[1], 0, function() {
+      document.getElementById('tripleSigno-d2').value = digits[1];
+      animateSlot('sTS3', digits[2], 0, function() {
+        document.getElementById('tripleSigno-d3').value = digits[2];
+      });
+    });
+  });
+
+  // Simultaneously spin the zodiac
+  var zodiacEl  = document.getElementById('tripleSigno-emoji');
+  var zodiacNom = document.getElementById('tripleSigno-nombre');
+  var chosen    = ZODIACOS[Math.floor(Math.random() * ZODIACOS.length)];
+  var ticks = 0, maxTicks = 16;
+  var ziv = setInterval(function() {
+    var rnd = ZODIACOS[Math.floor(Math.random() * ZODIACOS.length)];
+    if(zodiacEl) zodiacEl.textContent = rnd.emoji;
+    ticks++;
+    if(ticks >= maxTicks) {
+      clearInterval(ziv);
+      setTimeout(function() {
+        if(zodiacEl)  zodiacEl.textContent  = chosen.emoji;
+        if(zodiacNom) zodiacNom.textContent = chosen.nombre;
+        // Pulse effect
+        var circ = zodiacEl.parentElement;
+        circ.style.transform = 'scale(1.1)';
+        circ.style.boxShadow = '0 4px 24px rgba(251,191,36,0.6)';
+        setTimeout(function(){ circ.style.transform='scale(1)'; circ.style.boxShadow='0 4px 16px rgba(251,191,36,0.35)'; },250);
+      }, 60);
+    }
+  }, 55);
+}
+
+
+// ─── PIRÁMIDE DE LA SUERTE ───────────────────────────────────────────────────
+function buildPiramide() {
+  var now  = new Date();
+  var ddIn   = document.getElementById('pir-dd');
+  var mmIn   = document.getElementById('pir-mm');
+  var yyyyIn = document.getElementById('pir-yyyy');
+  var dd   = ddIn   && ddIn.value   ? String(ddIn.value).padStart(2,'0')   : String(now.getDate()).padStart(2,'0');
+  var mm   = mmIn   && mmIn.value   ? String(mmIn.value).padStart(2,'0')   : String(now.getMonth()+1).padStart(2,'0');
+  var yyyy = yyyyIn && yyyyIn.value ? String(yyyyIn.value)                 : String(now.getFullYear());
+  // Pre-fill inputs with today if empty
+  if (ddIn   && !ddIn.value)   ddIn.value   = dd;
+  if (mmIn   && !mmIn.value)   mmIn.value   = mm;
+  if (yyyyIn && !yyyyIn.value) yyyyIn.value  = yyyy;
+  var dateStr = dd + mm + yyyy;  // 8 digits
+
+  // Build rows: start with 8 digits of date, each row = sum of adjacent pairs % 10
+  var rows = [];
+  var row0 = dateStr.split('').map(Number);
+  rows.push(row0);
+  while (rows[rows.length-1].length > 1) {
+    var prev = rows[rows.length-1];
+    var next = [];
+    for (var i = 0; i < prev.length-1; i++) {
+      next.push((prev[i] + prev[i+1]) % 10);
+    }
+    rows.push(next);
+  }
+
+  // Render into #piramide-grid
+  var grid = document.getElementById('piramide-grid');
+  if (!grid) return;
+
+  grid.innerHTML = rows.map(function(row, ri) {
+    return '<div style="display:flex;gap:5px;justify-content:center;">' +
+      row.map(function(n, ci) {
+        var hot = n >= 5;
+        var isCenter = (row.length === 1); // tip cell
+        var bg = hot
+          ? 'background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;box-shadow:0 2px 8px rgba(124,58,237,0.4);'
+          : 'background:#facc15;color:#1a1a1a;box-shadow:0 2px 6px rgba(250,204,21,0.3);';
+        var sz = ri === 0 ? '2rem' : ri < 3 ? '2rem' : '1.9rem';
+        return '<div style="width:'+sz+';height:'+sz+';border-radius:0.45rem;display:flex;align-items:center;justify-content:center;font-family:\'Outfit\',sans-serif;font-weight:900;font-size:0.95rem;transition:transform 0.15s;cursor:default;'+bg+'" title="Fila '+(ri+1)+'">'+ n +'</div>';
+      }).join('') +
+    '</div>';
+  }).join('');
+}
+
+</script>
+</body>
+</html>

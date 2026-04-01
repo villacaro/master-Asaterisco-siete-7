@@ -1,0 +1,41 @@
+﻿python : SystemCheckError: System check identified 
+some issues:
+En línea: 1 Carácter: 1
++ python manage.py check 
+--settings=admin_asterisco7.settings_local 2>& ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (SystemChe 
+   ckErro...ed some issues::String) [], RemoteExcepti  
+  on
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+ERRORS:
+<class 'admin_profiles.admin.DireccionesAdmin'>: 
+(admin.E124) The value of 'list_editable[0]' refers to 
+the first field in 'list_display' ('direccion'), which 
+cannot be used unless 'list_display_links' is set.
+?: (admin.E403) A 
+'django.template.backends.django.DjangoTemplates' 
+instance must be configured in TEMPLATES in order to 
+use the admin application.
+admin_apuestas.Tickets.user: (fields.E305) Reverse 
+query name for 'admin_apuestas.Tickets.user' clashes 
+with reverse query name for 
+'admin_juego.Ticket.vendedor'.
+	HINT: Add or change a related_name argument to the 
+definition for 'admin_apuestas.Tickets.user' or 
+'admin_juego.Ticket.vendedor'.
+admin_juego.ModalidadJuego_Grupos: (fields.E336) The 
+model is used as an intermediate model by 
+'admin_juego.ModalidadApuesta.grupo', but it does not 
+have a foreign key to 'ModalidadApuesta' or 
+'GruposApuesta'.
+admin_juego.TipoProducto_Grupos: (fields.E336) The 
+model is used as an intermediate model by 
+'admin_juego.GruposApuesta.deporte', but it does not 
+have a foreign key to 'GruposApuesta' or 
+'TipoProducto'.
+
+System check identified 5 issues (0 silenced).

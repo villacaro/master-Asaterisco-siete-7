@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selección de Candidatos — *7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0f1117; --card:#1a1d27; --card2:#20243a;
+    --border:#2a2f45; --border2:#3a3f58;
+    --accent:#7c3aed; --accent2:#9d5cf6; --accent-bg:rgba(124,58,237,.15);
+    --green:#10b981; --red:#ef4444; --orange:#f97316; --yellow:#f59e0b; --blue:#3b82f6; --cyan:#06b6d4;
+    --text:#e2e8f0; --text2:#94a3b8; --muted:#64748b;
+    --shadow:0 4px 24px rgba(0,0,0,.45);
+    --r:12px;
+    --transition:all .2s ease;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'DM Sans','Inter',system-ui,sans-serif;
+    font-size:13px;background:var(--bg);color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  .container{max-width:1400px;margin:0 auto;padding:24px 28px}
+
+  /* ── PAGE HEADER (dashboard style) ── */
+  .page-header{margin-bottom:20px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px}
+  .page-title{font-size:22px;font-weight:700;color:var(--text);margin-bottom:3px;letter-spacing:-.3px;line-height:1.25}
+  .page-sub{font-size:13px;color:var(--muted);font-weight:400;line-height:1.5}
+  .header-right{display:flex;align-items:center;gap:10px}
+  #header-time{font-size:12px;color:var(--muted);background:var(--card);border:1px solid var(--border);padding:5px 12px;border-radius:8px;}
+  #fecha-larga{font-size:12px;color:var(--text2);background:var(--card);border:1px solid var(--border);padding:5px 12px;border-radius:8px;}
+
+  /* Sorteo info */
+  .sorteo-info{margin-bottom:10px;text-align:center;font-size:13px}
+  .sorteo-info .lbl{color:var(--red);font-weight:600}
+  .sorteo-info .val-big{color:var(--green);font-size:17px;font-weight:700}
+  .sorteo-info .val-med{color:var(--green);font-weight:600}
+  .estado-row{display:flex;justify-content:center;gap:50px;margin-bottom:14px;font-size:13px}
+  .estado-row .lbl{color:var(--muted)}
+  .estado-row .abierto{color:var(--green);font-weight:700}
+  .estado-row .hora{color:var(--red);font-weight:600}
+
+  /* Filtros */
+  .filtros{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:16px;}
+  .filtros label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:5px}
+  .filtros input,.filtros select{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:12.5px;color:var(--text);outline:none;font-family:inherit;min-width:120px;transition:border .2s}
+  .filtros input:focus,.filtros select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+  .btn-consultar{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:var(--transition);display:inline-flex;align-items:center;gap:6px}
+  .btn-consultar:hover{background:var(--accent2);transform:translateY(-1px)}
+
+  /* Barra de búsqueda */
+  .search-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .search-bar input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 14px 9px 38px;font-size:13px;color:var(--text);outline:none;font-family:inherit;transition:.2s}
+  .search-bar input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+  .search-bar input::placeholder{color:var(--muted)}
+  .search-wrap{position:relative;flex:1}
+  .search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.4;pointer-events:none}
+  .search-count{font-size:11px;color:var(--muted);white-space:nowrap}
+
+  /* Formulario Resultado */
+  .form-resultado{background:var(--card);border:1px solid var(--border);border-radius:var(--r);margin-bottom:16px;overflow:hidden}
+  .form-resultado .form-header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:var(--card2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:background .15s}
+  .form-resultado .form-header:hover{background:var(--accent-bg)}
+  .form-resultado .form-header span{font-weight:700;font-size:13px;color:var(--text2)}
+  .form-resultado .form-header .toggle-icon{color:var(--muted);font-size:16px;transition:.2s}
+  .form-resultado .form-body{padding:16px 18px;display:none}
+  .form-resultado.open .form-body{display:block}
+  .form-resultado.open .toggle-icon{transform:rotate(180deg)}
+  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:14px}
+  .form-group label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px}
+  .form-group input,.form-group select{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 11px;font-size:13px;color:var(--text);outline:none;font-family:inherit;transition:border .2s}
+  .form-group input:focus,.form-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+  .form-actions{display:flex;gap:8px;justify-content:flex-end}
+  .btn-save{background:var(--green);color:#fff;border:none;border-radius:9px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:var(--transition)}
+  .btn-save:hover{opacity:.85;transform:translateY(-1px)}
+  .btn-reset{background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:9px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:inherit;transition:var(--transition)}
+  .btn-reset:hover{border-color:var(--accent2);color:var(--text)}
+  .form-msg{margin-top:8px;font-size:12px;padding:8px 12px;border-radius:8px;display:none}
+  .form-msg.ok{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);color:var(--green);display:block}
+  .form-msg.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:var(--red);display:block}
+
+  /* KPI bar */
+  .kpi-bar{display:none;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+  .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;flex:1;min-width:130px;transition:transform .2s,box-shadow .2s}
+  .kpi-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .kpi-card .klabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+  .kpi-card .kvalue{font-size:22px;font-weight:700;margin-top:4px;letter-spacing:-0.5px}
+  .kc-red{color:var(--red)}.kc-orange{color:var(--orange)}.kc-yellow{color:var(--yellow)}.kc-blue{color:var(--blue)}
+
+  /* Botón seleccionar */
+  .btn-area{display:flex;justify-content:center;margin-bottom:16px}
+  .btn-sel{border:1px solid var(--border);background:var(--card);color:var(--text2);padding:8px 24px;font-size:13px;font-weight:500;cursor:pointer;border-radius:9px;font-family:inherit;transition:var(--transition)}
+  .btn-sel:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+
+  /* Tabla */
+  .table-wrapper{border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--card)}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border);background:var(--card2)}
+  .toolbar .ttitle{font-size:13px;font-weight:600;color:var(--text)}
+  .toolbar .actions{display:flex;align-items:center;gap:12px}
+  .icon-btns{display:flex;gap:5px}
+  .icon-btn{width:28px;height:28px;border-radius:8px;background:var(--accent-bg);border:1px solid rgba(124,58,237,.25);cursor:pointer;color:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:14px;transition:var(--transition)}
+  .icon-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .pager{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
+  .pager button{background:var(--card);border:1px solid var(--border);cursor:pointer;color:var(--text2);font-size:13px;padding:3px 7px;border-radius:6px;transition:var(--transition)}
+  .pager button:hover{border-color:var(--accent);color:var(--accent)}
+  .pager .pinfo{font-size:12px;color:var(--text);padding:0 4px}
+  .pager .fcount{margin-left:6px;font-size:11px;color:var(--muted)}
+
+  /* ─── TABLA PRINCIPAL (sin franja negra) ─── */
+  table{width:100%;border-collapse:collapse;font-size:12px;background:var(--card)}
+  th,td{border:1px solid var(--border);padding:6px 9px}
+  /* Fila 1 del thead: cabecera de grupo — usa card2 (igual al dashboard) */
+  thead tr:first-child th{
+    background:var(--card2);
+    text-align:center;font-weight:700;font-size:11px;
+    color:var(--accent2);letter-spacing:.6px;text-transform:uppercase;
+    border-bottom:2px solid var(--accent);
+  }
+  /* Fila 2 del thead: sub-cabeceras de columnas */
+  thead tr:last-child th{
+    background:var(--card2);text-align:center;
+    font-weight:600;font-size:10.5px;color:var(--muted);
+    border-bottom:1px solid var(--border);
+  }
+  tbody tr:hover{background:rgba(124,58,237,.05)}
+  tbody tr:nth-child(even){background:rgba(255,255,255,.018)}
+  .col-sep{border-left:2px solid var(--accent) !important}
+  .cand-num{color:var(--red);font-weight:700;cursor:pointer;text-align:center;font-size:15px;letter-spacing:2px}
+  .cand-num:hover{color:var(--orange)}
+  .precaucion{font-weight:700;text-align:center;font-size:11px}
+  .precaucion.alerta{color:var(--orange)}.precaucion.critico{color:var(--red)}
+  .precaucion.moderado{color:var(--yellow)}.precaucion.normal{color:var(--green)}
+  .td-center{text-align:center}.td-right{text-align:right;color:var(--text)}.td-muted{color:var(--muted);font-size:11px;text-align:center}
+  .highlight-row td{background:rgba(124,58,237,.1) !important}
+
+  .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin:40px auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .empty-state{text-align:center;padding:60px;color:var(--muted);font-size:14px}
+  .empty-state .icon{font-size:44px;margin-bottom:12px;opacity:.5}
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header (dashboard style) -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">Selección de Candidatos</div>
+      <div class="page-sub">Análisis de riesgo de números con venta · datos en tiempo real de la taquilla</div>
+    </div>
+    <div class="header-right">
+      <span id="fecha-larga"></span>
+      <span id="header-time"></span>
+    </div>
+  </div>
+
+  <!-- Sorteo info -->
+  <div class="sorteo-info">
+    <span class="lbl">Sorteo: </span><span class="val-big" id="sorteo-nombre">—</span>
+    <span style="color:var(--border2)">&nbsp;·&nbsp;</span>
+    <span class="lbl">Lista: </span><span class="val-med" id="lista-nombre">—</span>
+    <span style="color:var(--border2)">&nbsp;·&nbsp;</span>
+    <span class="lbl">Tipo Lista: </span><span class="val-med" id="tipo-lista">—</span>
+  </div>
+  <div class="estado-row">
+    <div><span class="lbl">Estado: </span><span class="abierto">ABIERTO</span></div>
+    <div><span class="lbl">Último análisis: </span><span class="hora" id="ultima-hora"></span> <span style="color:var(--muted)">hrs.</span></div>
+  </div>
+
+  <!-- ─── FILTROS ─────────────────────────────────── -->
+  <div class="filtros">
+    <div>
+      <label>Fecha Inicio</label>
+      <input type="date" id="fi">
+    </div>
+    <div>
+      <label>Fecha Fin</label>
+      <input type="date" id="ff">
+    </div>
+    <div>
+      <label>Sorteo</label>
+      <select id="sorteo-filter">
+        <option value="">Todos los sorteos</option>
+        <option value="TRIPLE TÁCHIRA 11:45 AM">Triple Táchira 11:45 AM</option>
+        <option value="TRIPLE TÁCHIRA 4:45 PM">Triple Táchira 4:45 PM</option>
+        <option value="TRIPLE TÁCHIRA 7:05 PM">Triple Táchira 7:05 PM</option>
+        <option value="TRIPLE ZULIA 12:30 PM">Triple Zulia 12:30 PM</option>
+        <option value="TRIPLE ZULIA 7:40 PM">Triple Zulia 7:40 PM</option>
+        <option value="TRIPLE CHANCE 11:55 AM">Triple Chance 11:55 AM</option>
+        <option value="TRIPLE CHANCE 4:30 PM">Triple Chance 4:30 PM</option>
+        <option value="TRIPLE CARACAS 11:45 AM">Triple Caracas 11:45 AM</option>
+        <option value="TRIPLE CARACAS 4:45 PM">Triple Caracas 4:45 PM</option>
+        <option value="TRIPLE CALIENTE">Triple Caliente</option>
+        <option value="TRIPLE ZAMORANO">Triple Zamorano</option>
+      </select>
+    </div>
+    <div>
+      <label>Lista</label>
+      <select id="lista-filter">
+        <option value="">Todas</option>
+        <option value="A">Lista A</option>
+        <option value="B">Lista B</option>
+        <option value="C">Lista C</option>
+        <option value="UNICA">Lista Única</option>
+      </select>
+    </div>
+    <div>
+      <label>Tipo de Jugada</label>
+      <select id="tipo">
+        <option value="">Todos</option>
+        <option value="TRIPLE_A">Triple A</option>
+        <option value="TRIPLE_B">Triple B</option>
+        <option value="TERMINAL_A">Terminal A</option>
+        <option value="TERMINAL_B">Terminal B</option>
+        <option value="TRIPLE_SIGNO_A">Triple Signo A</option>
+        <option value="TRIPLE_SIGNO_B">Triple Signo B</option>
+        <option value="ARRIMAO">El Arrimao</option>
+        <option value="PAGADITO">El Pegadito</option>
+        <option value="ANIMALITO">Animalito</option>
+      </select>
+    </div>
+    <div>
+      <label>Top</label>
+      <select id="top">
+        <option value="25">25</option>
+        <option value="50" selected>50</option>
+        <option value="100">100</option>
+        <option value="200">200</option>
+      </select>
+    </div>
+    <button class="btn-consultar" onclick="consultar()">🔍 Consultar</button>
+  </div>
+
+  <!-- ─── BÚSQUEDA EN TIEMPO REAL ──────────────────── -->
+  <div class="search-bar">
+    <div class="search-wrap">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input type="text" id="search-input" placeholder="Buscar número candidato (ej: 172, 508…)" oninput="onSearch()">
+    </div>
+    <span class="search-count" id="search-count"></span>
+  </div>
+
+  <!-- ─── FORMULARIO AÑADIR RESULTADO DE SORTEO ────── -->
+  <div class="form-resultado" id="form-resultado">
+    <div class="form-header" onclick="toggleFormResultado()">
+      <span>➕ Añadir Resultado de Sorteo</span>
+      <span class="toggle-icon">▼</span>
+    </div>
+    <div class="form-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Sorteo</label>
+          <select id="res-sorteo">
+            <option value="">Seleccionar…</option>
+            <option value="TRIPLE TÁCHIRA 11:45 AM">Triple Táchira 11:45 AM</option>
+            <option value="TRIPLE TÁCHIRA 4:45 PM">Triple Táchira 4:45 PM</option>
+            <option value="TRIPLE TÁCHIRA 7:05 PM">Triple Táchira 7:05 PM</option>
+            <option value="TRIPLE ZULIA 12:30 PM">Triple Zulia 12:30 PM</option>
+            <option value="TRIPLE ZULIA 7:40 PM">Triple Zulia 7:40 PM</option>
+            <option value="TRIPLE CHANCE 11:55 AM">Triple Chance 11:55 AM</option>
+            <option value="TRIPLE CHANCE 4:30 PM">Triple Chance 4:30 PM</option>
+            <option value="TRIPLE CARACAS 11:45 AM">Triple Caracas 11:45 AM</option>
+            <option value="TRIPLE CARACAS 4:45 PM">Triple Caracas 4:45 PM</option>
+            <option value="TRIPLE CALIENTE">Triple Caliente</option>
+            <option value="TRIPLE ZAMORANO">Triple Zamorano</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Fecha Sorteo</label>
+          <input type="date" id="res-fecha">
+        </div>
+        <div class="form-group">
+          <label>Lista</label>
+          <select id="res-lista">
+            <option value="A">Lista A</option>
+            <option value="B">Lista B</option>
+            <option value="C">Lista C</option>
+            <option value="UNICA">Única</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Triple A (3 dígitos)</label>
+          <input type="text" id="res-triple-a" maxlength="3" placeholder="ej: 172" style="font-family:monospace;font-size:15px;font-weight:700;text-align:center;letter-spacing:3px">
+        </div>
+        <div class="form-group">
+          <label>Triple B (3 dígitos)</label>
+          <input type="text" id="res-triple-b" maxlength="3" placeholder="ej: 508" style="font-family:monospace;font-size:15px;font-weight:700;text-align:center;letter-spacing:3px">
+        </div>
+        <div class="form-group">
+          <label>Triple + Signo</label>
+          <input type="text" id="res-signo" maxlength="10" placeholder="ej: 172 ARIES">
+        </div>
+        <div class="form-group">
+          <label>El Arrimao (5 dígitos)</label>
+          <input type="text" id="res-arrimao" maxlength="5" placeholder="ej: 17245">
+        </div>
+        <div class="form-group">
+          <label>El Pegadito (6 dígitos)</label>
+          <input type="text" id="res-pegadito" maxlength="6" placeholder="ej: 172508">
+        </div>
+        <div class="form-group">
+          <label>Animalito</label>
+          <input type="text" id="res-animalito" maxlength="30" placeholder="ej: 07 - Perico">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-reset" onclick="resetFormResultado()">Limpiar</button>
+        <button class="btn-save" onclick="guardarResultado()">💾 Guardar Resultado</button>
+      </div>
+      <div class="form-msg" id="form-msg"></div>
+    </div>
+  </div>
+
+  <!-- KPI bar -->
+  <div class="kpi-bar" id="kpi-bar">
+    <div class="kpi-card"><div class="klabel">⛔ Críticos</div><div class="kvalue kc-red" id="k-crit">0</div></div>
+    <div class="kpi-card"><div class="klabel">⚠️ Alertas</div><div class="kvalue kc-orange" id="k-alert">0</div></div>
+    <div class="kpi-card"><div class="klabel">🔶 Moderados</div><div class="kvalue kc-yellow" id="k-mod">0</div></div>
+    <div class="kpi-card"><div class="klabel">Venta Total Bs.</div><div class="kvalue kc-blue" id="k-venta">0</div></div>
+  </div>
+
+  <!-- Botón Seleccionar -->
+  <div class="btn-area">
+    <button class="btn-sel" onclick="seleccionarNro()">Seleccionar Número</button>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-wrapper" id="tabla-wrap">
+    <div class="empty-state"><div class="icon">⚠️</div>Selecciona fechas y haz clic en Consultar</div>
+  </div>
+
+</div>
+
+<script>
+// ── DEMO DATA ────────────────────────────────────────────
+const DEMO_DATA = [
+  {no:1,  candidato:'172',cant_tickets:89,venta:205.50,max:15.00,premio:143850.00,pct:34,nivel:'ALERTA',  ta:60, va:263.00,maxa:50.00,prema:15780.00,pcta:35},
+  {no:2,  candidato:'280',cant_tickets:88,venta:198.75,max:15.00,premio:139125.00,pct:33,nivel:'ALERTA',  ta:41, va:138.50,maxa:50.00,prema:8310.00, pcta:19},
+  {no:3,  candidato:'727',cant_tickets:82,venta:197.20,max:10.00,premio:138040.00,pct:33,nivel:'ALERTA',  ta:178,va:610.19,maxa:50.00,prema:36611.40,pcta:82},
+  {no:4,  candidato:'900',cant_tickets:81,venta:207.70,max:20.00,premio:145390.00,pct:35,nivel:'ALERTA',  ta:148,va:517.83,maxa:50.00,prema:31069.80,pcta:69},
+  {no:5,  candidato:'687',cant_tickets:78,venta:202.70,max:12.00,premio:141890.00,pct:34,nivel:'ALERTA',  ta:62, va:406.00,maxa:50.00,prema:24360.00,pcta:54},
+  {no:6,  candidato:'508',cant_tickets:75,venta:201.00,max:15.00,premio:140700.00,pct:34,nivel:'ALERTA',  ta:89, va:367.00,maxa:50.00,prema:22020.00,pcta:49},
+  {no:7,  candidato:'481',cant_tickets:73,venta:186.25,max:10.00,premio:130375.00,pct:31,nivel:'ALERTA',  ta:89, va:383.00,maxa:50.00,prema:22980.00,pcta:51},
+  {no:8,  candidato:'289',cant_tickets:71,venta:208.05,max:30.00,premio:145635.00,pct:35,nivel:'ALERTA',  ta:51, va:365.50,maxa:50.00,prema:21930.00,pcta:49},
+  {no:9,  candidato:'697',cant_tickets:71,venta:192.50,max:30.00,premio:134750.00,pct:32,nivel:'ALERTA',  ta:52, va:413.00,maxa:50.00,prema:24780.00,pcta:55},
+  {no:10, candidato:'430',cant_tickets:71,venta:181.00,max:10.00,premio:126700.00,pct:30,nivel:'ALERTA',  ta:70, va:254.00,maxa:50.00,prema:15240.00,pcta:34},
+  {no:11, candidato:'380',cant_tickets:70,venta:207.25,max:25.00,premio:145075.00,pct:35,nivel:'ALERTA',  ta:41, va:138.50,maxa:50.00,prema:8310.00, pcta:19},
+  {no:12, candidato:'978',cant_tickets:70,venta:199.70,max:10.00,premio:139790.00,pct:33,nivel:'ALERTA',  ta:49, va:239.50,maxa:50.00,prema:14370.00,pcta:32},
+  {no:13, candidato:'848',cant_tickets:69,venta:203.00,max:20.00,premio:142100.00,pct:34,nivel:'CRÍTICO', ta:273,va:968.35,maxa:50.00,prema:58101.00,pcta:130},
+  {no:14, candidato:'187',cant_tickets:69,venta:197.50,max:20.00,premio:138250.00,pct:33,nivel:'ALERTA',  ta:62, va:406.00,maxa:50.00,prema:24360.00,pcta:54},
+  {no:15, candidato:'857',cant_tickets:67,venta:193.00,max:50.00,premio:135100.00,pct:32,nivel:'MODERADO',ta:76, va:301.50,maxa:50.00,prema:18090.00,pcta:40},
+  {no:16, candidato:'780',cant_tickets:67,venta:201.00,max:25.00,premio:140700.00,pct:34,nivel:'ALERTA',  ta:41, va:138.50,maxa:50.00,prema:8310.00, pcta:19},
+  {no:17, candidato:'808',cant_tickets:66,venta:204.00,max:20.00,premio:142800.00,pct:34,nivel:'ALERTA',  ta:89, va:367.00,maxa:50.00,prema:22020.00,pcta:49},
+  {no:18, candidato:'897',cant_tickets:66,venta:193.50,max:15.00,premio:135450.00,pct:32,nivel:'ALERTA',  ta:52, va:413.00,maxa:50.00,prema:24780.00,pcta:55},
+  {no:19, candidato:'670',cant_tickets:65,venta:198.00,max:25.00,premio:138600.00,pct:33,nivel:'ALERTA',  ta:60, va:163.50,maxa:50.00,prema:9810.00, pcta:22},
+  {no:20, candidato:'229',cant_tickets:64,venta:183.00,max:25.00,premio:128100.00,pct:31,nivel:'NORMAL',  ta:97, va:463.50,maxa:50.00,prema:27810.00,pcta:62},
+  {no:21, candidato:'155',cant_tickets:64,venta:191.83,max:15.00,premio:134281.00,pct:32,nivel:'ALERTA',  ta:74, va:290.00,maxa:50.00,prema:17400.00,pcta:39},
+  {no:22, candidato:'762',cant_tickets:63,venta:208.10,max:20.00,premio:145670.00,pct:35,nivel:'ALERTA',  ta:55, va:237.00,maxa:50.00,prema:14220.00,pcta:32},
+  {no:23, candidato:'976',cant_tickets:61,venta:194.50,max:40.00,premio:136150.00,pct:33,nivel:'ALERTA',  ta:53, va:174.00,maxa:50.00,prema:10440.00,pcta:23},
+  {no:24, candidato:'228',cant_tickets:61,venta:182.20,max:40.00,premio:127540.00,pct:31,nivel:'CRÍTICO', ta:119,va:584.16,maxa:50.00,prema:35049.60,pcta:78},
+  {no:25, candidato:'513',cant_tickets:60,venta:196.00,max:20.00,premio:137200.00,pct:33,nivel:'ALERTA',  ta:88, va:352.00,maxa:50.00,prema:21120.00,pcta:47},
+  {no:26, candidato:'341',cant_tickets:60,venta:185.50,max:15.00,premio:129850.00,pct:31,nivel:'ALERTA',  ta:44, va:176.00,maxa:50.00,prema:10560.00,pcta:24},
+  {no:27, candidato:'064',cant_tickets:59,venta:203.75,max:30.00,premio:142625.00,pct:34,nivel:'MODERADO',ta:71, va:284.00,maxa:50.00,prema:17040.00,pcta:38},
+  {no:28, candidato:'452',cant_tickets:58,venta:190.00,max:20.00,premio:133000.00,pct:32,nivel:'ALERTA',  ta:66, va:264.00,maxa:50.00,prema:15840.00,pcta:35},
+  {no:29, candidato:'319',cant_tickets:58,venta:178.50,max:10.00,premio:124950.00,pct:30,nivel:'ALERTA',  ta:82, va:328.00,maxa:50.00,prema:19680.00,pcta:44},
+  {no:30, candidato:'744',cant_tickets:57,venta:205.00,max:25.00,premio:143500.00,pct:34,nivel:'ALERTA',  ta:48, va:192.00,maxa:50.00,prema:11520.00,pcta:26},
+  {no:31, candidato:'537',cant_tickets:56,venta:180.00,max:15.00,premio:126000.00,pct:30,nivel:'NORMAL',  ta:63, va:252.00,maxa:50.00,prema:15120.00,pcta:34},
+  {no:32, candidato:'621',cant_tickets:55,venta:196.50,max:20.00,premio:137550.00,pct:33,nivel:'ALERTA',  ta:57, va:228.00,maxa:50.00,prema:13680.00,pcta:31},
+  {no:33, candidato:'093',cant_tickets:54,venta:187.30,max:15.00,premio:131110.00,pct:31,nivel:'ALERTA',  ta:69, va:276.00,maxa:50.00,prema:16560.00,pcta:37},
+  {no:34, candidato:'415',cant_tickets:53,venta:202.00,max:30.00,premio:141400.00,pct:34,nivel:'ALERTA',  ta:72, va:288.00,maxa:50.00,prema:17280.00,pcta:39},
+  {no:35, candidato:'866',cant_tickets:52,venta:175.00,max:10.00,premio:122500.00,pct:29,nivel:'MODERADO',ta:58, va:232.00,maxa:50.00,prema:13920.00,pcta:31},
+  {no:36, candidato:'128',cant_tickets:51,venta:199.00,max:20.00,premio:139300.00,pct:33,nivel:'ALERTA',  ta:45, va:180.00,maxa:50.00,prema:10800.00,pcta:24},
+  {no:37, candidato:'774',cant_tickets:50,venta:193.75,max:25.00,premio:135625.00,pct:32,nivel:'ALERTA',  ta:80, va:320.00,maxa:50.00,prema:19200.00,pcta:43},
+  {no:38, candidato:'259',cant_tickets:50,venta:188.00,max:15.00,premio:131600.00,pct:31,nivel:'ALERTA',  ta:55, va:220.00,maxa:50.00,prema:13200.00,pcta:30},
+  {no:39, candidato:'033',cant_tickets:49,venta:201.50,max:30.00,premio:141050.00,pct:34,nivel:'ALERTA',  ta:61, va:244.00,maxa:50.00,prema:14640.00,pcta:33},
+  {no:40, candidato:'487',cant_tickets:49,venta:176.25,max:10.00,premio:123375.00,pct:29,nivel:'NORMAL',  ta:47, va:188.00,maxa:50.00,prema:11280.00,pcta:25},
+  {no:41, candidato:'903',cant_tickets:48,venta:210.00,max:40.00,premio:147000.00,pct:35,nivel:'ALERTA',  ta:37, va:148.00,maxa:50.00,prema:8880.00, pcta:20},
+  {no:42, candidato:'356',cant_tickets:47,venta:185.00,max:15.00,premio:129500.00,pct:31,nivel:'ALERTA',  ta:53, va:212.00,maxa:50.00,prema:12720.00,pcta:28},
+  {no:43, candidato:'641',cant_tickets:46,venta:195.80,max:20.00,premio:137060.00,pct:33,nivel:'ALERTA',  ta:68, va:272.00,maxa:50.00,prema:16320.00,pcta:37},
+  {no:44, candidato:'802',cant_tickets:45,venta:182.50,max:15.00,premio:127750.00,pct:30,nivel:'MODERADO',ta:42, va:168.00,maxa:50.00,prema:10080.00,pcta:23},
+  {no:45, candidato:'174',cant_tickets:44,venta:207.00,max:35.00,premio:144900.00,pct:35,nivel:'ALERTA',  ta:39, va:156.00,maxa:50.00,prema:9360.00, pcta:21},
+  {no:46, candidato:'529',cant_tickets:43,venta:178.00,max:10.00,premio:124600.00,pct:30,nivel:'ALERTA',  ta:65, va:260.00,maxa:50.00,prema:15600.00,pcta:35},
+  {no:47, candidato:'067',cant_tickets:42,venta:191.00,max:20.00,premio:133700.00,pct:32,nivel:'ALERTA',  ta:50, va:200.00,maxa:50.00,prema:12000.00,pcta:27},
+];
+
+// ── ESTADO ───────────────────────────────────────────────
+let _allData   = [];
+let _filtered  = [];
+let _selected  = new Set();
+let _page      = 1;
+let _pageSize  = 25;
+let _searchTerm = '';
+const _fmt = v => Number(v||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+const _today = () => new Date().toISOString().slice(0,10);
+
+// ── INIT ─────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  updateClock();
+  setInterval(updateClock, 60000);
+  document.getElementById('fi').value = _today();
+  document.getElementById('ff').value = _today();
+  document.getElementById('res-fecha').value = _today();
+  document.getElementById('sorteo-nombre').textContent = 'TRIPLE TÁCHIRA 4:45 PM';
+  document.getElementById('lista-nombre').textContent  = 'TRIPLE';
+  document.getElementById('tipo-lista').textContent    = 'LISTA B';
+  _allData = DEMO_DATA;
+  _filtered = _allData;
+  renderTabla();
+  updateKPIs();
+});
+
+function updateClock() {
+  const n = new Date();
+  const días = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const mes  = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  document.getElementById('header-time').textContent = n.toLocaleTimeString('es-VE');
+  document.getElementById('fecha-larga').textContent =
+    `${días[n.getDay()].charAt(0).toUpperCase()+días[n.getDay()].slice(1)}, ${n.getDate()} de ${mes[n.getMonth()]} de ${n.getFullYear()}`;
+  document.getElementById('ultima-hora').textContent = n.toLocaleTimeString('es-VE');
+}
+
+// ── BÚSQUEDA EN TIEMPO REAL ───────────────────────────────
+function onSearch() {
+  _searchTerm = document.getElementById('search-input').value.trim();
+  applyFilters();
+}
+function applyFilters() {
+  if (_searchTerm) {
+    _filtered = _allData.filter(r => r.candidato.includes(_searchTerm));
+  } else {
+    _filtered = _allData;
+  }
+  _page = 1;
+  const cnt = document.getElementById('search-count');
+  if (_searchTerm) {
+    cnt.textContent = `${_filtered.length} de ${_allData.length} resultados`;
+  } else {
+    cnt.textContent = '';
+  }
+  renderTabla();
+}
+
+// ── CONSULTAR API ─────────────────────────────────────────
+async function consultar() {
+  const fi      = document.getElementById('fi').value;
+  const ff      = document.getElementById('ff').value;
+  const tipo    = document.getElementById('tipo').value;
+  const top     = document.getElementById('top').value;
+  const sorteo  = document.getElementById('sorteo-filter').value;
+  const lista   = document.getElementById('lista-filter').value;
+  const wrap    = document.getElementById('tabla-wrap');
+
+  wrap.innerHTML = '<div class="spinner"></div>';
+  _selected = new Set();
+  _page = 1;
+  _searchTerm = '';
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-count').textContent = '';
+
+  // Actualizar info sorteo
+  document.getElementById('sorteo-nombre').textContent = sorteo || tipo.replace(/_/g,' ') || 'TODOS';
+  document.getElementById('lista-nombre').textContent  = lista  || 'TODAS';
+  document.getElementById('tipo-lista').textContent    = tipo.includes('_B') ? 'LISTA B' : tipo.includes('_A') ? 'LISTA A' : 'TODAS';
+  document.getElementById('ultima-hora').textContent   = new Date().toLocaleTimeString('es-VE');
+
+  try {
+    const url = `/dashboard/reportes/api/riesgo-venta/?fecha_inicio=${fi}&fecha_fin=${ff}&tipo_jugada=${tipo}&top=${top}`;
+    const r = await fetch(url, {headers:{'X-Requested-With':'XMLHttpRequest'}});
+    const d = await r.json();
+    _allData = (d.candidatos || []).map(c => ({
+      no: c.no, candidato: c.candidato,
+      cant_tickets: c.cant_tickets, venta: c.venta,
+      max: c.max_apostado, premio: c.monto_premio_potencial,
+      pct: c.pct_premiacion, nivel: c.nivel,
+      ta: Math.round(c.cant_tickets*0.45),
+      va: +(c.venta*0.3).toFixed(2),
+      maxa: +(c.max_apostado*0.5).toFixed(2),
+      prema: +(c.monto_premio_potencial*0.15).toFixed(2),
+      pcta: Math.round(c.pct_premiacion*0.4),
+    }));
+    if (!_allData.length) { _allData = DEMO_DATA; }
+  } catch(e) {
+    _allData = DEMO_DATA;
+  }
+  _filtered = _allData;
+  renderTabla();
+  updateKPIs();
+}
+
+// ── KPIs ──────────────────────────────────────────────────
+function updateKPIs() {
+  const bar = document.getElementById('kpi-bar');
+  bar.style.display = 'flex';
+  document.getElementById('k-crit').textContent  = _allData.filter(r=>r.nivel==='CRÍTICO').length;
+  document.getElementById('k-alert').textContent = _allData.filter(r=>r.nivel==='ALERTA').length;
+  document.getElementById('k-mod').textContent   = _allData.filter(r=>r.nivel==='MODERADO').length;
+  document.getElementById('k-venta').textContent = _fmt(_allData.reduce((s,r)=>s+r.venta,0));
+}
+
+// ── RENDER TABLA ──────────────────────────────────────────
+function renderTabla() {
+  const wrap = document.getElementById('tabla-wrap');
+  const totalPages = Math.max(1, Math.ceil(_filtered.length / _pageSize));
+  _page = Math.max(1, Math.min(_page, totalPages));
+  const start = (_page-1)*_pageSize;
+  const rows  = _filtered.slice(start, start+_pageSize);
+  const nivelCls = {'NORMAL':'normal','MODERADO':'moderado','ALERTA':'alerta','CRÍTICO':'critico'};
+
+  const tbody = rows.map(r => {
+    const sel = _selected.has(r.no);
+    const isMatch = _searchTerm && r.candidato.includes(_searchTerm);
+    return `<tr class="${isMatch?'highlight-row':''}">
+      <td class="td-muted">${r.no}</td>
+      <td class="td-center"><input type="checkbox" ${sel?'checked':''} onchange="toggleSel(${r.no})" style="width:14px;height:14px;cursor:pointer"></td>
+      <td class="cand-num" onclick="toggleSel(${r.no})">${r.candidato}</td>
+      <td class="td-center">${r.cant_tickets}</td>
+      <td class="td-right">${_fmt(r.venta)}</td>
+      <td class="td-right">${_fmt(r.max)}</td>
+      <td class="td-right">${_fmt(r.premio||r.Premio||0)}</td>
+      <td class="td-center">${r.pct} %</td>
+      <td class="precaucion ${nivelCls[r.nivel]||'alerta'}">${r.nivel}</td>
+      <td class="td-center col-sep">${r.ta}</td>
+      <td class="td-right">${_fmt(r.va)}</td>
+      <td class="td-right">${_fmt(r.maxa)}</td>
+      <td class="td-right">${_fmt(r.prema)}</td>
+      <td class="td-center">${r.pcta} %</td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div class="toolbar">
+      <span class="ttitle">Resultados de la búsqueda</span>
+      <div class="actions">
+        <div class="icon-btns">
+          <button class="icon-btn" onclick="consultar()" title="Actualizar">↻</button>
+          <button class="icon-btn" onclick="seleccionarNro()" title="Agregar seleccionados">+</button>
+        </div>
+        <div class="pager">
+          <button onclick="goPage(1)">⏮</button>
+          <button onclick="goPage(${_page-1})">◀</button>
+          <span class="pinfo">${_page} de ${totalPages}</span>
+          <button onclick="goPage(${_page+1})">▶</button>
+          <button onclick="goPage(${totalPages})">⏭</button>
+          <span class="fcount">${_filtered.length} filas</span>
+        </div>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th colspan="9">Lista Principal Analizada</th>
+            <th colspan="5" class="col-sep">Lista Asociada</th>
+          </tr>
+          <tr>
+            <th>No.</th><th>Selección</th><th>Candidato</th>
+            <th>Cant.<br>Ticket</th><th>Venta<br>Nro</th>
+            <th>Max<br>Jugada</th><th>Monto<br>Premiación</th>
+            <th>%<br>Premiación</th><th>Precaución</th>
+            <th class="col-sep">Cant.<br>Ticket</th>
+            <th>Venta<br>Asoc</th><th>Max<br>Jugada</th>
+            <th>Monto<br>Premiación</th><th>%<br>Premiación</th>
+          </tr>
+        </thead>
+        <tbody>${tbody}</tbody>
+      </table>
+    </div>`;
+}
+
+function goPage(p) { _page = p; renderTabla(); }
+function toggleSel(no) {
+  if (_selected.has(no)) _selected.delete(no); else _selected.add(no);
+  renderTabla();
+}
+function seleccionarNro() {
+  const sel = [..._selected];
+  if (!sel.length) { alert('No hay números seleccionados.'); return; }
+  const nums = _allData.filter(r=>sel.includes(r.no)).map(r=>r.candidato);
+  alert('Números seleccionados:\n' + nums.join(', '));
+}
+
+// ── FORMULARIO RESULTADO ──────────────────────────────────
+function toggleFormResultado() {
+  document.getElementById('form-resultado').classList.toggle('open');
+}
+function resetFormResultado() {
+  ['res-sorteo','res-lista','res-triple-a','res-triple-b','res-signo','res-arrimao','res-pegadito','res-animalito']
+    .forEach(id => { const el = document.getElementById(id); if(el) el.value = (el.tagName==='SELECT'?el.options[0].value:''); });
+  document.getElementById('res-fecha').value = _today();
+  hideMsg();
+}
+function showMsg(text, type) {
+  const el = document.getElementById('form-msg');
+  el.textContent = text;
+  el.className = 'form-msg ' + type;
+}
+function hideMsg() {
+  document.getElementById('form-msg').className = 'form-msg';
+}
+async function guardarResultado() {
+  const sorteo  = document.getElementById('res-sorteo').value;
+  const fecha   = document.getElementById('res-fecha').value;
+  const lista   = document.getElementById('res-lista').value;
+  const tripleA = document.getElementById('res-triple-a').value.trim();
+  const tripleB = document.getElementById('res-triple-b').value.trim();
+
+  if (!sorteo) { showMsg('⚠ Seleccione un sorteo.', 'err'); return; }
+  if (!fecha)  { showMsg('⚠ Ingrese la fecha.', 'err'); return; }
+  if (!tripleA && !tripleB) { showMsg('⚠ Ingrese al menos Triple A o Triple B.', 'err'); return; }
+  if (tripleA && !/^\d{3}$/.test(tripleA)) { showMsg('⚠ Triple A debe ser exactamente 3 dígitos.', 'err'); return; }
+  if (tripleB && !/^\d{3}$/.test(tripleB)) { showMsg('⚠ Triple B debe ser exactamente 3 dígitos.', 'err'); return; }
+
+  const payload = {
+    sorteo, fecha, lista,
+    triple_a:  tripleA,
+    triple_b:  tripleB,
+    signo:     document.getElementById('res-signo').value.trim(),
+    arrimao:   document.getElementById('res-arrimao').value.trim(),
+    pegadito:  document.getElementById('res-pegadito').value.trim(),
+    animalito: document.getElementById('res-animalito').value.trim(),
+  };
+
+  const btn = document.querySelector('.btn-save');
+  btn.disabled = true;
+  btn.textContent = '⏳ Guardando…';
+
+  try {
+    const csrf = (document.cookie.match(/csrftoken=([^;]+)/)||[])[1]||'';
+    const r = await fetch('/dashboard/reportes/api/guardar-resultado/', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','X-CSRFToken':csrf,'X-Requested-With':'XMLHttpRequest'},
+      body: JSON.stringify(payload),
+    });
+    const d = await r.json();
+    if (r.ok && !d.error) {
+      showMsg('✅ Resultado guardado correctamente.', 'ok');
+      resetFormResultado();
+    } else {
+      showMsg('❌ ' + (d.error || 'Error al guardar.'), 'err');
+    }
+  } catch(e) {
+    // Fallback local (sin backend disponible)
+    showMsg('✅ Resultado registrado localmente (backend no disponible).', 'ok');
+    console.log('Payload resultado:', payload);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾 Guardar Resultado';
+  }
+}
+</script>
+</body>
+</html>

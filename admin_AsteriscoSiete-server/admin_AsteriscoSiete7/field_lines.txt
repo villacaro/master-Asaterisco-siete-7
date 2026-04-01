@@ -1,0 +1,5 @@
+﻿  520:     comercializadora = models.ForeignKey(
+  548:     company = models.ForeignKey(
+ 3205:     detalle_encuentro = models.ForeignKey(
+ 3414:     detalle_encuentro = models.ForeignKey(
+ 3453:     favorito = models.NullBooleanField(

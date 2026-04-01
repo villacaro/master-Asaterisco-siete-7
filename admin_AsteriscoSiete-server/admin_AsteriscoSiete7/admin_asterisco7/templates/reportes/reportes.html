@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportes de Venta — Sistema Asterisco Siete (*7)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #0f1117;
+      --surface:  #1a1d2e;
+      --surface2: #232740;
+      --border:   #2e3354;
+      --accent:   #7b5ea7;
+      --accent2:  #a07fd4;
+      --green:    #22c55e;
+      --red:      #ef4444;
+      --yellow:   #f59e0b;
+      --orange:   #f97316;
+      --blue:     #3b82f6;
+      --text:     #e2e8f0;
+      --muted:    #94a3b8;
+      --radius:   10px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+    /* ── Header ── */
+    .header {
+      display:flex; align-items:center; gap:14px;
+      padding:16px 24px; background:var(--surface);
+      border-bottom:1px solid var(--border);
+    }
+    .header .logo { font-size:28px; font-weight:700; color:var(--accent2); }
+    .header .title { font-size:18px; font-weight:600; }
+    .header .sub { font-size:12px; color:var(--muted); }
+
+    /* ── Tabs ── */
+    .tabs { display:flex; gap:4px; padding:16px 24px 0; border-bottom:1px solid var(--border); }
+    .tab {
+      padding:10px 20px; border-radius:var(--radius) var(--radius) 0 0;
+      cursor:pointer; font-size:13px; font-weight:500; color:var(--muted);
+      border:1px solid transparent; border-bottom:none; transition:.2s;
+    }
+    .tab.active { background:var(--surface); color:var(--text); border-color:var(--border); }
+    .tab:hover:not(.active) { color:var(--text); }
+
+    /* ── Panel ── */
+    .panel { display:none; padding:24px; }
+    .panel.active { display:block; }
+
+    /* ── Filtros ── */
+    .filters {
+      display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:16px 20px; margin-bottom:20px;
+    }
+    .f-group { display:flex; flex-direction:column; gap:5px; }
+    .f-group label { font-size:11px; color:var(--muted); font-weight:500; text-transform:uppercase; letter-spacing:.5px; }
+    .f-group input, .f-group select {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:6px; padding:7px 12px; color:var(--text);
+      font-size:13px; outline:none; min-width:140px;
+    }
+    .f-group input:focus, .f-group select:focus { border-color:var(--accent); }
+    .btn-consultar {
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#fff; border:none; border-radius:8px; padding:9px 22px;
+      font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:7px;
+      transition:.2s; white-space:nowrap;
+    }
+    .btn-consultar:hover { opacity:.88; transform:translateY(-1px); }
+    .btn-consultar:disabled { opacity:.4; cursor:not-allowed; }
+
+    /* ── Info bar ── */
+    .info-bar {
+      display:flex; flex-wrap:wrap; gap:14px; margin-bottom:18px;
+    }
+    .kpi {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:14px 20px; flex:1; min-width:150px;
+    }
+    .kpi .label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+    .kpi .value { font-size:22px; font-weight:700; margin-top:4px; }
+    .kpi.green .value { color:var(--green); }
+    .kpi.red   .value { color:var(--red); }
+    .kpi.blue  .value { color:var(--blue); }
+    .kpi.purple .value { color:var(--accent2); }
+
+    /* ── Tabla genérica ── */
+    .table-wrap { overflow-x:auto; border-radius:var(--radius); border:1px solid var(--border); }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    thead { background:var(--surface2); }
+    th { padding:11px 14px; text-align:left; font-size:11px; color:var(--muted); font-weight:600;
+         text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid var(--border); }
+    td { padding:9px 14px; border-bottom:1px solid var(--border); }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:rgba(123,94,167,.08); }
+    .tr-total td { background:var(--surface2); font-weight:700; color:var(--accent2); }
+    .pos { color:var(--green); }
+    .neg { color:var(--red); }
+    .num-r { text-align:right; font-variant-numeric:tabular-nums; }
+
+    /* ── Badge nivel ── */
+    .badge {
+      display:inline-block; padding:2px 9px; border-radius:20px;
+      font-size:11px; font-weight:700; letter-spacing:.4px;
+    }
+    .badge.NORMAL   { background:rgba(34,197,94,.15);  color:var(--green); }
+    .badge.MODERADO { background:rgba(245,158,11,.15); color:var(--yellow); }
+    .badge.ALERTA   { background:rgba(249,115,22,.15); color:var(--orange); }
+    .badge.CRÍTICO  { background:rgba(239,68,68,.15);  color:var(--red); }
+
+    /* ── Grilla Lista en Línea ── */
+    .grid-info {
+      font-size:12px; color:var(--muted); margin-bottom:12px;
+    }
+    .grid-table { font-size:12px; }
+    .grid-table th, .grid-table td { padding:5px 8px; }
+    .num-cell { font-weight:700; color:var(--accent2); font-size:13px; }
+    .num-0 { color:var(--muted); }
+    .num-high { color:var(--orange); background:rgba(249,115,22,.1); }
+    .num-crit { color:var(--red); background:rgba(239,68,68,.12); font-weight:700; }
+
+    /* ── Estado vacío ── */
+    .empty { text-align:center; padding:60px 20px; color:var(--muted); }
+    .empty .ico { font-size:48px; margin-bottom:12px; }
+
+    /* ── Spinner ── */
+    .spinner {
+      width:32px; height:32px; border:3px solid var(--border);
+      border-top-color:var(--accent); border-radius:50%;
+      animation:spin .7s linear infinite; margin:40px auto;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── Filtros activos ── */
+    .active-filters {
+      font-size:12px; color:var(--muted); margin-bottom:16px;
+      display:flex; flex-wrap:wrap; gap:6px; align-items:center;
+    }
+    .filter-tag {
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:20px; padding:3px 10px;
+    }
+    .filter-tag span { color:var(--accent2); }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">★7</div>
+    <div>
+      <div class="title">Reportes de Venta</div>
+      <div class="sub">Sistema Asterisco Siete — Servicios Integrados Triple 7, C.A.</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('linea')">📊 Lista en Línea</div>
+    <div class="tab" onclick="switchTab('producto')">📦 Por Producto</div>
+    <div class="tab" onclick="switchTab('riesgo')">⚠️ Riesgo de Venta</div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       TAB 1 — LISTA EN LÍNEA
+       ════════════════════════════════════════════════════ -->
+  <div id="tab-linea" class="panel active">
+    <div class="filters">
+      <div class="f-group">
+        <label>Fecha Inicio</label>
+        <input type="date" id="ll-fecha-ini">
+      </div>
+      <div class="f-group">
+        <label>Fecha Fin</label>
+        <input type="date" id="ll-fecha-fin">
+      </div>
+      <div class="f-group">
+        <label>Tipo de Jugada</label>
+        <select id="ll-tipo">
+          <option value="">Todos los juegos</option>
+          <option value="TRIPLE_A">Triple A</option>
+          <option value="TRIPLE_B">Triple B</option>
+          <option value="TERMINAL_A">Terminal A</option>
+          <option value="TERMINAL_B">Terminal B</option>
+          <option value="TRIPLE_SIGNO_A">Triple Signo A</option>
+          <option value="TRIPLE_SIGNO_B">Triple Signo B</option>
+          <option value="ARRIMAO">El Arrimao</option>
+          <option value="PAGADITO">El Pegadito</option>
+          <option value="ANIMALITO">Animalito</option>
+        </select>
+      </div>
+      <button class="btn-consultar" onclick="consultarListaLinea()">
+        🔍 Consultar
+      </button>
+    </div>
+
+    <div id="ll-info-bar" class="info-bar" style="display:none">
+      <div class="kpi blue">
+        <div class="label">Total Registros</div>
+        <div class="value" id="ll-kpi-total">—</div>
+      </div>
+      <div class="kpi green">
+        <div class="label">Monto Total Bs.</div>
+        <div class="value" id="ll-kpi-monto">—</div>
+      </div>
+      <div class="kpi purple">
+        <div class="label">Tipo Jugada</div>
+        <div class="value" id="ll-kpi-tipo" style="font-size:14px">—</div>
+      </div>
+    </div>
+
+    <div id="ll-body">
+      <div class="empty">
+        <div class="ico">📋</div>
+        <div>Selecciona un rango de fechas y haz clic en <b>Consultar</b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       TAB 2 — POR PRODUCTO
+       ════════════════════════════════════════════════════ -->
+  <div id="tab-producto" class="panel">
+    <div class="filters">
+      <div class="f-group">
+        <label>Fecha Inicio</label>
+        <input type="date" id="pp-fecha-ini">
+      </div>
+      <div class="f-group">
+        <label>Fecha Fin</label>
+        <input type="date" id="pp-fecha-fin">
+      </div>
+      <button class="btn-consultar" onclick="consultarPorProducto()">
+        🔍 Consultar
+      </button>
+    </div>
+
+    <div id="pp-info-bar" class="info-bar" style="display:none">
+      <div class="kpi blue">
+        <div class="label">Total Venta</div>
+        <div class="value" id="pp-kpi-venta">—</div>
+      </div>
+      <div class="kpi red">
+        <div class="label">Total Premios</div>
+        <div class="value" id="pp-kpi-premios">—</div>
+      </div>
+      <div class="kpi green">
+        <div class="label">Saldo</div>
+        <div class="value" id="pp-kpi-saldo">—</div>
+      </div>
+    </div>
+
+    <div id="pp-body">
+      <div class="empty">
+        <div class="ico">📦</div>
+        <div>Selecciona un rango de fechas y haz clic en <b>Consultar</b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       TAB 3 — RIESGO DE VENTA
+       ════════════════════════════════════════════════════ -->
+  <div id="tab-riesgo" class="panel">
+    <div class="filters">
+      <div class="f-group">
+        <label>Fecha Inicio</label>
+        <input type="date" id="rv-fecha-ini">
+      </div>
+      <div class="f-group">
+        <label>Fecha Fin</label>
+        <input type="date" id="rv-fecha-fin">
+      </div>
+      <div class="f-group">
+        <label>Tipo de Jugada</label>
+        <select id="rv-tipo">
+          <option value="">Todos los juegos</option>
+          <option value="TRIPLE_A">Triple A</option>
+          <option value="TRIPLE_B">Triple B</option>
+          <option value="TERMINAL_A">Terminal A</option>
+          <option value="TERMINAL_B">Terminal B</option>
+          <option value="TRIPLE_SIGNO_A">Triple Signo A</option>
+          <option value="ARRIMAO">El Arrimao</option>
+          <option value="PAGADITO">El Pegadito</option>
+          <option value="ANIMALITO">Animalito</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label>Top candidatos</label>
+        <select id="rv-top">
+          <option value="25">25</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+        </select>
+      </div>
+      <button class="btn-consultar" onclick="consultarRiesgo()">
+        🔍 Consultar
+      </button>
+    </div>
+
+    <div id="rv-alert-bar" class="info-bar" style="display:none">
+      <div class="kpi red">
+        <div class="label">⛔ Críticos</div>
+        <div class="value" id="rv-kpi-crit">0</div>
+      </div>
+      <div class="kpi" style="border-color:var(--orange)">
+        <div class="label">⚠️ Alertas</div>
+        <div class="value" id="rv-kpi-alert" style="color:var(--orange)">0</div>
+      </div>
+      <div class="kpi" style="border-color:var(--yellow)">
+        <div class="label">🔶 Moderados</div>
+        <div class="value" id="rv-kpi-mod" style="color:var(--yellow)">0</div>
+      </div>
+      <div class="kpi blue">
+        <div class="label">Monto Total Venta</div>
+        <div class="value" id="rv-kpi-venta">—</div>
+      </div>
+    </div>
+
+    <div id="rv-body">
+      <div class="empty">
+        <div class="ico">⚠️</div>
+        <div>Selecciona un rango de fechas y haz clic en <b>Consultar</b></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ─────────────────────────────────────────────
+  // Utilidades
+  // ─────────────────────────────────────────────
+  const today = () => new Date().toISOString().slice(0,10);
+
+  function fmtMonto(val) {
+    return Number(val).toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  function setLoading(id) {
+    document.getElementById(id).innerHTML = '<div class="spinner"></div>';
+  }
+
+  function getCsrfToken() {
+    const m = document.cookie.match(/csrftoken=([^;]+)/);
+    return m ? m[1] : '';
+  }
+
+  async function fetchAPI(url) {
+    const r = await fetch(url, {headers:{'X-Requested-With':'XMLHttpRequest'}});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }
+
+  // ─────────────────────────────────────────────
+  // Tabs
+  // ─────────────────────────────────────────────
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    const tabs = [...document.querySelectorAll('.tab')];
+    const idx = ['linea','producto','riesgo'].indexOf(name);
+    if (tabs[idx]) tabs[idx].classList.add('active');
+  }
+
+  // ─────────────────────────────────────────────
+  // LISTA EN LÍNEA
+  // ─────────────────────────────────────────────
+  async function consultarListaLinea() {
+    const fi   = document.getElementById('ll-fecha-ini').value || today();
+    const ff   = document.getElementById('ll-fecha-fin').value || today();
+    const tipo = document.getElementById('ll-tipo').value;
+    const bar  = document.getElementById('ll-info-bar');
+
+    setLoading('ll-body');
+    bar.style.display = 'none';
+
+    try {
+      const data = await fetchAPI(
+        `/dashboard/reportes/api/lista-linea/?fecha_inicio=${fi}&fecha_fin=${ff}&tipo_jugada=${tipo}`
+      );
+
+      // KPIs
+      document.getElementById('ll-kpi-total').textContent = data.total_registros.toLocaleString();
+      document.getElementById('ll-kpi-monto').textContent = 'Bs. ' + fmtMonto(data.total_monto);
+      document.getElementById('ll-kpi-tipo').textContent  = tipo || 'TODOS';
+      bar.style.display = 'flex';
+
+      // Calcular umbral top 10%
+      const montos = data.numeros.map(n => n.monto).filter(m => m > 0).sort((a,b) => b-a);
+      const umbralAlerta  = montos[Math.floor(montos.length * 0.1)] || 0;
+      const umbralCritico = montos[Math.floor(montos.length * 0.02)] || 0;
+
+      // Construir grilla en columnas de 100 (estilo original)
+      const grupos = [];
+      for (let g = 0; g < 10; g++) {
+        grupos.push(data.numeros.slice(g * 100, (g+1) * 100));
+      }
+
+      // Renderizar tabla de 100 filas × 10 grupos (cada grupo: num + monto)
+      let html = `
+        <div class="grid-info">
+          Mostrando 1000 números — Fecha: <b>${fi}</b> al <b>${ff}</b>
+          &nbsp;|&nbsp; Tipo: <b>${tipo || 'TODOS'}</b>
+          &nbsp;|&nbsp; Ordenado por: <b>NÚMERO</b>
+        </div>
+        <div class="table-wrap">
+        <table class="grid-table">
+          <thead>
+            <tr>`;
+      for (let g = 0; g < 10; g++) {
+        html += `<th>#</th><th>Núm</th><th class="num-r">Monto</th>`;
+      }
+      html += `</tr></thead><tbody>`;
+
+      for (let row = 0; row < 100; row++) {
+        html += '<tr>';
+        for (let g = 0; g < 10; g++) {
+          const n = grupos[g][row];
+          const cls = n.monto >= umbralCritico && n.monto > 0 ? 'num-crit'
+                    : n.monto >= umbralAlerta  ? 'num-high'
+                    : n.monto === 0 ? 'num-0' : '';
+          html += `
+            <td>${g * 100 + row + 1}</td>
+            <td class="num-cell ${cls}">${n.numero}</td>
+            <td class="num-r ${cls}">${n.monto > 0 ? fmtMonto(n.monto) : '0,00'}</td>`;
+        }
+        html += '</tr>';
+      }
+      html += '</tbody></table></div>';
+      document.getElementById('ll-body').innerHTML = html;
+
+    } catch(e) {
+      document.getElementById('ll-body').innerHTML =
+        `<div class="empty"><div class="ico">❌</div><div>Error: ${e.message}</div></div>`;
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // REPORTE POR PRODUCTO
+  // ─────────────────────────────────────────────
+  async function consultarPorProducto() {
+    const fi = document.getElementById('pp-fecha-ini').value || today();
+    const ff = document.getElementById('pp-fecha-fin').value || today();
+    const bar = document.getElementById('pp-info-bar');
+
+    setLoading('pp-body');
+    bar.style.display = 'none';
+
+    try {
+      const data = await fetchAPI(
+        `/dashboard/reportes/api/por-producto/?fecha_inicio=${fi}&fecha_fin=${ff}`
+      );
+
+      document.getElementById('pp-kpi-venta').textContent   = 'Bs. ' + fmtMonto(data.total_venta);
+      document.getElementById('pp-kpi-premios').textContent = 'Bs. ' + fmtMonto(data.total_premios);
+      const saldo = data.total_saldo;
+      const el = document.getElementById('pp-kpi-saldo');
+      el.textContent = 'Bs. ' + fmtMonto(Math.abs(saldo));
+      el.className = 'value ' + (saldo >= 0 ? 'pos' : 'neg');
+      bar.style.display = 'flex';
+
+      if (!data.filas.length) {
+        document.getElementById('pp-body').innerHTML =
+          `<div class="empty"><div class="ico">📦</div><div>Sin datos en ese período.</div></div>`;
+        return;
+      }
+
+      let html = `
+        <div class="active-filters">
+          Rango de Fechas: <span class="filter-tag">del <span>${fi}</span> al <span>${ff}</span></span>
+          &nbsp;| Agrupado por: <span class="filter-tag"><span>PRODUCTO</span></span>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr>
+            <th>#</th><th>Producto</th><th>Lotería</th>
+            <th class="num-r">Venta Bs.</th><th class="num-r">% Venta</th>
+            <th class="num-r">Premios Bs.</th>
+            <th class="num-r">Saldo Bs.</th><th>Tickets</th>
+          </tr></thead>
+          <tbody>`;
+
+      data.filas.forEach((r, i) => {
+        const saldoCls = r.saldo >= 0 ? 'pos' : 'neg';
+        html += `<tr>
+          <td>${i+1}</td>
+          <td><b>${r.producto}</b></td>
+          <td style="color:var(--muted);font-size:12px">${r.loteria}</td>
+          <td class="num-r" style="color:var(--blue)">${fmtMonto(r.venta)}</td>
+          <td class="num-r" style="color:var(--muted)">${r.pct_venta}%</td>
+          <td class="num-r" style="color:var(--red)">${fmtMonto(r.premios)}</td>
+          <td class="num-r ${saldoCls}">${r.saldo < 0 ? '-' : ''}${fmtMonto(Math.abs(r.saldo))}</td>
+          <td>${r.cant_tickets.toLocaleString()}</td>
+        </tr>`;
+      });
+
+      html += `</tbody>
+        <tfoot><tr class="tr-total">
+          <td colspan="3">TOTAL</td>
+          <td class="num-r">Bs. ${fmtMonto(data.total_venta)}</td>
+          <td class="num-r">100 %</td>
+          <td class="num-r">Bs. ${fmtMonto(data.total_premios)}</td>
+          <td class="num-r ${data.total_saldo >= 0 ? 'pos' : 'neg'}">
+            ${data.total_saldo < 0 ? '-' : ''}Bs. ${fmtMonto(Math.abs(data.total_saldo))}
+          </td>
+          <td>—</td>
+        </tr></tfoot>
+        </table></div>`;
+
+      document.getElementById('pp-body').innerHTML = html;
+
+    } catch(e) {
+      document.getElementById('pp-body').innerHTML =
+        `<div class="empty"><div class="ico">❌</div><div>Error: ${e.message}</div></div>`;
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // RIESGO DE VENTA
+  // ─────────────────────────────────────────────
+  async function consultarRiesgo() {
+    const fi   = document.getElementById('rv-fecha-ini').value || today();
+    const ff   = document.getElementById('rv-fecha-fin').value || today();
+    const tipo = document.getElementById('rv-tipo').value;
+    const top  = document.getElementById('rv-top').value;
+    const bar  = document.getElementById('rv-alert-bar');
+
+    setLoading('rv-body');
+    bar.style.display = 'none';
+
+    try {
+      const data = await fetchAPI(
+        `/dashboard/reportes/api/riesgo-venta/?fecha_inicio=${fi}&fecha_fin=${ff}&tipo_jugada=${tipo}&top=${top}`
+      );
+
+      const ra = data.resumen_alertas;
+      document.getElementById('rv-kpi-crit').textContent  = ra.criticos;
+      document.getElementById('rv-kpi-alert').textContent = ra.alertas;
+      document.getElementById('rv-kpi-mod').textContent   = ra.moderados;
+      document.getElementById('rv-kpi-venta').textContent = 'Bs. ' + fmtMonto(data.total_venta);
+      bar.style.display = 'flex';
+
+      if (!data.candidatos.length) {
+        document.getElementById('rv-body').innerHTML =
+          `<div class="empty"><div class="ico">⚠️</div><div>Sin datos en ese período.</div></div>`;
+        return;
+      }
+
+      let html = `
+        <div class="active-filters">
+          Fecha: <span class="filter-tag">del <span>${fi}</span> al <span>${ff}</span></span>
+          &nbsp;| Lista: <span class="filter-tag"><span>${tipo || 'TODOS'}</span></span>
+          &nbsp;| Ordenado por: <span class="filter-tag"><span>VENTA DESC</span></span>
+          &nbsp;| Top: <span class="filter-tag"><span>${top} candidatos</span></span>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr>
+            <th>No</th>
+            <th>Candidato</th>
+            <th>Tipo Jugada</th>
+            <th class="num-r">Cant. Tickets</th>
+            <th class="num-r">Venta Bs.</th>
+            <th class="num-r">Máx. Apostado</th>
+            <th class="num-r">Premio Potencial Bs.</th>
+            <th class="num-r">Multiplicador</th>
+            <th class="num-r">% Premiación</th>
+            <th>Nivel Riesgo</th>
+          </tr></thead>
+          <tbody>`;
+
+      data.candidatos.forEach(r => {
+        const rowCls = r.nivel === 'CRÍTICO' ? 'style="background:rgba(239,68,68,.05)"'
+                     : r.nivel === 'ALERTA'  ? 'style="background:rgba(249,115,22,.04)"' : '';
+        html += `<tr ${rowCls}>
+          <td>${r.no}</td>
+          <td style="font-size:18px;font-weight:700;color:var(--accent2);letter-spacing:2px">${r.candidato}</td>
+          <td style="font-size:11px;color:var(--muted)">${r.tipo_jugada}</td>
+          <td class="num-r">${r.cant_tickets.toLocaleString()}</td>
+          <td class="num-r" style="color:var(--blue)">${fmtMonto(r.venta)}</td>
+          <td class="num-r">${fmtMonto(r.max_apostado)}</td>
+          <td class="num-r ${r.nivel === 'CRÍTICO' ? 'neg' : r.nivel === 'ALERTA' ? '' : 'pos'}">
+            ${fmtMonto(r.monto_premio_potencial)}
+          </td>
+          <td class="num-r" style="color:var(--muted)">×${r.multiplicador}</td>
+          <td class="num-r"><b>${r.pct_premiacion}%</b></td>
+          <td><span class="badge ${r.nivel}">${r.nivel}</span></td>
+        </tr>`;
+      });
+
+      html += '</tbody></table></div>';
+      document.getElementById('rv-body').innerHTML = html;
+
+    } catch(e) {
+      document.getElementById('rv-body').innerHTML =
+        `<div class="empty"><div class="ico">❌</div><div>Error: ${e.message}</div></div>`;
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // Init: fechas por defecto
+  // ─────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    const t = today();
+    ['ll-fecha-ini','ll-fecha-fin','pp-fecha-ini','pp-fecha-fin','rv-fecha-ini','rv-fecha-fin']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.value = t; });
+
+    // Activar tab según hash de la URL (#linea / #producto / #riesgo)
+    const hash = window.location.hash.replace('#', '');
+    const validTabs = { linea: true, producto: true, riesgo: true };
+    if (validTabs[hash]) {
+      switchTab(hash);
+    }
+  });
+  </script>
+</body>
+</html>

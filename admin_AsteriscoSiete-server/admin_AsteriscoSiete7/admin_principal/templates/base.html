@@ -1,0 +1,375 @@
+{% spaceless %}
+
+{% load url from future %}
+{% load i18n %}
+{% load humanize %}
+{% load principal_tags %}
+
+{% load static %}
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="es"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>{{ info_system.name }} - v{{ info_system.version }}</title>
+    <meta name="description" content="">
+    <!--<meta name="viewport" content="width=device-width">-->
+    <link rel="stylesheet" href="{% static 'css/vendor/normalize.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animation.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendor/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/vendor/jquery.dataTables.css' %}">
+    <link rel="stylesheet" href="{% static 'icomoon/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/chosen.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery.datetimepicker.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-switch.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery-steps.css' %}">
+    
+    {% for theme in themes.css %}
+    <link rel="stylesheet" href="{% static theme %}">
+    {% endfor %}
+
+    <script type="text/javascript">
+      /*Se define la variable de pag no encontradas
+      referenciada en el settings, muy importante para quitar
+      de vista botones o enlaces a dichos sitios
+
+      envio este prefijo para tener un solo valor global.
+      */
+      PAGE_404_URL = "{{ PAGE_404_URL }}"
+      INDEX_URL = "{{ INDEX_URL }}"
+      LOGOUT_URL = "{{ LOGOUT_URL }}"
+      ACCESO_URL = "{{ ACCESO_URL }}"
+      
+    </script>
+
+    <script src="{% static 'js/vendor/jquery-1.11.3.min.js' %}"></script>
+    <script src="{% static 'js/vendor/modernizr-2.6.2.min.js' %}"></script>
+    <script src="{% static 'js/vendor/chosen.jquery.js' %}"></script>
+    <script src="{% static 'js/vendor/jquery.dataTables.js' %}"></script>
+    <script src="{% static 'js/vendor/jquery.datetimepicker.js' %}"></script>
+    <script src="{% static 'js/vendor/fnSetFilteringDelay.js' %}"></script>
+    <script src="{% static 'js/vendor/jquery.MultiFile.js' %}"></script>
+    <script src="{% static 'js/themesChanger.js' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="{% static 'js/jquery.steps.js' %}"></script>
+    <script src="{% static 'js/bootstrap-switch.min.js' %}"></script>
+
+    <script src="{% static 'js/vendor/tinymce/tinymce.min.js' %}"></script>
+
+  </head>
+  <body onBlur="Inacivo()" onFocus="Activo()">
+
+    <!--Modal con la info del usuario -->
+    {% if info_user.user.get_comercializadora_is_multiple %}
+    <div class="modal">
+      <div class="modal-container">
+        <div class="panel panel-default">
+          <div class="panel-head">
+            <div class="modal-close">
+              <i class="icon-cancel"></i>
+
+            </div>
+          </div>
+          <div class="panel-body panel-body-border panel-shadow">
+
+            <script type="text/javascript">
+              function consultar_comercializadoras(modal_param){
+                $.get(modal_param, function(data){
+                  if( data.indexOf("Iniciar sesión") == -1 ){
+                    $("#modal_ajax").html( data ).hide().slideDown("slow");
+                    $('.table-data-comercializadoras').dataTable({
+                        "sPaginationType": "full_numbers",
+                        "iDisplayLength": 10,
+                    });
+                  }
+                  else{
+                    javascript:location.reload();
+                  }
+                });
+              }
+
+            </script>
+
+            <div id="modal_ajax" class="modal-content">
+              
+              <div class="center">
+                <i class="icon-spin4 animate-spin"></i>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <input type="hidden" id="token" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+    <!--[if lt IE 7]>
+            <p class="chromeframe">Usted está utilizando un <strong>navegador obsoleto</strong>. Por favor <a href="http://browsehappy.com/">actualize su navegador</a> o <a href="http://www.google.com/chromeframe/?redirect=true">active Google Chrome Frame</a> para mejorar su experiencia.</p>
+        <![endif]-->
+        <header class="header header_bg header_shadow">
+            <div class="side left">
+              {% if info_user.sistema %}
+                <img src="{{MEDIA_URL}}{{ info_user.sistema.logo }}" width="auto" height="35" class="logo">
+              {% else %}
+                <img src="{% static 'images/logo.png' %}" width="73" height="35" class="logo">
+              {% endif %}
+            </div>
+            <div class="side right">
+                <ul>
+                  <li class="header-ip">
+                    <span class="text">
+                     <i class="icon-shield"></i> IP: {{ info_user.ip }}
+                    </span>
+                  </li>
+                  <li class="header-clock">
+                    <div class="clock">
+                      <script type="text/javascript">
+                        var date_server = "{% now "Y-m-d-H-i-s" %}"; 
+                      </script>
+                      <ul>
+                          <li id="hours"></li>
+                          <li id="point">:</li>
+                          <li id="min"></li>
+                          <li id="d"></li>
+                      </ul>
+                      <div id="Date"></div>
+                    </div>
+                  </li>
+                    <li class="header-user">
+                        <a href="#" class="header-item">
+                            <span class="user">
+                              <i class="icon-user"></i>
+                                {{ info_user.user }} : 
+
+                                <i class="icon-building"></i>
+                                {% if info_user.user.etiqueta %}
+                                  {{ info_user.user.etiqueta }}
+                                {% elif info_user.comercializadora %}
+                                  {{  info_user.comercializadora }}
+                                {% else %}
+                                  {{ info_user.user.profile }}
+                                {% endif %}
+
+                                {% with status=info_user.comercializadora.get_status %}
+                                
+                                {% if status.codename == "status_activo" %}
+                                  <i class="icon-money-2"></i>
+                                {% elif status.codename == "status_activo_sin_venta"%}
+                                  <i class="icon-money-2"></i>
+                                  <i class="icon-block-5"></i>
+
+                                  <script type="text/javascript">
+                                    
+                                    icon_move_1 = "icon-money-2"
+                                    icon_move_2 = "icon-block-5"
+                                    $("."+icon_move_2).hide()
+                                    bandera = true
+                                    function move() {
+                                        $("."+icon_move_1).hide()
+                                        $("."+icon_move_2).fadeIn()
+                                        var aux = icon_move_1
+                                        icon_move_1 = icon_move_2
+                                        icon_move_2 = aux
+                                    }
+
+                                    setInterval("move()", 2000  );
+                                    
+                                  </script>
+                                  
+                                {% elif status.codename == "status_bloqueado"%}
+                                  <i class="icon-lock-filled"></i>
+                                {% endif %}
+                                
+                                {% endwith %}
+
+                            </span>
+                            <span class="caret_down"></span>
+                        </a>
+                        <div class="header-dropdown">
+                          <ul>
+                            {% if info_user.comercializadora %}
+                            <li>
+                              <span><i class='icon-flow-tree'></i> Comercializador</span>
+                              <span class="text">
+                              {{ info_user.comercializadora }}</span>
+                              <span><i class='icon-progress-two'></i> Estatus</span>
+                              <span class="text">
+                                {% with status=info_user.comercializadora.get_status %}
+                                  
+                                  {% if status.codename == "status_activo" %}
+                                    <i class="icon-money"></i>
+                                  {% elif status.codename == "status_activo_sin_venta"%}
+                                    <i class="icon-money-2"></i>
+                                    <i class="icon-block-5"></i>
+                                  {% elif status.codename == "status_bloqueado"%}
+                                    <i class="icon-lock-filled"></i>
+                                  {% endif %}
+
+                                  {{ status }}
+                                
+                                {% endwith %}
+                                
+                              </span>
+
+                            </li>
+                            {% endif %}
+                            <li>
+                              <span><i class='icon-hour-glass'></i> Fecha de trabajo</span>
+                              <span class="text">{{ info_user.comercializadora.get_dia_trabajo.dia.fecha }}</span>
+                            </li>
+                            {% if info_user.sistema %}
+                            <li>
+                              <span><i class="icon-gamepad"></i> Sistema de juego</span>
+                              <span class="text">
+                                
+                              {{ info_user.sistema }}
+                              {% if info_user.sistema.logo %}
+                                  <img src="{{MEDIA_URL}}{{info_user.sistema.logo}}" width="auto" height="12">
+                                {% endif %}
+                              </span>
+
+                            </li>
+                            {% endif %}
+                            <li>
+                              <span title="{{ info_user.user.last_login }}"><i class="icon-timer"></i> Última conexión</span>
+                              <span class="text">
+                                {{ info_user.user.last_login|naturaltime }}
+                              </span>
+                            </li>
+                            <li>
+                              <span title="{{ info_user.user.last_login }}"><i class="icon-shield"></i> IP</span>
+                              <span class="text">
+                                {{ info_user.ip }}
+                              </span>
+                            </li>
+                            <li><a href="{% url 'admin_users_users_password_change' %}" ><i class="icon-key"></i> Cambiar contraseña</a></li>
+                            
+                            {% if info_user.user.get_comercializadora_is_multiple %}
+                              <li><a href="#" class="exe-modal" exe_modal_funct="consultar_comercializadoras" exe_modal_param="{% url 'admin_principal_change_comercializadora_list' %}"><i class="icon-group"></i> Cambiar comercializador</a></li>
+                            {% endif %}
+                            
+                            <li><a href="{% url 'admin_users_users_account' %}"><i class="icon-settings"></i> Mi cuenta</a></li>
+                          </ul>
+                        </div>
+                    </li><!--
+                 --><li>
+                      <div class="form-margin">
+                        <form action="{% url 'admin_principal_logout' %}" method='post' encoding='utf-8' class="salir-margin">{% csrf_token %}
+                          <button type="submit" class="btn btn-small btn-danger"><i class="icon-off"></i>Salir</button>
+                        </form>
+                      </div>
+                    </li>
+                </ul>
+            </div>
+        </header>
+        <aside class="sidebar sidebar_bg page-sidebar">
+            <ul id="nav-menu" class="nav">
+              <li>
+                <ul class="nav nav_option">
+                  <li>
+                    <a href="/"><i class="icon-home"></i> Inicio</a>
+
+                  </li>
+                </ul>
+              </li>
+
+              {% for m in info_menu %}
+              <li>
+                
+                <p class="nav_p">
+                  <i id="{{ m.codename }}" class="{{ m.icon }}"></i> {{ m.name }}
+                </p>
+
+                <ul class="nav nav_option">
+                  {% for m2 in m.nodos %}
+                  
+                  <li>
+                    <a id="{{ m2.codename }}" class="nav-option" href="{%if m2.url %}{{ m2.url }}{% else %}#{% endif %}">
+                      <i class="{{ m2.icon }}"></i> {{ m2.name }}
+                    </a>
+                    <ul class="nav nav_dropdown">
+                      {% for m3 in m2.nodos %}
+                      <li>                        
+                        <a 
+                          id="{{ m3.codename }}" 
+                          href="{{ m3.url }}" 
+                          class="{%if m3.url == info_menu_url %}active{% else %}no-active{% endif %}"
+                        >
+                          <i class="{{ m3.icon }}"></i> {{ m3.name }}
+
+                        </a>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </li>
+              {% endfor %}
+            </ul>
+        </aside>
+        <section class="content col-lg-12">
+            
+            {% block messages %}
+                {% if messages %}
+                <ul class="messagelist">
+                  {% for message in messages %}
+                    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+            {% endblock messages %}
+
+            {% block content %}
+
+            {% endblock %}
+            
+            <footer>{{ info_system.footer }}</footer>
+
+        </section>
+
+  {% block js_home %}
+    <script type="text/javascript">
+                
+      var url_notification = '{% url "admin_juego_eventnotification_list" %}'
+      if ( url_notification != PAGE_404_URL )
+      {
+        var admin_juego_eventnotification_subtitle = {{ admin_juego_eventnotification_subtitle }};
+        {% if admin_juego_eventnotification_subtitle != 0 %}
+          add = '<span class="right tag tag-red" >+{{admin_juego_eventnotification_subtitle}}</span>'
+          html = $("#admin_juego_eventnotification_subtitle").html( )
+          $("#admin_juego_eventnotification_subtitle").html( html + add )
+        {% endif %}
+      }
+
+      var url_notification = '{% url "admin_mail_message_list_recibidos" %}'
+      if ( url_notification != PAGE_404_URL )
+      {
+        var admin_mail_message_subtitle = {{ admin_mail_message_subtitle }};
+        {% if admin_mail_message_subtitle != 0 %}
+          add = '<span class="right tag tag-red" >+{{admin_mail_message_subtitle}}</span>'
+          html = $("#admin_mail_message_subtitle").html( )
+          $("#admin_mail_message_subtitle").html( html + add )
+
+
+          html = $("#admin_mail_message_list_recibidos").html( )
+          $("#admin_mail_message_list_recibidos").html( html + add )
+
+        {% endif %}
+      }
+    
+    </script>
+    
+  {% endblock %}
+
+  {% block js %}
+
+  {% endblock %}
+  </body>
+</html>
+
+{% endspaceless %}

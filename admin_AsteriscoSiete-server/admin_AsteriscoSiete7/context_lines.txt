@@ -1,0 +1,36 @@
+﻿ORIGEN FK lines: []
+=== L520 ===
+  519:     )
+  520:     comercializadora = models.ForeignKey(
+  521:         'admin_finanzas.Comercializadora',  # TODO: revisar modelo destino
+  522:         on_delete=models.CASCADE,
+  523:     )
+  524:     is_resultados = models.BooleanField(
+=== L548 ===
+  547:     )
+  548:     company = models.ForeignKey(
+  549:         'admin_finanzas.Comercializadora',  # TODO: revisar modelo destino
+  550:         on_delete=models.CASCADE,
+  551:     )
+  552:     created_at = models.DateTimeField(
+=== L3205 ===
+ 3204:     """
+ 3205:     detalle_encuentro = models.ForeignKey(
+ 3206:         'admin_juego.Sorteo',  # TODO: revisar modelo destino
+ 3207:         on_delete=models.CASCADE,
+ 3208:     )
+ 3209:     encuentros_modalidad = models.ForeignKey(
+=== L3414 ===
+ 3413: 
+ 3414:     detalle_encuentro = models.ForeignKey(
+ 3415:         'admin_juego.Sorteo',  # TODO: revisar modelo destino
+ 3416:         on_delete=models.CASCADE,
+ 3417:     )
+ 3418:     encuentros_modalidad = models.ForeignKey(
+=== L3453 ===
+ 3452:     )
+ 3453:     favorito = models.NullBooleanField(
+ 3454:         verbose_name='Favorito',
+ 3455:         blank=True
+ 3456:     )
+ 3457:     sistema = models.ForeignKey(

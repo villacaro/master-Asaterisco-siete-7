@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centro de Apuesta · Asterisco *7</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  :root {
+    --bg:        #0f1117;
+    --surface:   #1a1d27;
+    --border:    #2a2d3d;
+    --text:      #e2e8f0;
+    --muted:     #6b7280;
+    --accent:    #6366f1;
+    --accent2:   #818cf8;
+    --green:     #22c55e;
+    --red:       #ef4444;
+    --orange:    #f97316;
+    --yellow:    #f59e0b;
+    --blue:      #3b82f6;
+    /* Sidebar maroon — igual al screenshot */
+    --sb-bg:     #6b1c2a;
+    --sb-hover:  #8b2a3a;
+    --sb-active: #a33545;
+    --sb-text:   #f8d7da;
+    --sb-head:   #fff;
+    --sb-w:      210px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; font-size: 13px; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── SIDEBAR ─────────────────────────────────────────── */
+  .sidebar {
+    width: var(--sb-w);
+    background: var(--sb-bg);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+  .sb-header {
+    padding: 20px 16px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.15);
+  }
+  .sb-header .sb-title {
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: rgba(255,255,255,.5);
+  }
+  .sb-header .sb-brand {
+    font-size: 15px; font-weight: 700; color: var(--sb-head); margin-top: 4px;
+  }
+  .sb-section-title {
+    font-size: 9px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: rgba(255,255,255,.4);
+    padding: 14px 16px 6px;
+  }
+  .sb-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; cursor: pointer;
+    color: var(--sb-text); font-size: 13px; font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: background .15s, border-color .15s;
+    user-select: none;
+  }
+  .sb-item:hover  { background: var(--sb-hover); }
+  .sb-item.active { background: var(--sb-active); border-left-color: #fff; color: #fff; font-weight: 600; }
+  .sb-item .sb-icon { font-size: 15px; width: 20px; text-align: center; }
+  .sb-divider { border: none; border-top: 1px solid rgba(255,255,255,.12); margin: 6px 14px; }
+
+  /* ── MAIN CONTENT ────────────────────────────────────── */
+  .main {
+    flex: 1; display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .topbar {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+    flex-shrink: 0;
+  }
+  .topbar .tb-title {
+    font-size: 16px; font-weight: 700; color: var(--text);
+  }
+  .topbar .tb-sub {
+    font-size: 11px; color: var(--muted); margin-top: 2px;
+  }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .tb-time { font-size: 11px; color: var(--muted); }
+  .tb-badge {
+    background: var(--sb-bg); color: #fff; border-radius: 12px;
+    padding: 3px 10px; font-size: 11px; font-weight: 600;
+  }
+
+  /* ── KPI bar ─────────────────────────────────────────── */
+  .kpi-row {
+    display: flex; gap: 12px; padding: 14px 20px 0;
+    flex-shrink: 0;
+  }
+  .kpi-card {
+    flex: 1; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+  }
+  .kpi-card .kl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .kpi-card .kv { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  .kc-green { color: var(--green); }
+  .kc-blue  { color: var(--blue); }
+  .kc-orange{ color: var(--orange); }
+  .kc-red   { color: var(--red); }
+
+  /* ── TABLE AREA ──────────────────────────────────────── */
+  .table-area {
+    flex: 1; overflow: auto; padding: 14px 20px 20px;
+  }
+  .table-header {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-bottom: none; border-radius: 8px 8px 0 0;
+    padding: 10px 14px;
+  }
+  .table-header .th-title { font-size: 13px; font-weight: 600; }
+  .search-box {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 10px; font-size: 12px; color: var(--text); outline: none;
+    font-family: inherit; width: 200px;
+  }
+  .search-box:focus { border-color: var(--accent); }
+  .btn-new {
+    background: var(--accent); color: #fff; border: none; border-radius: 6px;
+    padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: background .15s;
+  }
+  .btn-new:hover { background: var(--accent2); }
+  .table-wrap {
+    border: 1px solid var(--border); border-radius: 0 0 8px 8px; overflow: hidden;
+    background: var(--surface);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { background: #1e2235; color: var(--accent2); font-size: 11px; font-weight: 700;
+       text-transform: uppercase; letter-spacing: .5px; padding: 8px 10px;
+       border-bottom: 1px solid var(--border); text-align: left; }
+  td { padding: 7px 10px; border-bottom: 1px solid var(--border); color: var(--text); }
+  tbody tr:hover { background: rgba(99,102,241,.06); }
+  tbody tr:nth-child(even) { background: rgba(255,255,255,.02); }
+  .td-center { text-align: center; }
+  .td-muted  { color: var(--muted); font-size: 11px; }
+  .badge-on  { background: rgba(34,197,94,.15); color: var(--green); border-radius: 10px; padding: 2px 8px; font-size: 11px; font-weight: 600; }
+  .badge-off { background: rgba(239,68,68,.12); color: var(--red); border-radius: 10px; padding: 2px 8px; font-size: 11px; font-weight: 600; }
+  .btn-edit {
+    background: rgba(99,102,241,.15); color: var(--accent2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 3px 10px; font-size: 11px; cursor: pointer;
+    font-family: inherit; transition: background .12s;
+  }
+  .btn-edit:hover { background: rgba(99,102,241,.3); }
+  /* Pager */
+  .pager-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 14px; border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .pager-info { font-size: 12px; color: var(--muted); }
+  .pager-btns { display: flex; gap: 4px; }
+  .pager-btns button {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); padding: 4px 10px; cursor: pointer; font-size: 12px;
+  }
+  .pager-btns button:hover { border-color: var(--accent); color: var(--accent2); }
+  .pager-btns button:disabled { opacity: .35; cursor: default; }
+
+  /* Spinner / empty */
+  .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; margin: 50px auto; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty { text-align: center; padding: 60px; color: var(--muted); }
+  .empty .ei { font-size: 36px; margin-bottom: 10px; }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sb-header">
+    <div class="sb-title">Asterisco *7</div>
+    <div class="sb-brand">🏪 Centro de Apuesta</div>
+  </div>
+
+  <div class="sb-section-title">Jerarquía Comercial</div>
+
+  <div class="sb-item active" data-mod="operadoras" onclick="loadSection(this)">
+    <span class="sb-icon">🏢</span> Operadoras
+  </div>
+  <div class="sb-item" data-mod="bloques" onclick="loadSection(this)">
+    <span class="sb-icon">🏦</span> Multi Banca
+  </div>
+  <div class="sb-item" data-mod="distribuidores" onclick="loadSection(this)">
+    <span class="sb-icon">🚚</span> Distribuidores
+  </div>
+  <div class="sb-item" data-mod="agencias" onclick="loadSection(this)">
+    <span class="sb-icon">🏪</span> Centro de Apuesta
+  </div>
+  <div class="sb-item" data-mod="taquillas" onclick="loadSection(this)">
+    <span class="sb-icon">🖥️</span> Taquillas
+  </div>
+
+  <hr class="sb-divider">
+  <div class="sb-section-title">Otros</div>
+
+  <div class="sb-item" onclick="window.location='/dashboard/'">
+    <span class="sb-icon">📊</span> Dashboard
+  </div>
+  <div class="sb-item" onclick="window.location='/dashboard/reportes/'">
+    <span class="sb-icon">📈</span> Reportes de Venta
+  </div>
+</aside>
+
+<!-- ══ MAIN ═════════════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div>
+      <div class="tb-title" id="sec-title">Operadoras</div>
+      <div class="tb-sub" id="sec-sub">Administración · Centro de Apuesta</div>
+    </div>
+    <div class="topbar-right">
+      <span class="tb-time" id="tb-clock"></span>
+      <span class="tb-badge" id="tb-count">— registros</span>
+    </div>
+  </div>
+
+  <!-- KPI row -->
+  <div class="kpi-row" id="kpi-row">
+    <div class="kpi-card">
+      <div class="kl">Total registros</div>
+      <div class="kv kc-blue" id="k-total">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kl">Activos</div>
+      <div class="kv kc-green" id="k-active">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kl">Inactivos / Cerrados</div>
+      <div class="kv kc-red" id="k-inactive">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kl">Nivel jerárquico</div>
+      <div class="kv kc-orange" id="k-level">—</div>
+    </div>
+  </div>
+
+  <!-- Table area -->
+  <div class="table-area">
+    <div class="table-header">
+      <span class="th-title" id="tbl-title">🏢 Operadoras</span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input class="search-box" type="text" id="search-box" placeholder="Buscar…" oninput="filterRows()">
+        <button class="btn-new" onclick="goAdmin()">+ Nuevo</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <div id="table-body"><div class="spinner"></div></div>
+    </div>
+    <div class="pager-row" id="pager-row" style="display:none">
+      <span class="pager-info" id="pager-info"></span>
+      <div class="pager-btns">
+        <button id="btn-prev" onclick="changePage(-1)">◀ Anterior</button>
+        <button id="btn-next" onclick="changePage(1)">Siguiente ▶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Config de secciones ──────────────────────────────────────
+const SECTIONS = {
+  operadoras:   { title: 'Operadoras',        icon: '🏢', level: '1 — Raíz',
+                  cols: ['nombre','telefono','rif','email'],
+                  heads: ['Nombre','Teléfono','RIF','Email'] },
+  bloques:      { title: 'Multi Banca',        icon: '🏦', level: '2 — Banca',
+                  cols: ['nombre','telefono','rif','email'],
+                  heads: ['Nombre','Teléfono','RIF','Email'] },
+  distribuidores:{ title: 'Distribuidores',   icon: '🚚', level: '3 — Distribuidor',
+                  cols: ['nombre','telefono','rif','email'],
+                  heads: ['Nombre','Teléfono','RIF','Email'] },
+  agencias:     { title: 'Centro de Apuesta', icon: '🏪', level: '4 — Agencia',
+                  cols: ['nombre','telefono','rif','email'],
+                  heads: ['Nombre','Teléfono','RIF','Email'] },
+  taquillas:    { title: 'Taquillas',          icon: '🖥️', level: '5 — Taquilla',
+                  cols: ['taquilla','serial'],
+                  heads: ['Nombre Taquilla','Serial'] },
+};
+
+let _currentMod  = 'operadoras';
+let _allRows     = [];
+let _filteredRows= [];
+let _page        = 1;
+const PAGE_SIZE  = 20;
+
+// ── Clock ────────────────────────────────────────────────────
+function startClock() {
+  const el = document.getElementById('tb-clock');
+  const tick = () => { el.textContent = new Date().toLocaleTimeString('es-VE'); };
+  tick(); setInterval(tick, 1000);
+}
+
+// ── Load section ─────────────────────────────────────────────
+function loadSection(el) {
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  _currentMod = el.dataset.mod;
+  fetchData(_currentMod);
+}
+
+async function fetchData(mod) {
+  const cfg = SECTIONS[mod];
+  document.getElementById('sec-title').textContent  = cfg.title;
+  document.getElementById('sec-sub').textContent    = `${cfg.icon}  ${cfg.level} · Centro de Apuesta`;
+  document.getElementById('tbl-title').textContent  = `${cfg.icon} ${cfg.title}`;
+  document.getElementById('k-level').textContent    = cfg.level;
+  document.getElementById('table-body').innerHTML   = '<div class="spinner"></div>';
+  document.getElementById('pager-row').style.display = 'none';
+  document.getElementById('search-box').value = '';
+
+  try {
+    const res = await fetch(`/dashboard/api/${mod}/?page=1&page_size=1000`);
+    const d   = await res.json();
+    _allRows  = d.results || d.items || d.data || [];
+    if (!_allRows.length && Array.isArray(d)) _allRows = d;
+    _filteredRows = [..._allRows];
+    _page = 1;
+    updateKPIs(_allRows);
+    renderTable();
+  } catch(e) {
+    document.getElementById('table-body').innerHTML =
+      `<div class="empty"><div class="ei">⚠️</div>Error al cargar datos.<br><small>${e.message}</small></div>`;
+  }
+}
+
+function updateKPIs(rows) {
+  const total   = rows.length;
+  const active  = rows.filter(r => r.activo === true || r.activo === 'SI' || r.status === 'ACTIVO').length;
+  const inactive= total - active;
+  document.getElementById('k-total').textContent   = total;
+  document.getElementById('k-active').textContent  = active;
+  document.getElementById('k-inactive').textContent= inactive;
+  document.getElementById('tb-count').textContent  = `${total} registros`;
+}
+
+function filterRows() {
+  const q = document.getElementById('search-box').value.toLowerCase();
+  _filteredRows = q
+    ? _allRows.filter(r => Object.values(r).some(v => String(v||'').toLowerCase().includes(q)))
+    : [..._allRows];
+  _page = 1;
+  renderTable();
+}
+
+function renderTable() {
+  const cfg   = SECTIONS[_currentMod];
+  const total = _filteredRows.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  _page = Math.min(_page, pages);
+  const start = (_page - 1) * PAGE_SIZE;
+  const rows  = _filteredRows.slice(start, start + PAGE_SIZE);
+
+  if (!rows.length) {
+    document.getElementById('table-body').innerHTML =
+      '<div class="empty"><div class="ei">📋</div>Sin registros encontrados.</div>';
+    document.getElementById('pager-row').style.display = 'none';
+    return;
+  }
+
+  const thead = `<thead><tr>
+    <th class="td-muted">#</th>
+    ${cfg.heads.map(h => `<th>${h}</th>`).join('')}
+    <th>Status</th>
+    <th class="td-center">Acciones</th>
+  </tr></thead>`;
+
+  const tbody = rows.map((r, i) => {
+    const isActive = r.activo === true || r.activo === 'SI' || r.status_name === 'ACTIVO';
+    const statusBadge = isActive
+      ? `<span class="badge-on">✓ Activo</span>`
+      : `<span class="badge-off">✗ Inactivo</span>`;
+    const cells = cfg.cols.map(c => {
+      const v = r[c];
+      if (v === null || v === undefined || v === '') return '<td class="td-muted">—</td>';
+      return `<td>${escHtml(String(v))}</td>`;
+    }).join('');
+    return `<tr>
+      <td class="td-muted td-center">${start + i + 1}</td>
+      ${cells}
+      <td class="td-center">${statusBadge}</td>
+      <td class="td-center">
+        <button class="btn-edit" onclick="openAdmin(${r.id||r.pk||0})">✏️ Editar</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('table-body').innerHTML =
+    `<table>${thead}<tbody>${tbody}</tbody></table>`;
+
+  // Pager
+  document.getElementById('pager-row').style.display = '';
+  document.getElementById('pager-info').textContent =
+    `Página ${_page} de ${pages} · ${total} registros`;
+  document.getElementById('btn-prev').disabled = (_page <= 1);
+  document.getElementById('btn-next').disabled = (_page >= pages);
+}
+
+function changePage(dir) {
+  _page += dir;
+  renderTable();
+}
+
+function openAdmin(pk) {
+  // Abrir en Django Admin hasta que el CRUD del dashboard soporte este módulo
+  const pathMap = {
+    operadoras:    'admin_comercializacion/operadoras',
+    bloques:       'admin_comercializacion/bloques',
+    distribuidores:'admin_comercializacion/distribuidores',
+    agencias:      'admin_comercializacion/agencias',
+    taquillas:     'admin_comercializacion/taquillas',
+  };
+  const base = pathMap[_currentMod] || 'admin';
+  if (pk) window.open(`/admin/${base}/${pk}/change/`, '_blank');
+}
+
+function goAdmin() {
+  const pathMap = {
+    operadoras:    'admin_comercializacion/operadoras',
+    bloques:       'admin_comercializacion/bloques',
+    distribuidores:'admin_comercializacion/distribuidores',
+    agencias:      'admin_comercializacion/agencias',
+    taquillas:     'admin_comercializacion/taquillas',
+  };
+  window.open(`/admin/${pathMap[_currentMod]||'admin'}/add/`, '_blank');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Init ─────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  startClock();
+  fetchData('operadoras');
+});
+</script>
+</body>
+</html>

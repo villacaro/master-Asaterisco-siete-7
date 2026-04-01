@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Usuarios Firebase – Admin{% endblock %}
+{% block content %}
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+    <h2>👥 Usuarios de Firebase ({{ usuarios|length }})</h2>
+    <a href="{% url 'crear_usuario' %}" class="btn btn-gold">➕ Nuevo Usuario</a>
+  </div>
+
+  {% if usuarios %}
+  <table>
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Nombre</th>
+        <th>Proveedor</th>
+        <th>Estado</th>
+        <th>Verificado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in usuarios %}
+      <tr>
+        <td style="font-weight:700;">{{ u.email }}</td>
+        <td>{{ u.nombre }}</td>
+        <td>
+          {% for p in u.proveedor %}
+            <span class="badge badge-purple">{{ p }}</span>
+          {% endfor %}
+        </td>
+        <td>
+          {% if u.deshabilitado %}
+            <span class="badge badge-red">🔴 Deshabilitado</span>
+          {% else %}
+            <span class="badge badge-green">🟢 Activo</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if u.verificado %}
+            <span class="badge badge-green">✅ Sí</span>
+          {% else %}
+            <span class="badge badge-red">⏳ No</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="actions">
+            <a href="{% url 'detalle_usuario' u.uid %}" class="btn btn-purple">📂 Ver datos</a>
+
+            {% if u.deshabilitado %}
+              <a href="{% url 'toggle_usuario' u.uid %}?deshabilitar=0" class="btn btn-green">✅ Habilitar</a>
+            {% else %}
+              <a href="{% url 'toggle_usuario' u.uid %}?deshabilitar=1" class="btn btn-red">⛔ Deshabilitar</a>
+            {% endif %}
+
+            <!-- Cambiar contraseña -->
+            <form method="POST" action="{% url 'cambiar_password' u.uid %}"
+                  onsubmit="return confirm('¿Cambiar contraseña de {{ u.email }}?')"
+                  style="display:inline;">
+              {% csrf_token %}
+              <input type="password" name="nueva_password" placeholder="Nueva contraseña"
+                     style="width:140px;display:inline;padding:0.3rem 0.5rem;font-size:0.78rem;" required />
+              <button type="submit" class="btn btn-purple">🔑</button>
+            </form>
+
+            <!-- Eliminar -->
+            <form method="POST" action="{% url 'eliminar_usuario' u.uid %}"
+                  onsubmit="return confirm('⚠️ ¿Eliminar permanentemente a {{ u.email }}?')"
+                  style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-red">🗑 Eliminar</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p style="color:var(--muted);text-align:center;padding:2rem;">
+      No hay usuarios en Firebase Auth o las credenciales no están configuradas.
+    </p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Detalle Usuario – Admin{% endblock %}
+{% block content %}
+<div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;align-items:center;">
+  <a href="{% url 'lista_usuarios' %}" class="btn btn-purple">← Volver</a>
+  <h2 style="margin:0;">📂 Datos del Usuario</h2>
+</div>
+
+<p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;">UID: <code style="color:var(--gold);">{{ uid }}</code></p>
+
+<!-- CLIENTES -->
+<div class="card">
+  <h2>👥 Clientes en Firestore ({{ clientes|length }})</h2>
+  {% if clientes %}
+  <table>
+    <thead>
+      <tr><th>Nombre</th><th>Teléfono</th><th>Cédula</th><th>Correo</th><th>Crédito (Bs)</th></tr>
+    </thead>
+    <tbody>
+      {% for c in clientes %}
+      <tr>
+        <td>{{ c.nombre|default:"—" }} {{ c.apellido|default:"" }}</td>
+        <td>{{ c.telefono|default:"—" }}</td>
+        <td>{{ c.cedula|default:"—" }}</td>
+        <td>{{ c.correo|default:"—" }}</td>
+        <td style="color:var(--gold);font-weight:900;">{{ c.credito|default:"0" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p style="color:var(--muted);padding:1rem 0;">Sin clientes registrados.</p>
+  {% endif %}
+</div>
+
+<!-- APUESTAS -->
+<div class="card">
+  <h2>🎟 Últimas Apuestas ({{ apuestas|length }})</h2>
+  {% if apuestas %}
+  <table>
+    <thead>
+      <tr><th>Cliente</th><th>Sorteo</th><th>Número</th><th>Monto (Bs)</th><th>Fecha</th></tr>
+    </thead>
+    <tbody>
+      {% for a in apuestas %}
+      <tr>
+        <td>{{ a.cliente|default:"—" }}</td>
+        <td>{{ a.sorteo|default:"—" }}</td>
+        <td style="font-weight:900;color:var(--gold);">{{ a.numero|default:"—" }}</td>
+        <td style="color:#f87171;font-weight:700;">{{ a.monto|default:"0" }}</td>
+        <td style="color:var(--muted);font-size:0.78rem;">{{ a.fecha|default:"—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p style="color:var(--muted);padding:1rem 0;">Sin apuestas registradas.</p>
+  {% endif %}
+</div>
+{% endblock %}

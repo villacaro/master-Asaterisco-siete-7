@@ -1,0 +1,12 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "pip install -r admin_panel/requirements.txt && cd admin_panel && python manage.py collectstatic --noinput"
+  },
+  "deploy": {
+    "startCommand": "cd admin_panel && python manage.py migrate --noinput && gunicorn admin_panel.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 5
+  }
+}

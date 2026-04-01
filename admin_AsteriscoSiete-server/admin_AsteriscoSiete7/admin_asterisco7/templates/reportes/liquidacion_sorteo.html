@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liquidación de Sorteo — Asterisco *7</title>
+  <meta name="description" content="Reporte de liquidaciones de sorteos por agencia y taquilla — Sistema Asterisco Siete">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0b0d18;
+      --surface:   #13162a;
+      --surface2:  #1c2040;
+      --surface3:  #242850;
+      --border:    #2a2f5a;
+      --accent:    #7c3aed;
+      --accent2:   #a78bfa;
+      --accent3:   #c4b5fd;
+      --green:     #22c55e;
+      --green-dim: rgba(34,197,94,.12);
+      --red:       #ef4444;
+      --red-dim:   rgba(239,68,68,.12);
+      --yellow:    #f59e0b;
+      --orange:    #f97316;
+      --blue:      #3b82f6;
+      --cyan:      #06b6d4;
+      --text:      #e2e8f0;
+      --muted:     #94a3b8;
+      --radius:    12px;
+      --radius-sm: 8px;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ─── */
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 28px;
+      background: linear-gradient(90deg, var(--surface) 0%, rgba(124,58,237,.15) 100%);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      font-size: 26px; font-weight: 800; letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--accent2), var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .header-title { font-size: 17px; font-weight: 700; }
+    .header-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .nav-links { display: flex; gap: 8px; }
+    .nav-link {
+      font-size: 12px; color: var(--muted); text-decoration: none;
+      padding: 5px 12px; border-radius: 20px;
+      border: 1px solid var(--border); transition: .2s;
+    }
+    .nav-link:hover { color: var(--accent2); border-color: var(--accent); }
+    .nav-link.active { color: var(--accent2); background: rgba(124,58,237,.1); border-color: var(--accent); }
+
+    /* ── Main Layout ─── */
+    .main { padding: 24px 28px; max-width: 1700px; margin: 0 auto; }
+
+    /* ── Page title ─── */
+    .page-title {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 22px;
+    }
+    .page-title .icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      border-radius: var(--radius-sm); display: grid; place-items: center;
+      font-size: 22px; box-shadow: 0 4px 18px rgba(124,58,237,.35);
+    }
+    .page-title h1 { font-size: 20px; font-weight: 700; }
+    .page-title p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Filtros ─── */
+    .filters-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      margin-bottom: 22px;
+      display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;
+    }
+    .f-group { display: flex; flex-direction: column; gap: 5px; }
+    .f-group label {
+      font-size: 10px; color: var(--muted); font-weight: 600;
+      text-transform: uppercase; letter-spacing: .6px;
+    }
+    .f-group input, .f-group select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 13px; color: var(--text);
+      font-size: 13px; outline: none;
+      min-width: 148px; font-family: inherit;
+      transition: border-color .2s;
+    }
+    .f-group input:focus, .f-group select:focus { border-color: var(--accent); }
+    .btn-consultar {
+      background: linear-gradient(135deg, var(--accent), #9333ea);
+      color: #fff; border: none; border-radius: var(--radius-sm);
+      padding: 9px 24px; font-size: 13px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; gap: 7px;
+      transition: .2s; white-space: nowrap; letter-spacing: .3px;
+    }
+    .btn-consultar:hover { opacity: .88; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,.4); }
+    .btn-consultar:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+    .btn-export {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: var(--radius-sm);
+      padding: 9px 16px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: .2s; display: flex; align-items: center; gap: 6px;
+      font-family: inherit;
+    }
+    .btn-export:hover { border-color: var(--accent); color: var(--accent2); }
+
+    /* ── KPI Cards ─── */
+    .kpi-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px; margin-bottom: 22px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+    .kpi-card .kpi-label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+    .kpi-card .kpi-val   { font-size: 21px; font-weight: 800; margin-top: 5px; letter-spacing: -.5px; }
+    .kpi-card .kpi-sub   { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .kpi-card.blue  .kpi-val { color: var(--blue); }
+    .kpi-card.red   .kpi-val { color: var(--red); }
+    .kpi-card.green .kpi-val { color: var(--green); }
+    .kpi-card.purp  .kpi-val { color: var(--accent2); }
+    .kpi-card.cyan  .kpi-val { color: var(--cyan); }
+    .kpi-card.orange .kpi-val { color: var(--orange); }
+
+    /* ── Tabs de detalle ─── */
+    .detail-tabs {
+      display: flex; gap: 4px; margin-bottom: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .dtab {
+      padding: 9px 18px; font-size: 12px; font-weight: 600;
+      color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent;
+      transition: .2s; white-space: nowrap;
+    }
+    .dtab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+    .dtab:hover:not(.active) { color: var(--text); }
+
+    /* ── Tabla ─── */
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .table-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .table-title { font-size: 13px; font-weight: 700; }
+    .table-count { font-size: 11px; color: var(--muted); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    thead { background: var(--surface3); position: sticky; top: 0; z-index: 5; }
+    th {
+      padding: 10px 13px; text-align: left; font-size: 10px; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
+      border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    th.num-r { text-align: right; }
+    td { padding: 9px 13px; border-bottom: 1px solid rgba(42,47,90,.6); white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(124,58,237,.06); }
+    .tr-total td {
+      background: var(--surface2); font-weight: 800;
+      color: var(--accent3); border-top: 1px solid var(--border);
+      border-bottom: none; font-size: 12px;
+    }
+    .num-r { text-align: right; font-variant-numeric: tabular-nums; }
+    .pos { color: var(--green); }
+    .neg { color: var(--red); }
+    .muted-cell { color: var(--muted); font-size: 11px; }
+
+    /* ── Badges ─── */
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 20px;
+      font-size: 10px; font-weight: 700; letter-spacing: .4px;
+    }
+    .badge-sorteo { background: rgba(59,130,246,.15); color: var(--blue); }
+    .badge-agc    { background: rgba(6,182,212,.15);  color: var(--cyan); }
+
+    /* ── Actor saldo columns ─── */
+    .saldo-oper { color: #fb923c; }
+    .saldo-com  { color: var(--accent2); }
+    .saldo-ban  { color: var(--blue); }
+    .saldo-dis  { color: var(--yellow); }
+    .saldo-agc  { color: var(--cyan); }
+
+    /* ── Porcentajes mini table ─── */
+    .pct-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+      padding: 14px 18px;
+    }
+    .pct-actor {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 12px 14px;
+    }
+    .pct-actor .actor-name {
+      font-size: 10px; color: var(--muted); font-weight: 700;
+      text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px;
+    }
+    .pct-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+    .pct-row .pct-lbl { color: var(--muted); }
+    .pct-row .pct-val { font-weight: 700; }
+
+    /* ── Spinner / Empty ─── */
+    .spinner-wrap { display: flex; justify-content: center; padding: 60px 0; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty {
+      text-align: center; padding: 70px 20px; color: var(--muted);
+    }
+    .empty .ico { font-size: 52px; margin-bottom: 14px; }
+    .empty p { font-size: 14px; }
+
+    /* ── Error ─── */
+    .error-msg {
+      display: flex; align-items: center; gap: 10px; padding: 14px 18px;
+      background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.3);
+      border-radius: var(--radius-sm); color: var(--red); font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Section divider ─── */
+    .section-sep {
+      margin: 28px 0 20px; font-size: 11px; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 1px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-sep::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ─────────────────────────────────── -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">★7</div>
+      <div>
+        <div class="header-title">Liquidación de Sorteo</div>
+        <div class="header-sub">Sistema Asterisco Siete — Resumen financiero por sorteo</div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="/dashboard/" class="nav-link">🏠 Panel</a>
+      <a href="/dashboard/reportes/" class="nav-link">📊 Reportes</a>
+      <a href="/dashboard/candidatos/" class="nav-link">🎯 Candidatos</a>
+      <a href="#" class="nav-link active">📋 Liquidaciones</a>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ── Page title ─── -->
+    <div class="page-title">
+      <div class="icon">📋</div>
+      <div>
+        <h1>Reporte de Liquidación de Sorteo</h1>
+        <p>Resumen financiero completo por sorteo — venta, premios, comisiones y saldos por actor de la cadena</p>
+      </div>
+    </div>
+
+    <!-- ── Filtros ─────────────────────────────── -->
+    <div class="filters-card">
+      <div class="f-group">
+        <label>Fecha Inicio</label>
+        <input type="date" id="fi-fecha-ini">
+      </div>
+      <div class="f-group">
+        <label>Fecha Fin</label>
+        <input type="date" id="fi-fecha-fin">
+      </div>
+      <div class="f-group">
+        <label>Agencia (ID)</label>
+        <input type="number" id="fi-agencia" placeholder="Todas" min="0" style="min-width:120px">
+      </div>
+      <div class="f-group">
+        <label>ID Sorteo</label>
+        <input type="number" id="fi-sorteo" placeholder="Todos" min="0" style="min-width:120px">
+      </div>
+      <div class="f-group">
+        <label>Agrupar por</label>
+        <select id="fi-agrupar">
+          <option value="sorteo">Sorteo → Agencia</option>
+          <option value="agencia">Agencia → Sorteo</option>
+          <option value="taquilla">Taquilla</option>
+        </select>
+      </div>
+      <button class="btn-consultar" id="btn-consultar" onclick="consultar()">
+        🔍 Consultar
+      </button>
+      <button class="btn-export" id="btn-export" onclick="exportarCSV()" style="display:none">
+        📥 Exportar CSV
+      </button>
+    </div>
+
+    <!-- ── KPIs ───────────────────────────────── -->
+    <div id="kpi-row" class="kpi-row" style="display:none">
+      <div class="kpi-card blue">
+        <div class="kpi-label">Total Registros</div>
+        <div class="kpi-val" id="kpi-registros">—</div>
+        <div class="kpi-sub">liquidaciones</div>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-label">Total Venta</div>
+        <div class="kpi-val" id="kpi-venta">—</div>
+        <div class="kpi-sub">Bs. apostados</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">Total Premios</div>
+        <div class="kpi-val" id="kpi-premios">—</div>
+        <div class="kpi-sub">Bs. pagados</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Saldo Operador</div>
+        <div class="kpi-val" id="kpi-saldo-oper">—</div>
+        <div class="kpi-sub">Bs. neto operador</div>
+      </div>
+      <div class="kpi-card purp">
+        <div class="kpi-label">Saldo Agencia</div>
+        <div class="kpi-val" id="kpi-saldo-agc">—</div>
+        <div class="kpi-sub">Bs. saldo agencia</div>
+      </div>
+      <div class="kpi-card cyan">
+        <div class="kpi-label">Comisión Agencia</div>
+        <div class="kpi-val" id="kpi-comision-agc">—</div>
+        <div class="kpi-sub">Bs. comisión</div>
+      </div>
+    </div>
+
+    <!-- ── Tabla Principal ──────────────────────── -->
+    <div id="resultado-container">
+      <div class="empty">
+        <div class="ico">📋</div>
+        <p>Selecciona un rango de fechas y haz clic en <b>Consultar</b></p>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <script>
+  // ─────────────────────────────────────────────────────
+  // Utilidades
+  // ─────────────────────────────────────────────────────
+  let _data = [];
+
+  const today = () => new Date().toISOString().slice(0,10);
+
+  function fmt(val) {
+    const n = Number(val) || 0;
+    return n.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  function fmtPct(val) {
+    return (Number(val) || 0).toFixed(2) + '%';
+  }
+
+  function sign(val) {
+    return val >= 0 ? 'pos' : 'neg';
+  }
+
+  function setKPI(id, text, cls) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    if (cls) el.className = 'kpi-val ' + cls;
+  }
+
+  async function fetchAPI(url) {
+    const r = await fetch(url, {headers: {'X-Requested-With': 'XMLHttpRequest'}});
+    const json = await r.json();
+    if (!r.ok || !json.ok) throw new Error(json.error || 'Error HTTP ' + r.status);
+    return json;
+  }
+
+  // ─────────────────────────────────────────────────────
+  // CONSULTAR
+  // ─────────────────────────────────────────────────────
+  async function consultar() {
+    const fi       = document.getElementById('fi-fecha-ini').value || today();
+    const ff       = document.getElementById('fi-fecha-fin').value || today();
+    const agencia  = document.getElementById('fi-agencia').value || '';
+    const sorteoId = document.getElementById('fi-sorteo').value || '';
+    const btn      = document.getElementById('btn-consultar');
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Consultando…';
+    document.getElementById('kpi-row').style.display = 'none';
+    document.getElementById('btn-export').style.display = 'none';
+    document.getElementById('resultado-container').innerHTML =
+      '<div class="spinner-wrap"><div class="spinner"></div></div>';
+
+    try {
+      let url = `/dashboard/reportes/api/liquidaciones/?fecha_inicio=${fi}&fecha_fin=${ff}`;
+      if (agencia) url += `&agencia_id=${agencia}`;
+
+      const data = await fetchAPI(url);
+
+      // Si se filtra por sorteo en frontend (la API no tiene ese param directo)
+      let filas = data.filas;
+      if (sorteoId) {
+        filas = filas.filter(r => String(r.id_sorteo) === String(sorteoId));
+      }
+
+      _data = filas;
+      renderKPIs(filas, data);
+      renderTabla(filas);
+
+    } catch(e) {
+      document.getElementById('resultado-container').innerHTML = `
+        <div class="error-msg">❌ ${e.message}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🔍 Consultar';
+    }
+  }
+
+  // ─────────────────────────────────────────────────────
+  // KPIs
+  // ─────────────────────────────────────────────────────
+  function renderKPIs(filas, data) {
+    const totalVenta      = filas.reduce((s,r) => s + Number(r.venta), 0);
+    const totalPremios    = filas.reduce((s,r) => s + Number(r.premios), 0);
+    const totalSaldoOper  = filas.reduce((s,r) => s + Number(r.saldo_oper || 0), 0);
+    const totalSaldoAgc   = filas.reduce((s,r) => s + Number(r.saldo_agc || 0), 0);
+    const totalComAgc     = filas.reduce((s,r) => s + Number(r.comision_agc || 0), 0);
+
+    setKPI('kpi-registros', filas.length.toLocaleString());
+    setKPI('kpi-venta',      'Bs. ' + fmt(totalVenta));
+    setKPI('kpi-premios',    'Bs. ' + fmt(totalPremios));
+    setKPI('kpi-saldo-oper', 'Bs. ' + fmt(totalSaldoOper), sign(totalSaldoOper));
+    setKPI('kpi-saldo-agc',  'Bs. ' + fmt(Math.abs(totalSaldoAgc)), sign(totalSaldoAgc));
+    setKPI('kpi-comision-agc','Bs. ' + fmt(totalComAgc));
+
+    document.getElementById('kpi-row').style.display = 'grid';
+  }
+
+  // ─────────────────────────────────────────────────────
+  // TABLA PRINCIPAL
+  // ─────────────────────────────────────────────────────
+  function renderTabla(filas) {
+    const fi = document.getElementById('fi-fecha-ini').value || today();
+    const ff = document.getElementById('fi-fecha-fin').value || today();
+
+    if (!filas.length) {
+      document.getElementById('resultado-container').innerHTML = `
+        <div class="empty">
+          <div class="ico">📋</div>
+          <p>Sin liquidaciones en ese período / filtro.</p>
+        </div>`;
+      return;
+    }
+
+    // Totales
+    const tv   = filas.reduce((s,r) => s + Number(r.venta), 0);
+    const tp   = filas.reduce((s,r) => s + Number(r.premios), 0);
+    const tca  = filas.reduce((s,r) => s + Number(r.comision_agc || 0), 0);
+    const tsa  = filas.reduce((s,r) => s + Number(r.saldo_oper || 0), 0);
+    const tsag = filas.reduce((s,r) => s + Number(r.saldo_agc  || 0), 0);
+
+    let rows = '';
+    filas.forEach((r, i) => {
+      const saldoOp  = Number(r.saldo_oper || 0);
+      const saldoAg  = Number(r.saldo_agc  || 0);
+      const pct      = fmtPct(r.pct_comision_agc || 0);
+      rows += `<tr>
+        <td>${i+1}</td>
+        <td><span class="badge badge-sorteo">S-${r.id_sorteo}</span></td>
+        <td class="muted-cell">${r.fecha || '—'}</td>
+        <td><span class="badge badge-agc">${r.nombre_agencia}</span></td>
+        <td class="muted-cell">${r.id_taquilla || '—'}</td>
+        <td class="num-r" style="color:var(--blue)">${fmt(r.venta)}</td>
+        <td class="num-r" style="color:var(--red)">${fmt(r.premios)}</td>
+        <td class="num-r" style="color:var(--orange)">${fmt(r.comision_agc || 0)}</td>
+        <td class="num-r muted-cell">${pct}</td>
+        <td class="num-r ${saldoOp >= 0 ? 'saldo-oper pos' : 'neg'}">${fmt(saldoOp)}</td>
+        <td class="num-r ${saldoAg >= 0 ? 'saldo-agc pos' : 'neg'}">${fmt(Math.abs(saldoAg))}</td>
+      </tr>`;
+    });
+
+    const html = `
+      <div class="table-card">
+        <div class="table-header">
+          <div>
+            <div class="table-title">📋 Liquidaciones de Sorteo</div>
+          </div>
+          <div class="table-count">${filas.length.toLocaleString()} registros &nbsp;|&nbsp; ${fi} → ${ff}</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sorteo</th>
+                <th>Fecha</th>
+                <th>Agencia</th>
+                <th>Taquilla</th>
+                <th class="num-r">Venta Bs.</th>
+                <th class="num-r">Premios Bs.</th>
+                <th class="num-r">Comisión Agc.</th>
+                <th class="num-r">% Comisión</th>
+                <th class="num-r">Saldo Operador</th>
+                <th class="num-r">Saldo Agencia</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+            <tfoot>
+              <tr class="tr-total">
+                <td colspan="5">TOTALES</td>
+                <td class="num-r">Bs. ${fmt(tv)}</td>
+                <td class="num-r">Bs. ${fmt(tp)}</td>
+                <td class="num-r">Bs. ${fmt(tca)}</td>
+                <td class="num-r">—</td>
+                <td class="num-r ${tsa >= 0 ? 'pos' : 'neg'}">Bs. ${fmt(tsa)}</td>
+                <td class="num-r ${tsag >= 0 ? 'pos' : 'neg'}">Bs. ${fmt(Math.abs(tsag))}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- ── Porcentajes Summary ── -->
+        <div class="section-sep" style="margin:0 18px; padding-top:18px">Porcentajes por actor</div>
+        <div class="pct-grid" id="pct-grid-container">
+          ${renderPctGrid(filas)}
+        </div>
+      </div>`;
+
+    document.getElementById('resultado-container').innerHTML = html;
+    document.getElementById('btn-export').style.display = 'flex';
+  }
+
+  // ─────────────────────────────────────────────────────
+  // PORCENTAJES PROMEDIO POR ACTOR
+  // ─────────────────────────────────────────────────────
+  function renderPctGrid(filas) {
+    const avg = (field) => {
+      const vals = filas.map(r => Number(r[field] || 0)).filter(v => v > 0);
+      return vals.length ? (vals.reduce((s,v) => s+v, 0) / vals.length).toFixed(2) : '—';
+    };
+
+    // Los porcentajes vienen en la API de liquidaciones
+    // Reconstruimos desde los disponibles
+    const pct_com_agc = avg('pct_comision_agc');
+
+    return `
+      <div class="pct-actor" style="border-left:3px solid var(--orange)">
+        <div class="actor-name">🏢 Agencia</div>
+        <div class="pct-row">
+          <span class="pct-lbl">% Comisión promedio</span>
+          <span class="pct-val" style="color:var(--orange)">${pct_com_agc}%</span>
+        </div>
+        <div class="pct-row">
+          <span class="pct-lbl">Total comisión</span>
+          <span class="pct-val" style="color:var(--orange)">
+            Bs. ${fmt(filas.reduce((s,r)=>s+Number(r.comision_agc||0),0))}
+          </span>
+        </div>
+      </div>
+      <div class="pct-actor" style="border-left:3px solid var(--blue)">
+        <div class="actor-name">⚙️ Operador</div>
+        <div class="pct-row">
+          <span class="pct-lbl">Saldo total</span>
+          <span class="pct-val" style="color:var(--blue)">
+            Bs. ${fmt(filas.reduce((s,r)=>s+Number(r.saldo_oper||0),0))}
+          </span>
+        </div>
+        <div class="pct-row">
+          <span class="pct-lbl">Sorteos liquidados</span>
+          <span class="pct-val" style="color:var(--blue)">
+            ${[...new Set(filas.map(r=>r.id_sorteo))].length}
+          </span>
+        </div>
+      </div>
+      <div class="pct-actor" style="border-left:3px solid var(--cyan)">
+        <div class="actor-name">🏦 Resumen General</div>
+        <div class="pct-row">
+          <span class="pct-lbl">Venta total</span>
+          <span class="pct-val" style="color:var(--cyan)">
+            Bs. ${fmt(filas.reduce((s,r)=>s+Number(r.venta||0),0))}
+          </span>
+        </div>
+        <div class="pct-row">
+          <span class="pct-lbl">Premios pagados</span>
+          <span class="pct-val" style="color:var(--red)">
+            Bs. ${fmt(filas.reduce((s,r)=>s+Number(r.premios||0),0))}
+          </span>
+        </div>
+        <div class="pct-row">
+          <span class="pct-lbl">Agencias únicas</span>
+          <span class="pct-val" style="color:var(--cyan)">
+            ${[...new Set(filas.map(r=>r.id_agencia))].length}
+          </span>
+        </div>
+      </div>`;
+  }
+
+  // ─────────────────────────────────────────────────────
+  // EXPORTAR CSV
+  // ─────────────────────────────────────────────────────
+  function exportarCSV() {
+    if (!_data.length) return;
+    const headers = ['#','ID Sorteo','Fecha','Agencia','ID Taquilla','Venta Bs.','Premios Bs.','Comisión Agc. Bs.','% Comisión','Saldo Operador Bs.','Saldo Agencia Bs.'];
+    const rows = _data.map((r,i) => [
+      i+1, r.id_sorteo, r.fecha || '', r.nombre_agencia, r.id_taquilla || '',
+      Number(r.venta).toFixed(2), Number(r.premios).toFixed(2),
+      Number(r.comision_agc||0).toFixed(2),
+      fmtPct(r.pct_comision_agc||0),
+      Number(r.saldo_oper||0).toFixed(2),
+      Number(r.saldo_agc||0).toFixed(2),
+    ]);
+    const csv = [headers, ...rows].map(r => r.join(';')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8;'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `liquidaciones_${document.getElementById('fi-fecha-ini').value}_${document.getElementById('fi-fecha-fin').value}.csv`;
+    a.click();
+  }
+
+  // ─────────────────────────────────────────────────────
+  // Init
+  // ─────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    const t = today();
+    // Últimos 7 días por defecto
+    const d7 = new Date(); d7.setDate(d7.getDate() - 7);
+    document.getElementById('fi-fecha-ini').value = d7.toISOString().slice(0,10);
+    document.getElementById('fi-fecha-fin').value = t;
+  });
+  </script>
+</body>
+</html>

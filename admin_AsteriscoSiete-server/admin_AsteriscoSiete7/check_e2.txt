@@ -1,0 +1,70 @@
+Traceback (most recent call last):
+  File "C:\Users\villa\OneDrive\Documentos\sistema Parley\proyecto master Asterisco Siete (7)\admin_AsteriscoSiete-server\admin_AsteriscoSiete7\manage.py", line 37, in <module>
+    execute_from_command_line(sys.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\management\__init__.py", line 443, in execute_from_command_line
+    utility.execute()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\management\__init__.py", line 437, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\management\base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\management\base.py", line 464, in execute
+    output = self.handle(*args, **options)
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\management\commands\check.py", line 81, in handle
+    self.check(
+    ~~~~~~~~~~^
+        app_configs=app_configs,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        databases=options["databases"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\management\base.py", line 496, in check
+    all_issues = checks.run_checks(
+        app_configs=app_configs,
+    ...<2 lines>...
+        databases=databases,
+    )
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\checks\registry.py", line 89, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\contrib\admin\checks.py", line 52, in check_admin_app
+    errors.extend(site.check(app_configs))
+                  ~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\contrib\admin\sites.py", line 91, in check
+    errors.extend(modeladmin.check())
+                  ~~~~~~~~~~~~~~~~^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\contrib\admin\options.py", line 149, in check
+    return self.checks_class().check(self, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\contrib\admin\checks.py", line 828, in check
+    *self._check_inlines(admin_obj),
+     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\contrib\admin\checks.py", line 865, in _check_inlines
+    return list(
+        chain.from_iterable(
+    ...<2 lines>...
+        )
+    )
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\contrib\admin\checks.py", line 867, in <genexpr>
+    self._check_inlines_item(obj, item, "inlines[%d]" % index)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\contrib\admin\checks.py", line 908, in _check_inlines_item
+    return inline(obj.model, obj.admin_site).check()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\contrib\admin\options.py", line 149, in check
+    return self.checks_class().check(self, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\contrib\admin\checks.py", line 1264, in check
+    *self._check_relation(inline_obj, parent_model),
+     ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\contrib\admin\checks.py", line 1305, in _check_relation
+    _get_foreign_key(parent_model, obj.model, fk_name=obj.fk_name)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\forms\models.py", line 1277, in _get_foreign_key
+    f.remote_field.model._meta.proxy
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute '_meta'

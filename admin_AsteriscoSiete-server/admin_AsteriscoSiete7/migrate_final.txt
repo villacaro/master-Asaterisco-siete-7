@@ -1,0 +1,141 @@
+﻿Operations to perform:
+  Apply all migrations: admin, admin_apuestas, admin_comercializacion, admin_datamart, admin_finanzas, admin_historic, admin_juego, admin_mail, admin_permisologia, admin_profiles, admin_resultados, admin_status, admin_themes, admin_users, auth, contenttypes, sessions, sites
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying admin_permisologia.0001_initial... OK
+  Applying admin_datamart.0001_initial... OK
+  Applying admin_profiles.0001_initial... OK
+  Applying admin_comercializacion.0001_initial... OK
+  Applying admin_finanzas.0001_initial... OK
+  Applying admin_users.0001_initial... OK
+  Applying admin_status.0001_initial... OK
+  Applying admin_juego.0001_initial... OK
+  Applying admin_apuestas.0001_initial... OK
+  Applying admin_apuestas.0002_initial... OK
+  Applying admin_permisologia.0002_initial... OK
+python : Traceback (most recent call last):
+En línea: 1 Carácter: 1
++ python manage.py migrate --settings=admin_asterisco7.settings_local - ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::S 
+   tring) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "C:\Users\villa\OneDrive\Documentos\sistema Parley\proyecto master 
+Asterisco Siete (7)\admin_AsteriscoSiete-server\admin_AsteriscoSiete7\manage.py", 
+line 37, in <module>
+    execute_from_command_line(sys.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\
+management\__init__.py", line 443, in execute_from_command_line
+    utility.execute()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\
+management\__init__.py", line 437, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\
+management\base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\
+management\base.py", line 464, in execute
+    output = self.handle(*args, **options)
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\
+management\base.py", line 111, in wrapper
+    res = handle_func(*args, **kwargs)
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\core\
+management\commands\migrate.py", line 354, in handle
+    post_migrate_state = executor.migrate(
+        targets,
+    ...<3 lines>...
+        fake_initial=fake_initial,
+    )
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\mi
+grations\executor.py", line 137, in migrate
+    state = self._migrate_all_forwards(
+        state, plan, full_plan, fake=fake, fake_initial=fake_initial
+    )
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\mi
+grations\executor.py", line 169, in _migrate_all_forwards
+    state = self.apply_migration(
+        state, migration, fake=fake, fake_initial=fake_initial
+    )
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\mi
+grations\executor.py", line 257, in apply_migration
+    state = migration.apply(state, schema_editor)
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\mi
+grations\migration.py", line 132, in apply
+    operation.database_forwards(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.app_label, schema_editor, old_state, project_state
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\mi
+grations\operations\fields.py", line 118, in database_forwards
+    schema_editor.add_field(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        from_model,
+        ^^^^^^^^^^^
+        field,
+        ^^^^^^
+    )
+    ^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\ba
+ckends\sqlite3\schema.py", line 325, in add_field
+    self._remake_table(model, create_field=field)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\ba
+ckends\sqlite3\schema.py", line 249, in _remake_table
+    self.create_model(new_model)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\ba
+ckends\base\schema.py", line 510, in create_model
+    sql, params = self.table_sql(model)
+                  ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\ba
+ckends\base\schema.py", line 222, in table_sql
+    definition, extra_params = self.column_sql(model, field)
+                               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\ba
+ckends\base\schema.py", line 384, in column_sql
+    field_db_params = field.db_parameters(connection=self.connection)
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\mo
+dels\fields\related.py", line 1229, in db_parameters
+    target_db_parameters = self.target_field.db_parameters(connection)
+                           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\mo
+dels\fields\related.py", line 1119, in target_field
+    return self.foreign_related_fields[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\utils
+\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\mo
+dels\fields\related.py", line 808, in foreign_related_fields
+    rhs_field for lhs_field, rhs_field in self.related_fields if rhs_field
+                                          ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\utils
+\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\mo
+dels\fields\related.py", line 795, in related_fields
+    return self.resolve_related_fields()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\mo
+dels\fields\related.py", line 1146, in resolve_related_fields
+    related_fields = super().resolve_related_fields()
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\mo
+dels\fields\related.py", line 775, in resolve_related_fields
+    raise ValueError(
+        "Related model %r cannot be resolved" % self.remote_field.model
+    )
+ValueError: Related model 'admin_permisologia.profile' cannot be resolved
+  Applying admin_comercializacion.0002_initial...

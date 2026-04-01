@@ -1,0 +1,298 @@
+
+  <!-- ① INICIO -->
+  <div class="nav-section">
+    <div class="nav-item active" id="nav-home" onclick="navigate('home','Panel de control')">
+      <span><span class="ico">🏠</span> Panel de control</span>
+    </div>
+    <div class="nav-item" onclick="renderMonitor()">
+      <span><span class="ico">🖥️</span> Monitor en vivo</span>
+    </div>
+  </div>
+
+  <!-- ② RED COMERCIAL — jerarquía: Operadora → Comercializadora → Multi Banca → Distribuidor → Banca → Centro → Taquilla -->
+  <div class="nav-section">
+    <div class="nav-label">Red Comercial</div>
+
+    <div class="nav-item" onclick="toggleSub('sub-op',this)">
+      <span><span class="ico">🏢</span> Operadoras</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-op">
+      <button class="nav-sub-item" onclick="navigate('operadoras','Operadoras')">📋 Lista</button>
+      <button class="nav-sub-item" onclick="navigate('operadoraloteria','Operadoras Lotería')">🎰 Operadoras Lotería</button>
+      <button class="nav-sub-item" style="color:var(--accent);font-weight:600" onclick="openCrudModal('operadoras','Operadora',null)">+ Añadir Operadora</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-comer',this)">
+      <span><span class="ico">🏛️</span> Comercializadoras</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-comer">
+      <button class="nav-sub-item" onclick="navigate('comercializadoras','Comercializadoras')">📋 Lista</button>
+      <button class="nav-sub-item" style="color:var(--accent);font-weight:600" onclick="openCrudModal('comercializadoras','Comercializadora',null)">+ Añadir</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-mb',this)">
+      <span><span class="ico">🏗️</span> Multi Bancas</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-mb">
+      <button class="nav-sub-item" onclick="navigate('bloques','Multi Bancas')">📋 Lista</button>
+      <button class="nav-sub-item" style="color:var(--accent);font-weight:600" onclick="openCrudModal('bloques','Multi Banca',null)">+ Añadir</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-dist',this)">
+      <span><span class="ico">🚚</span> Distribuidores</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-dist">
+      <button class="nav-sub-item" onclick="navigate('distribuidores','Distribuidores')">📋 Lista</button>
+      <button class="nav-sub-item" style="color:var(--accent);font-weight:600" onclick="openCrudModal('distribuidores','Distribuidor',null)">+ Añadir</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-banc',this)">
+      <span><span class="ico">🏪</span> Bancas</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-banc">
+      <button class="nav-sub-item" onclick="navigate('bancas','Bancas')">📋 Lista</button>
+      <button class="nav-sub-item" style="color:var(--accent);font-weight:600" onclick="openCrudModal('bancas','Banca',null)">+ Añadir</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-ca',this)" id="ni-ca">
+      <span><span class="ico">🏬</span> Centros de Apuesta</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-ca">
+      <button class="nav-sub-item" onclick="navigate('agencias','Centro de Apuesta')">📋 Lista</button>
+      <button class="nav-sub-item" style="color:var(--accent);font-weight:600" onclick="openCrudModal('agencias','Centro de Apuesta',null)">+ Crear</button>
+      <button class="nav-sub-header">Configuración</button>
+      <button class="nav-sub-item" onclick="renderAgenciaPreferencias()">⚙️ Preferencias</button>
+      <button class="nav-sub-item" onclick="renderAgenciaPorcentajes()">📊 Porcentajes</button>
+      <button class="nav-sub-item" onclick="renderAgenciaCupos()">🎯 Cupos</button>
+      <button class="nav-sub-item" onclick="renderAgenciaRiesgo()">⚠️ Factor de Riesgo</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-taq',this)">
+      <span><span class="ico">🎟️</span> Taquillas</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-taq">
+      <button class="nav-sub-item" onclick="navigate('taquillas','Taquillas')">📋 Lista</button>
+      <button class="nav-sub-item" style="color:var(--accent);font-weight:600" onclick="openCrudModal('taquillas','Taquilla',null)">+ Añadir</button>
+      <button class="nav-sub-item" onclick="navigate('usuariostaquilla','Usuarios Taquilla')">👤 Usuarios Taquilla</button>
+      <button class="nav-sub-item" style="color:var(--accent);font-weight:600" onclick="openCrudModal('usuariostaquilla','Usuario Taquilla',null)">+ Añadir Usuario</button>
+    </div>
+  </div>
+
+  <!-- ③ OPERACIONES DIARIAS -->
+  <div class="nav-section">
+    <div class="nav-label">Operaciones Diarias</div>
+
+    <div class="nav-item" onclick="toggleSub('sub-lot',this)">
+      <span><span class="ico">🎰</span> Loterías y Sorteos</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-lot">
+      <button class="nav-sub-item" onclick="navigate('loterias','Loterías')">🎯 Loterías</button>
+      <button class="nav-sub-item" onclick="navigate('productoloteria','Productos Lotería')">📦 Productos</button>
+      <button class="nav-sub-item" onclick="navigate('sorteos','Sorteos')">🔢 Sorteos</button>
+      <button class="nav-sub-item" onclick="navigate('fechas','Fechas Jornada')">🗓️ Fechas Jornada</button>
+      <button class="nav-sub-item" onclick="navigate('plantillas','Plantillas')">📋 Plantillas</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-bet',this)">
+      <span><span class="ico">🎫</span> Tickets de Apuesta</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-bet">
+      <button class="nav-sub-item" onclick="navigate('tickets','Tickets de Apuesta')">🎫 Todos los Tickets</button>
+      <button class="nav-sub-item" style="color:var(--accent);font-weight:600" onclick="renderTicketsAdd()">➕ Añadir Ticket</button>
+      <button class="nav-sub-item" onclick="navigate('ticketsdetail','Detalle de Tickets')">📋 Detalle</button>
+      <button class="nav-sub-item" onclick="navigate('ticketstatus','Estado del Ticket')">🔖 Estado Ticket</button>
+      <button class="nav-sub-item" onclick="navigate('ticketstype','Tipos de Ticket')">🗂️ Tipos de Ticket</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-anim',this)">
+      <span><span class="ico">🐾</span> Animalitos</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-anim">
+      <button class="nav-sub-item" onclick="navigate('animalitos','Animalitos')">🐾 Animalitos</button>
+      <button class="nav-sub-item" onclick="navigate('grupoanimales','Grupos de Animales')">📁 Grupos</button>
+      <button class="nav-sub-item" onclick="navigate('animalfigura','Figuras Animalito')">🖼️ Figuras</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-res',this)">
+      <span><span class="ico">🏆</span> Resultados</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-res">
+      <button class="nav-sub-item" onclick="navigate('resultadossorteo','Resultados Sorteo')">🏆 Ingresar Resultado</button>
+      <button class="nav-sub-item" onclick="navigate('resultados','Resultados')">📊 Ver Resultados</button>
+      <button class="nav-sub-item" onclick="navigate('anotaciones','Anotaciones')">📝 Anotaciones</button>
+      <button class="nav-sub-item" onclick="navigate('resultadosrestric','Restricciones')">🚫 Restricciones</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-status',this)">
+      <span><span class="ico">🚦</span> Status Sistema</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-status">
+      <button class="nav-sub-item" onclick="navigate('statuslist','Lista de Status')">🚦 Status</button>
+      <button class="nav-sub-item" onclick="navigate('statusdetail','Detalle Status')">📋 Detalle</button>
+      <button class="nav-sub-item" onclick="navigate('taquillastatusdetail','Status Taquilla')">🎟️ Status Taquilla</button>
+    </div>
+  </div>
+
+  <!-- ④ REPORTES Y FINANZAS -->
+  <div class="nav-section">
+    <div class="nav-label">Reportes y Finanzas</div>
+
+    <div class="nav-item" onclick="toggleSub('sub-rep',this)" id="ni-ventas">
+      <span><span class="ico">📊</span> Reportes de Venta</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-rep">
+      <button class="nav-sub-item" onclick="renderReportesLinea()">📈 Venta en Línea</button>
+      <button class="nav-sub-item" onclick="renderReportesProducto()">📦 Por Juego / Producto</button>
+      <button class="nav-sub-item" onclick="renderReportesRiesgo()">⚠️ Riesgo de Venta</button>
+      <button class="nav-sub-item" onclick="renderCuadre()">📊 Cuadre por Agencia</button>
+      <button class="nav-sub-item" onclick="renderLiquidaciones()">🧾 Liquidaciones</button>
+      <button class="nav-sub-item" onclick="renderResumenAdmin()">📅 Resumen Administrativo</button>
+      <button class="nav-sub-item" onclick="renderDiasTrabajo()">🗓️ Días de Trabajo</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-mov',this)">
+      <span><span class="ico">🔄</span> Movimientos Fin.</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-mov">
+      <button class="nav-sub-item" onclick="navigate('movimientos','Movimientos')">↕️ Todos los Movimientos</button>
+      <button class="nav-sub-item" style="color:var(--accent);font-weight:600" onclick="openCrudModal('movimientos','Movimiento',null)">+ Añadir Movimiento</button>
+      <button class="nav-sub-item" onclick="navigate('estatocuenta','Estado de Cuenta')">📊 Estado de Cuenta</button>
+      <button class="nav-sub-item" onclick="navigate('cuentas','Cuentas')">🏦 Cuentas</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-bancos',this)">
+      <span><span class="ico">🏦</span> Bancos y Cuentas</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-bancos">
+      <button class="nav-sub-item" onclick="navigate('bancos','Bancos')">🏦 Bancos</button>
+      <button class="nav-sub-item" style="color:var(--accent);font-weight:600" onclick="openCrudModal('bancos','Banco',null)">+ Añadir Banco</button>
+      <button class="nav-sub-item" onclick="navigate('tipocuenta','Tipos de Cuenta')">📒 Tipos de Cuenta</button>
+      <button class="nav-sub-item" onclick="navigate('tipomovimiento','Tipos de Movimiento')">↕️ Tipos Movimiento</button>
+    </div>
+  </div>
+
+  <!-- ⑤ CONFIGURACIÓN -->
+  <div class="nav-section">
+    <div class="nav-label">Configuración</div>
+
+    <div class="nav-item" onclick="toggleSub('sub-juego2',this)">
+      <span><span class="ico">🎲</span> Estructura de Juego</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-juego2">
+      <button class="nav-sub-item" onclick="navigate('sistemajuego','Sistemas de Juego')">⚙️ Sistemas de Juego</button>
+      <button class="nav-sub-item" onclick="navigate('tipoproducto','Tipos de Producto')">🗂️ Tipos de Producto</button>
+      <button class="nav-sub-item" onclick="navigate('periodosorteo','Periodos Sorteo')">📅 Periodos Sorteo</button>
+      <button class="nav-sub-item" onclick="navigate('grupossorteo','Grupos Sorteo')">📁 Grupos Sorteo</button>
+      <button class="nav-sub-item" onclick="navigate('sorteo','Sorteos (Config.)')">🎰 Sorteos Config.</button>
+      <button class="nav-sub-item" onclick="navigate('sorteodetalle','Detalle Sorteo')">📄 Detalle Sorteo</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-modalidades',this)">
+      <span><span class="ico">🎯</span> Modalidades y Números</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-modalidades">
+      <button class="nav-sub-item" onclick="navigate('modalidadjuego','Modalidades Juego')">🎯 Modalidades Juego</button>
+      <button class="nav-sub-item" onclick="navigate('modalidadapuesta','Modalidades Apuesta')">🎲 Modalidades Apuesta</button>
+      <button class="nav-sub-item" onclick="navigate('sorteomodalidades','Sorteo Modalidades')">🔗 Sorteo Modalidades</button>
+      <button class="nav-sub-item" onclick="navigate('gruposapuesta','Grupos Apuesta')">📦 Grupos Apuesta</button>
+      <button class="nav-sub-item" onclick="navigate('condiciones','Condiciones')">📏 Condiciones</button>
+      <button class="nav-sub-item" onclick="navigate('tiponumerosorteo','Tipo Número')">🔤 Tipo Número</button>
+      <button class="nav-sub-item" onclick="navigate('numerosorteo','Números Sorteo')">🔢 Números Sorteo</button>
+      <button class="nav-sub-item" onclick="navigate('plantillajugada','Plantillas Jugada')">📋 Plantillas Jugada</button>
+      <button class="nav-sub-item" onclick="navigate('restriccionessorteo','Restricciones')">🚫 Restricciones</button>
+      <button class="nav-sub-item" onclick="navigate('limitecentro','Límites Centro')">📊 Límites Centro</button>
+      <button class="nav-sub-item" onclick="navigate('jugadasinformativas','Jugadas Informativas')">ℹ️ Jugadas Info</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-params',this)">
+      <span><span class="ico">⚙️</span> Parámetros Comerciales</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-params">
+      <button class="nav-sub-item" onclick="navigate('tipoporcentajes','Tipo Porcentajes')">📊 Tipo Porcentajes</button>
+      <button class="nav-sub-item" onclick="navigate('porcentajes','Porcentajes')">📈 Porcentajes</button>
+      <button class="nav-sub-item" onclick="navigate('cupos','Cupos')">🔢 Cupos</button>
+      <button class="nav-sub-item" onclick="navigate('factorriesgo','Factor Riesgo')">⚠️ Factor Riesgo</button>
+      <button class="nav-sub-item" onclick="navigate('datadefault','Datos Default')">📋 Datos Default</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-prefs',this)">
+      <span><span class="ico">🎛️</span> Preferencias</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-prefs">
+      <button class="nav-sub-item" onclick="navigate('grouppreferences','Grupos Preferencias')">🗂️ Grupos</button>
+      <button class="nav-sub-item" onclick="navigate('typepreferences','Tipos Preferencias')">🔤 Tipos</button>
+      <button class="nav-sub-item" onclick="navigate('defaultpreferences','Prefs Default')">📌 Valores Default</button>
+      <button class="nav-sub-item" onclick="navigate('preferences','Preferencias')">⚙️ Preferencias</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-geo',this)">
+      <span><span class="ico">🗺️</span> Geografía</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-geo">
+      <button class="nav-sub-item" onclick="navigate('paises','Países')">🌎 Países</button>
+      <button class="nav-sub-item" onclick="navigate('estados','Estados')">📍 Estados</button>
+      <button class="nav-sub-item" onclick="navigate('municipios','Municipios')">🏙️ Municipios</button>
+      <button class="nav-sub-item" onclick="navigate('parroquias','Parroquias')">🏘️ Parroquias</button>
+      <button class="nav-sub-item" onclick="navigate('direcciones','Direcciones')">📮 Direcciones</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-themes',this)">
+      <span><span class="ico">🎨</span> Apariencia</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-themes">
+      <button class="nav-sub-item" onclick="navigate('themes','Temas / Plantillas')">🎨 Temas</button>
+      <button class="nav-sub-item" onclick="navigate('company','Empresas')">🏢 Empresas</button>
+    </div>
+  </div>
+
+  <!-- ⑥ SEGURIDAD Y ACCESOS -->
+  <div class="nav-section">
+    <div class="nav-label">Seguridad y Accesos</div>
+
+    <div class="nav-item" onclick="toggleSub('sub-adm',this)">
+      <span><span class="ico">👥</span> Usuarios</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-adm">
+      <button class="nav-sub-item" onclick="navigate('usuarios','Usuarios')">👥 Usuarios Admin</button>
+      <button class="nav-sub-item" onclick="navigate('gruposadmin','Grupos Admin')">🛡️ Grupos Admin</button>
+      <button class="nav-sub-item" onclick="navigate('usuariostaquilla','Usuarios Taquilla')">🎟️ Usuarios Taquilla</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-perm',this)">
+      <span><span class="ico">🛡️</span> Permisos</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-perm">
+      <button class="nav-sub-item" onclick="navigate('menus','Menús')">📋 Menús</button>
+      <button class="nav-sub-item" onclick="navigate('permisos','Permisos')">🔑 Permisos</button>
+      <button class="nav-sub-item" onclick="navigate('grupospermisologia','Grupos Permisos')">🛡️ Grupos</button>
+      <button class="nav-sub-item" onclick="navigate('permisosventas','Permisos de Venta')">💰 Permisos Venta</button>
+      <button class="nav-sub-item" onclick="navigate('permisosventasrestric','Restricciones Venta')">🚫 Restric. Venta</button>
+    </div>
+
+    <div class="nav-item" onclick="toggleSub('sub-hist',this)">
+      <span><span class="ico">🕐</span> Histórico / Audit.</span><span class="chev">›</span>
+    </div>
+    <div class="nav-sub" id="sub-hist">
+      <button class="nav-sub-item" onclick="navigate('usersprocesos','Procesos Usuario')">⚙️ Procesos</button>
+      <button class="nav-sub-item" onclick="navigate('sesiones','Sesiones Admin')">🔐 Sesiones Admin</button>
+      <button class="nav-sub-item" onclick="navigate('taquillasesiones','Sesiones Taquilla')">🎟️ Sesiones Taquilla</button>
+      <button class="nav-sub-item" onclick="navigate('sesionesdetail','Detalle Sesiones')">📋 Detalle Sesiones</button>
+    </div>
+  </div>
+
+  <!-- ⑦ MI CUENTA -->
+  <div class="nav-section">
+    <div class="nav-label">Mi Cuenta</div>
+    <div class="nav-item" id="nav-profile" onclick="navigate('__profile__','Mi Perfil')">
+      <span><span class="ico">👤</span> Mi Perfil</span>
+    </div>
+    <div class="nav-item" onclick="navigate('__settings__','Configuración')">
+      <span><span class="ico">⚙️</span> Configuración</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <button class="btn-sm" onclick="window.open('/admin/','_blank')">🔧 Admin</button>
+    <button class="btn-sm" onclick="toggleTheme()">☀️ Tema</button>
+  </div>
+</aside>

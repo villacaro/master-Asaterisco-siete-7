@@ -1,0 +1,399 @@
+
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load url from future %}
+
+{% block content %}
+
+{% load static %}
+<div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-chart-bar"></i> Hoja de banco</h1>
+                            {% include 'admin_finanzas/diatrabajo/dia_view.html' %}
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li>
+                                  <a href="{% url 'admin_finanzas_resumenadministrativo_general' %}"> <i class="icon-industrial-building"></i> Resumen administrativo</a>
+                                </li>
+                                <li> 
+                                  <i class="icon-chart-bar"></i> 
+                                  Hoja de banco</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+
+     
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                        <div class="panel-head">
+                          <p class="left">Hoja de banco</p>
+                          {% if consulta %}
+                          <div class="title right">
+                              <a id="expandir" class="btn btn-mini btn-icon"> - </a>
+                          </div>
+                          {% endif %}
+                          </div>
+
+                   <div>
+                   
+                    <form id="form_resumen_administrativo" action='' method='post' encoding='utf-8'>
+                      {% csrf_token %}
+
+
+                        <div class="panel-body panel-filters">
+                          <div class="row">
+                            
+                            <div class="col-xs-12">
+                              <div class="form-margin">
+                                
+                                <div class="row form form-group">
+                                  <div class="col-xs-4">
+                                    <div class="form-label">
+                                    </div>
+                                  </div>
+                                  <div class="col-xs-6">
+
+                                      <h3 class="title">
+                                          {{ object.get_object.get_verbose_name }} :
+                                        <span class="link-red">
+                                          {{ object.get_object }}
+                                        </span>
+                                      </h3>
+                                      
+                                  </div>
+
+                                </div>
+
+                                <div class="row form form-group">
+                                 
+
+                                  <div class="col-xs-4">
+                                            <div class="form-label">{{ form.filter_fecha.label }}</div>
+                                          </div>
+                                          
+                                          <div class="col-xs-8">
+                                            {{ form.filter_fecha }}
+                                          </div>
+                                          <div class="col-xs-3">
+                                            {%  if form.filter_fecha.errors %}   
+                                              <div class="alert alert-warning">{{ form.filter_fecha.errors }}</div>
+                                            {% endif %}
+                                          </div>
+                                </div>
+                                
+                              </div>
+                            </div>
+                            
+                          </div>
+                        </div>
+                        <div class="panel-footer panel-shadow">
+                              
+                              <div class="col-xs-6">
+                                <p>
+
+                                </p>
+                              </div>
+
+                        </div>
+                        
+                      </div>
+
+                      </form> 
+
+                      </div>
+                    </div>
+
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                           <div class="panel-head">
+
+                              <div class="title left">
+                                 <a href="{% url 'admin_finanzas_resumenadministrativo_comercializadora_list' comercializadora=comercializadora.pk %}" class='btn btn-mini'>
+                                    <span class="">←</span> Atras
+                                 </a> 
+                              </div>
+
+                              <div class="title left">
+                                 <a href="" class='btn btn-mini'>
+                                    <i class="icon-arrows-ccw"></i>  Recargar
+                                 </a> 
+                              </div>
+                          <!--
+                             {% if cache_key %}
+                              <div class="title right">
+                                <a class="btn btn-mini btn-pdf" target="_blank" href="{% url 'admin_finanzas_resumenadministrativo_hojabanco_print_pdf' cache_key=cache_key %}">
+                                  <i class="icon-print"></i>PDF
+                                </a>  
+                              </div>
+                              <div class="title right">
+                                <a class="btn btn-mini btn-excel" target="_blank" href="{% url 'admin_finanzas_resumenadministrativo_hojabanco_print_csv' cache_key=cache_key %}"><i class="icon-download"></i>EXCEL
+                                </a>  
+                              </div>
+                            {% endif %}
+                          -->
+                          </div>
+                          <div class="panel-body panel-body-border panel-shadow" >
+                              <table class='table table-striped table-panel table-small table-hover' id='table_resumen'>
+                                <thead>
+                                  <tr>
+                                      
+                                      <th width="">
+                                        Nro.
+                                      </th>
+                                      <th width="10%">
+                                        Dia
+                                      </th>
+                                      <th width="10%">
+                                        Fecha
+                                      </th>
+
+                                      <th width="">
+                                        Saldo Anterior
+                                      </th>
+                                      
+                                      <th width="">
+                                        Saldo oper
+                                      </th>
+                                      
+                                      <th width="">
+                                        Depósito
+                                      </th>
+                                      <th width="">
+                                        Pagos
+                                      </th>
+                                      <th width="">
+                                        Ajustes
+                                      </th>
+                                      <th width="">
+                                        Cargos
+                                      </th>
+                                      <th width="">
+                                        Saldo Actual
+                                      </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% for object in objects %}
+                                      
+                                    {% for obj in object.get_diccionario.movimientos.detalle %}
+                                      <tr>
+
+                                        <td >
+                                         {{obj.count }}
+                                        </td>
+                                        <td>
+                                           {{ object.dia.fecha|date:"l"|capfirst}}
+                                        </td>
+                                        <td>
+                                           {{ object.dia.fecha|date:"d-m-Y"}}
+                                        </td>
+
+                                        <td class="text-align-right ">
+                                          {% if obj.saldo_anterior = 0 %}
+                                            0
+                                          {% else %}
+                                            <span class="{% if obj.saldo_anterior < 0 %} link-red {% endif %} ">
+                                            {{ obj.saldo_anterior|floatformat:2 }}
+                                            </span>
+                                          {% endif %}
+                                        </td>  
+                                        
+                                        <td class="text-align-right ">
+                                            0
+                                        </td>  
+                                         <td class="text-align-right ">
+                                          {% if obj.tipo_deposito = 0 %}
+                                            0
+                                          {% else %}
+                                           <span class="link-red">
+                                            {{ obj.tipo_deposito|floatformat:2 }}
+                                           </span>
+                                          {% endif %}
+                                        </td>  
+                                        <td class="text-align-right ">
+                                          {% if obj.tipo_pago = 0 %}
+                                            0
+                                          {% else %}
+                                            <span class="{% if obj.tipo_pago > 0 %} link-blue {% endif %} ">
+                                            {{ obj.tipo_pago|floatformat:2 }}
+                                            </span>
+                                          {% endif %}
+                                        </td>  
+                                        <td class="text-align-right ">
+                                          {% if obj.tipo_ajuste = 0 %}
+                                            0
+                                          {% else %}
+                                            <span class="{% if obj.tipo_ajuste < 0 %} link-red {% endif %} ">
+                                            {{ obj.tipo_ajuste|floatformat:2 }}
+                                            </span>
+                                          {% endif %}
+                                        </td>  
+                                        <td class="text-align-right ">
+                                            0
+                                        </td>  
+                                        <td class="text-align-right ">
+                                          {% if obj.saldo_actual = 0 %}
+                                            0
+                                          {% else %}
+                                            <span class="{% if obj.saldo_actual < 0 %} link-red {% endif %} ">
+                                            {{ obj.saldo_actual|floatformat:2 }}
+                                            </span>
+                                          {% endif %}
+                                        </td> 
+
+                                      </tr>
+                                    {% endfor %}
+
+
+                                  <tr>
+                                    
+                                  
+                                    <td >
+                                     
+                                     {{ object.get_diccionario.movimientos.count }}
+
+                                    </td>
+                                    <td>
+                                       {{ object.dia.fecha|date:"l"|capfirst}}
+                                    </td>
+                                    <td>
+                                       {{ object.dia.fecha|date:"d-m-Y"}}
+                                    </td>
+                                    <td class="text-align-right ">
+                                      {% if object.get_diccionario.movimientos.saldo_anterior = 0 %}
+                                        0
+                                      {% else %}
+                                        <span class="{% if object.get_diccionario.movimientos.saldo_anterior < 0 %} link-red {% endif %} ">
+                                        {{ object.get_diccionario.movimientos.saldo_anterior|floatformat:2 }}
+                                        </span>
+                                      {% endif %}
+                                    </td>  
+                                    
+                                    <td class="text-align-right ">
+                                      {% if object.saldo_oper = 0 %}
+                                        0
+                                      {% else %}
+                                        <span class="{% if object.saldo_oper < 0 %} link-red {% endif %} ">
+                                        {{ object.saldo_oper|floatformat:2 }}
+                                        </span>
+                                      {% endif %}
+                                    </td>  
+                                    <td class="text-align-right ">
+                                        0
+                                    </td>  
+                                    <td class="text-align-right ">
+                                      0
+                                    </td>  
+                                    <td class="text-align-right ">
+                                      0
+                                    </td>  
+                                    <td class="text-align-right ">
+                                      0
+                                    </td>  
+                                    <td class="text-align-right ">
+                                      {% if object.get_saldo_actual = 0 %}
+                                        0
+                                      {% else %}
+                                        <span class="{% if object.get_saldo_actual < 0 %} link-red {% endif %} ">
+                                        {{ object.get_saldo_actual|floatformat:2 }}
+                                        </span>
+                                      {% endif %}
+                                    </td>  
+                                  </tr>
+                                  {% endfor %}
+                                  
+                                </tbody>
+                                  
+                                <tfoot>
+                                  <tr class="text-align-right">
+                                    <td colspan="4">
+                                        Total
+                                    </td>
+                                    
+                                    <td class="text-align-right ">
+                                      {% if objects_sum.saldo_oper__sum = 0 %}
+                                        0
+                                      {% else %}
+                                        <span class="{% if objects_sum.saldo_oper__sum < 0 %} link-red {% endif %} ">
+                                        {{ objects_sum.saldo_oper__sum|floatformat:2 }}
+                                        </span>
+                                      {% endif %}
+                                    </td>  
+                                     <td class="text-align-right ">
+                                      {% if objects_sum.deposito__sum = 0 %}
+                                        0
+                                      {% else %}
+                                       <span class="link-red">
+                                        {{ objects_sum.deposito__sum|floatformat:2 }}
+                                       </span>
+                                      {% endif %}
+                                    </td>  
+                                    <td class="text-align-right ">
+                                      {% if objects_sum.pago__sum = 0 %}
+                                        0
+                                      {% else %}
+                                        <span class="{% if objects_sum.pago__sum > 0 %} link-blue {% endif %} ">
+                                        {{ objects_sum.pago__sum|floatformat:2 }}
+                                        </span>
+                                      {% endif %}
+                                    </td>  
+                                    <td class="text-align-right ">
+                                      {% if objects_sum.ajuste__sum = 0 %}
+                                        0
+                                      {% else %}
+                                        <span class="{% if objects_sum.ajuste__sum < 0 %} link-red {% endif %} ">
+                                        {{ objects_sum.ajuste__sum|floatformat:2 }}
+                                        </span>
+                                      {% endif %}
+                                    </td>  
+                                    <td class="text-align-right ">
+                                      {% if objects_sum.cargo__sum = 0 %}
+                                        0
+                                      {% else %}
+                                        {{ objects_sum.cargo__sum|floatformat:2 }}
+                                      {% endif %}
+                                    </td>  
+                                    <td class="text-align-right ">
+                                      {% if objects_sum.saldo_actual__sum = 0 %}
+                                        0
+                                      {% else %}
+                                        <span class="{% if objects_sum.saldo_actual__sum < 0 %} link-red {% endif %} ">
+                                        {{ objects_sum.saldo_actual__sum|floatformat:2 }}
+                                        </span>
+                                      {% endif %}
+                                    </td> 
+                                    
+
+                                  </tr>
+                                  
+                                </tfoot>
+
+                              </table>
+
+                          </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+            </div>
+
+
+{% endblock %}
+{% block js %}
+<script>
+
+  $(".filter_movimientos").on("change", function(){
+          $("#form_resumen_administrativo").submit();      
+  });
+
+</script>
+{% endblock %}

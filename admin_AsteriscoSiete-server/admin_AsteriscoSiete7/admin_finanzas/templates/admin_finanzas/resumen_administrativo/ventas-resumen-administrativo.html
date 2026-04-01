@@ -1,0 +1,232 @@
+
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load url from future %}
+{% load humanize %}
+
+
+{% block content %}
+
+<!--Incluimos el js para finanzas-->
+{% load static %}
+<div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-document"></i> {{verbose}}</h1>
+                            {% include 'admin_finanzas/diatrabajo/dia_view.html' %}
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><i class="icon-document"></i> {{verbose}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+
+     
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                        <div class="panel-head">
+                          <p class="left">{{verbose}}</p>
+                          
+                          {% if importar_saldo %}
+                          <div class="title right">
+                            <a href='{% url "admin_finanzas_resumenadministrativo_general_import" %}?next_url={{next_url}}' class='btn btn-success' type='submit'>
+                                Importar saldos
+                            </a>
+                          </div>
+                          {% endif %}
+
+                          
+                          </div>
+
+                   {% if consulta %}
+                     <div id="barra" class="">
+                   {% else %}
+                       <div>
+                   {% endif %}
+                    
+                        </div>
+                      </div>
+                    </div>
+
+                    {% if consulta %}
+
+                    <div class="col-xs-12">
+                      <div class="panel panel-default">
+                           <div class="panel-head">
+                           {% if consulta.cache_key %}
+                              <div class="title right">
+                                <a class="btn btn-mini btn-pdf" target="_blank" href="{% url 'admin_finanzas_resumenadministrativo_general_print_pdf' cache_key=consulta.cache_key %}">
+                                  <i class="icon-print"></i>PDF
+                                </a>  
+                              </div>
+                              <div class="title right">
+                                <a class="btn btn-mini btn-excel" target="_blank" href="{% url 'admin_finanzas_resumenadministrativo_general_print_csv' cache_key=consulta.cache_key %}"><i class="icon-download"></i>EXCEL
+                                </a>  
+                              </div>
+                            {% endif %}
+                          </div>
+                          <div class="panel-body panel-body-border panel-shadow" >
+                              <table class='table table-striped table-panel table-small table-hover' id='table_resumen'>
+                                <thead>
+                                  <tr>
+                                    {% for title in consulta.titles %}
+                                      <th width="{{ title.width }}" title="{{ title.title }}">
+                                        {{ title.text|safe }}
+                                      </th>
+                                    {% endfor %}
+                                  </tr>
+                                </thead>
+                                
+                                <tfoot>
+                                  <tr>
+                                    
+                                    <td class="text-align-right" colspan="2">
+                                      <strong>Total</strong>
+                                    </td>
+
+                                    {% for tabulador in tabuladores %}
+                                      <td class="text-align-right ">
+                                        
+                                      </td>  
+                                    {% endfor %}
+                                    
+                                    <td class="text-align-right ">
+                                      {% if consulta.totales.venta = 0 %}
+                                        0
+                                      {% else %}
+                                        {{ consulta.totales.venta|intcomma }}
+                                      {% endif %}
+                                    </td>  
+
+                                    <td class="text-align-right">
+                                      
+                                      {% if consulta.totales.premio = 0 %}
+                                        0
+                                      {% else %}
+                                        <span class="link-red">
+                                        {{ consulta.totales.premio|intcomma }}
+                                        </span>
+                                      {% endif %}
+                                      
+                                    </td>  
+
+                                    <td class="text-align-right ">
+                                      {% if consulta.totales.comision = 0 %}
+                                        0
+                                      {% else %}
+                                        {{ consulta.totales.comision|intcomma }}
+                                      {% endif %}
+                                    </td>  
+
+                                    <td class="text-align-right ">
+                                      {% if consulta.totales.regalia = 0 %}
+                                        0
+                                      {% else %}
+                                        {{ consulta.totales.regalia|intcomma }}
+                                      {% endif %}
+                                    </td>  
+
+                                    <td class="text-align-right ">
+                                      {% if consulta.totales.saldo = 0 %}
+                                        0
+                                      {% else %}
+                                        {{ consulta.totales.saldo|intcomma }}
+                                      {% endif %}
+                                    </td>  
+                                    
+                                    <td class="text-align-right ">
+                                      {% if consulta.totales.operador = 0 %}
+                                        0
+                                      {% else %}
+                                        {{ consulta.totales.operador|intcomma }}
+                                      {% endif %}
+                                    </td>  
+                                     <td class="text-align-right ">
+                                      {% if consulta.totales.depositos = 0 %}
+                                        0
+                                      {% else %}
+                                       <span class="link-red">
+                                        {{ consulta.totales.depositos|intcomma }}
+                                       </span>
+                                      {% endif %}
+                                    </td>  
+                                    <td class="text-align-right ">
+                                      {% if consulta.totales.pagos = 0 %}
+                                        0
+                                      {% else %}
+                                        <span class="{% if consulta.totales.pagos > 0 %} link-blue {% endif %} ">
+                                        {{ consulta.totales.pagos|intcomma }}
+                                        </span>
+                                      {% endif %}
+                                    </td>  
+                                    <td class="text-align-right ">
+                                      {% if consulta.totales.ajustes = 0 %}
+                                        0
+                                      {% else %}
+                                        <span class="{% if consulta.totales.ajustes < 0 %} link-red {% endif %} ">
+                                        {{ consulta.totales.ajustes|intcomma }}
+                                        </span>
+                                      {% endif %}
+                                    </td>  
+                                    <td class="text-align-right ">
+                                      {% if consulta.totales.cargos = 0 %}
+                                        0
+                                      {% else %}
+                                        {{ consulta.totales.cargos|intcomma }}
+                                      {% endif %}
+                                    </td>  
+                                    <td class="text-align-right ">
+                                      
+                                    </td>  
+
+                                  </tr>
+                                </tfoot>
+                                
+                                <tbody>
+                                  {% for contenido in consulta.detalle %}
+                                  <tr>
+                                      {% for item in contenido %}
+                                      <td class="{{item.class}}">
+                                        {% if item.html %}
+                                          {{ item.val|safe }}
+                                        {% else %}
+
+                                            {% if item.val = 0 %}
+                                              0
+                                            {% else %}
+                                              {{ item.val|intcomma }}
+                                            {% endif %}
+                                        {% endif %}
+                                      </td>
+                                      {% endfor %}
+                                  </tr>
+                                  {% endfor %}
+                                  
+                                </tbody>
+                                
+                              </table>
+
+                          </div>
+                      </div>
+                    </div>
+
+                    {% endif %}
+
+                  </div>
+                </div>
+            </div>
+
+
+{% endblock %}
+{% block js %}
+<script>
+
+</script>
+{% endblock %}

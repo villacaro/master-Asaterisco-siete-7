@@ -1,0 +1,122 @@
+{% extends "admin/base_site.html" %}
+{% load i18n sorteo_filters %}
+
+{% block title %}Control de Sorteos – Matriz{% endblock %}
+
+{% block content_title %}
+<h1 style="font-size:1.4rem;font-weight:700;margin-bottom:0.5rem;">
+  🎰 Control de Sorteos — Apertura y Cierre
+</h1>
+<p style="color:#6b7280;font-size:0.85rem;margin-bottom:1.5rem;">
+  ✅ Verde = Abierto &nbsp;|&nbsp; ⬜ Vacío = Cerrado &nbsp;|&nbsp; Haz clic en el checkbox para cambiar el estado. Luego haz clic en <strong>Guardar Cambios</strong>.
+</p>
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+<ul class="messagelist">
+  {% for message in messages %}
+  <li class="{{ message.tags }}">{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<form method="post" action="">
+  {% csrf_token %}
+
+  <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.1);">
+      <!-- Header -->
+      <thead>
+        <tr style="background:#1e293b;color:#fff;">
+          <th style="padding:0.75rem 1rem;text-align:left;font-size:0.85rem;font-weight:700;min-width:150px;">Juego</th>
+          {% for horario in horarios %}
+          <th style="padding:0.75rem 0.5rem;text-align:center;font-size:0.82rem;font-weight:700;min-width:100px;">{{ horario }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+
+      <!-- Body -->
+      <tbody>
+        {% for sorteo_label, sorteo_code in sorteos %}
+        <tr style="border-bottom:1px solid #e5e7eb;{% cycle 'background:#f9fafb;' 'background:#fff;' %}">
+          <td style="padding:0.7rem 1rem;font-weight:600;font-size:0.85rem;color:#1e293b;">
+            {{ sorteo_label }}
+          </td>
+          {% for horario in horarios %}
+            {% with key=sorteo_code|add:"-"|add:horario %}
+            <td style="padding:0.5rem;text-align:center;">
+              {% if matrix|dict_get:key %}
+                {# Sorteo exists - show toggle #}
+                {% with obj=matrix|dict_get:key %}
+                <label style="cursor:pointer;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:6px;
+                  {% if obj.abierto %}background:#16a34a;{% else %}background:#e5e7eb;border:2px solid #d1d5db;{% endif %}
+                  transition:all 0.2s;" title="{% if obj.abierto %}Abierto - click para cerrar{% else %}Cerrado - click para abrir{% endif %}">
+                  <input type="checkbox" name="sorteo_{{ obj.id }}"
+                    {% if obj.abierto %}checked{% endif %}
+                    style="display:none;"
+                    onchange="toggleCell(this)">
+                  {% if obj.abierto %}
+                  <svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:3;" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  {% endif %}
+                </label>
+                {% endwith %}
+              {% else %}
+                <span style="color:#d1d5db;font-size:0.7rem;">—</span>
+              {% endif %}
+            </td>
+            {% endwith %}
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Save button -->
+  <div style="margin-top:1.5rem;display:flex;gap:1rem;align-items:center;">
+    <button type="submit"
+      style="background:#16a34a;color:#fff;border:none;padding:0.6rem 2rem;border-radius:6px;font-size:0.9rem;font-weight:700;cursor:pointer;transition:background 0.2s;"
+      onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">
+      💾 Guardar Cambios
+    </button>
+    <a href="../" style="color:#6b7280;font-size:0.85rem;text-decoration:none;">← Volver al listado</a>
+  </div>
+</form>
+
+<!-- Leyenda -->
+<div style="margin-top:2rem;padding:1rem;background:#f1f5f9;border-radius:8px;display:flex;gap:2rem;">
+  <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;">
+    <span style="width:28px;height:28px;background:#16a34a;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;">
+      <svg style="width:16px;height:16px;fill:none;stroke:#fff;stroke-width:3;" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+    </span>
+    <span><strong>Abierto</strong> – Las apuestas están permitidas</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;">
+    <span style="width:28px;height:28px;background:#e5e7eb;border:2px solid #d1d5db;border-radius:5px;display:inline-block;"></span>
+    <span><strong>Cerrado</strong> – Las apuestas están bloqueadas</span>
+  </div>
+</div>
+
+<script>
+function toggleCell(checkbox) {
+  const label = checkbox.closest('label');
+  const isChecked = checkbox.checked;
+  if (isChecked) {
+    label.style.background = '#16a34a';
+    label.style.border = 'none';
+    label.innerHTML = checkbox.outerHTML +
+      '<svg style="width:18px;height:18px;fill:none;stroke:#fff;stroke-width:3;" viewBox="0 0 24 24">' +
+      '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
+  } else {
+    label.style.background = '#e5e7eb';
+    label.style.border = '2px solid #d1d5db';
+    label.innerHTML = checkbox.outerHTML;
+  }
+  // Restore the onchange
+  label.querySelector('input').onchange = function() { toggleCell(this); };
+}
+</script>
+{% endblock %}

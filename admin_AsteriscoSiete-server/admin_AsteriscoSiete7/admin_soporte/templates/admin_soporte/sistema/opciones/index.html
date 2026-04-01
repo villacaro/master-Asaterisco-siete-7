@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!--Incluimos el js para finanzas-->
+{% load static %}
+              <div class="row">
+                <div class="col-xs-12">
+                   <div class="page-toolbar page-toolbar-default">
+                        <div class="page-toolbar-body page-toolbar-border">
+                            <h1><i class="icon-ticket"></i>Soporte</h1>
+                        </div>
+                        <div class="page-toolbar-footer page-toolbar-shadow">
+                            <ul class="breadcrumb">
+                                <li><a href="/"><i class="icon-home"></i> Inicio</a></li>
+                                <li><i class="icon-ticket"></i>Gestion de sistema</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                  <div class="container-margin">
+
+                    <form id='form' action='' method='post' encoding='utf-8'>
+                      {% csrf_token %}
+
+                          <div class="col-xs-12">
+                            <div class="panel panel-default">
+                            <div class="panel-head">
+                              
+                              {% if view.object_comercializadora.prefix_filter == 'master' %}
+                              <p class="title left">
+                                <button name="_process" value="cache_clear" class='btn btn-large btn-danger' type='submit'><i class="icon-delete"></i>Cache
+                                </button>
+                              </p>
+                              {% endif %}
+                             
+                            </div>
+                            <div class="panel-body panel-head-border">
+                              <div class="form-margin">
+
+                                {% for item in form %}
+                                  <div class="row form form-group">
+                                    <div class="col-xs-3">
+                                      <div class="form-label">
+                                        {{ item.label }}
+                                      </div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                      {{ item }}
+                                    </div>
+                                  </div>
+                                {% endfor %}
+                              </div>
+
+                  
+
+
+
+                              
+                                
+                                  <!--
+                                     <div class="col-xs-6">
+                                      <p>
+                                        <button name="_process" value="cache_clear" class='btn btn-large btn-danger' type='submit'>
+                                          <i class="icon-delete"></i>
+                                           Cache
+                                        </button>
+                                      </p>
+                                  </div>
+
+                                   <div class="col-xs-6">
+                                      <p>
+                                        <button name="_process" value="WS_MAINTENANCE_BET-False" class='btn btn-large btn-success' type='submit'>
+                                           Habilitar venta en taquilla
+                                        </button>
+                                      </p>
+                                  </div>
+
+                                  <div class="col-xs-6">
+                                      <p>
+                                        <button name="_process" value="WS_MAINTENANCE_PAY-True" class='btn btn-large btn-danger' type='submit'>
+                                           Deshabilitar pago de tickects en taquilla
+                                        </button>
+                                      </p>
+                                  </div>
+
+                                   <div class="col-xs-6">
+                                      <p>
+                                        <button name="_process" value="WS_MAINTENANCE_PAY-False" class='btn btn-large btn-success' type='submit'>
+                                           Habilitar pago de tickects en taquilla
+                                        </button>
+                                      </p>
+                                  </div>
+
+                                  <div class="col-xs-6">
+                                      <p>
+                                        <button name="_process" value="WS_MAINTENANCE_GLOBAL-True" class='btn btn-large btn-danger' type='submit'>
+                                           Deshabilitar conexión taquilla
+                                        </button>
+                                      </p>
+                                  </div>
+
+                                   <div class="col-xs-6">
+                                      <p>
+                                        <button name="_process" value="WS_MAINTENANCE_GLOBAL-False" class='btn btn-large btn-success' type='submit'>
+                                           Habilitar conexión taquilla
+                                        </button>
+                                      </p>
+                                  </div>
+
+                                  <div class="col-xs-6">
+                                      <p>
+                                        <button name="_process" value="PANEL_MAINTENANCE-True" class='btn btn-large btn-danger' type='submit'>
+                                           Deshabilitar conexión en el panel
+                                        </button>
+                                      </p>
+                                  </div>
+
+                                   <div class="col-xs-6">
+                                      <p>
+                                        <button name="_process" value="PANEL_MAINTENANCE-False" class='btn btn-large btn-success' type='submit'>
+                                           Habilitar conexión en el panel
+                                        </button>
+                                      </p>
+                                  </div>
+
+                                   <div class="col-xs-6">
+                                      <p>
+                                        <button name="_process" value="" class='btn btn-large btn-default' type='submit'>
+                                          --------------
+                                        </button>
+                                      </p>
+                                  </div>
+
+                                  <div class="col-xs-6">
+                                      <p>
+                                        <button name="_process" value="" class='btn btn-large btn-default' type='submit'>
+                                          --------------
+                                        </button>
+                                      </p>
+                                  </div>
+
+                              </div>
+                              -->
+
+                            
+                          </div>
+                          <div class="panel-footer panel-shadow">
+                              
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+              </div>
+                      </div>
+{% endblock %}
+
+{% block js %}
+<script>
+  $("input:checkbox").bootstrapSwitch('onColor', 'success');
+  $("input:checkbox").bootstrapSwitch('offColor', 'danger');
+
+  $(":checkbox").on('switchChange.bootstrapSwitch',function(){
+    this_selected = this
+    $(":checkbox").each(function(){
+      if (this!=this_selected){
+        this.disabled = true;
+      }
+    });
+    
+    if ($(this).is(':checked') == false){
+      $(this).prop("checked",true);
+    }
+    console.log($("#form").serialize());
+    $("#form").submit();
+  });
+  
+
+
+  $('#id_frecuencia_semanal').datetimepicker({
+    format:'d-m-Y',
+    lang:'es',
+    onShow:function( ct ){
+
+    },
+    onChangeDateTime:function(dp,$input){
+    
+    },
+    timepicker:false
+  });
+
+  $('#id_frecuencia_quincenal').datetimepicker({
+    format:'d-m-Y',
+    lang:'es',
+    onShow:function( ct ){
+
+    },
+    onChangeDateTime:function(dp,$input){
+    
+    },
+    timepicker:false
+  });
+
+  $('#id_frecuencia_mensual').datetimepicker({
+    format:'d-m-Y',
+    lang:'es',
+    onShow:function( ct ){
+
+    },
+    onChangeDateTime:function(dp,$input){
+    
+    },
+    timepicker:false
+  });
+
+</script>
+{% endblock %}

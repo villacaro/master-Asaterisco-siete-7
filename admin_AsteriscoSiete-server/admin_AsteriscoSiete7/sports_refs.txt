@@ -1,0 +1,48 @@
+﻿=== DEPORTE (87 refs) ===
+  L21: 'deporte':            (1, 'Loter├¡as'),            # antes: TipoProducto
+  L126: ['ID Loter├¡a',  self.data['deporte_id']],
+  L137: ['Sistema',         self.data.get('deporte_id', '-')],
+  L146: ['ID Loter├¡a',       self.data.get('deporte_id', '-')],
+  L159: ['ID Loter├¡a',          self.data['deporte_id']],
+=== TORNEO (27 refs) ===
+  L808: return 'jugada__encuentros_modalidad__encuentro__jornada__temporadas__torneo__de
+  L896: prefix_filter = 'torneo'
+  L901: nombre(string): nombre del torneo o liga
+  L903: logo(imagen): logo del torneo
+  L909: deporte(foreign): deporte al cual pertenece el torneo, ejemplo
+=== TEMPORADA (73 refs) ===
+  L22: 'temporada':          (2, 'Tipos de Sorteo'),     # antes: PeriodoSorteo
+  L124: ['Tipo',        self.data['temporada']],
+  L210: return ('admin_juego_temporadas_detail', (), {'pk': self.pk_origin})
+  L808: return 'jugada__encuentros_modalidad__encuentro__jornada__temporadas__torneo__de
+  L984: return 'jugada__encuentros_modalidad__encuentro__jornada__temporadas__torneo_id'
+=== JORNADA (74 refs) ===
+  L23: 'jornada':            (3, 'Horarios de Sorteo'),  # antes: Fechas
+  L132: ['Sorteo',          self.data['jornada']],
+  L133: ['Hora de Cierre',  self.data.get('hora_cierre', self.data.get('jornada', '-'))]
+  L152: ['Sorteo',              self.data.get('nombre_sorteo', self.data.get('jornada_id
+  L158: ['ID Tipo de Sorteo',   self.data['jornada_id']],
+=== ENCUENTRO (235 refs) ===
+  L25: 'encuentro':          (5, 'Sorteos del d├¡a'),     # antes: Sorteo
+  L26: 'encuentro_modalidad':(6, 'Resultados Loter├¡a'),  # antes: Referencias
+  L169: ['ID Sorteo',        self.data.get('encuentro_id', '-')],
+  L219: return ('admin_juego_encuentros_detail', (), {'pk': self.pk_origin})
+  L228: self.data.get('encuentro_id', self.pk_origin),
+=== EQUIPO (95 refs) ===
+  L24: 'equipos':            (4, 'Animalitos/Figuras'),  # antes: ModalidadJuego
+  L216: return ('admin_juego_equipos_detail', (), {'pk': self.pk_origin})
+  L672: orden_equipos(entero): entero tipo choice que indica el orden de impreseion de l
+  L681: de 2 o mas equipos
+  L714: CHOICES_ORDEN_EQUIPOS = (
+=== JUGADOR (38 refs) ===
+  L856: {"pk": jugador_tipo["pk"] * -1}
+  L857: for jugador_tipo in self.jugadortipo_set.all().values("pk")
+  L1254: """TipoNumeroSorteo: Tipos de jugadores
+  L1259: codename(string): codigo del tipo de jugador
+  L1261: deporte(foreign): deporte al que pertenece dicho tipo de jugador
+=== LIGA (21 refs) ===
+  L136: ['ID Tipo',         self.data.get('liga_id', '-')],
+  L196: ['ID Loter├¡a',  self.data.get('liga_id', '-')],
+  L901: nombre(string): nombre del torneo o liga
+  L945: verbose_name='Liga por Fechas ',
+  L951: verbose_name='Liga por grupos ',

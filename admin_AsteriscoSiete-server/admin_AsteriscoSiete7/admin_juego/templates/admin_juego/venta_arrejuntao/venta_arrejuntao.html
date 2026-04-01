@@ -1,0 +1,722 @@
+{% extends "admin_asterisco_sietesports/base.html" %}
+{% load static %}
+
+{% block title %}Venta — EL ARREJUNTAO | Sistema Asterisco Siete (*7){% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ── Variables de marca ───────────────────────────────────────── */
+  :root {
+    --ast7-primary:   #1a237e;
+    --ast7-accent:    #ffd600;
+    --ast7-success:   #00c853;
+    --ast7-danger:    #d50000;
+    --ast7-card-bg:   #f5f7ff;
+    --ast7-ticket-bg: #fffde7;
+  }
+
+  body { background: #eef0f8; }
+
+  /* ── Header de producto ───────────────────────────────────────── */
+  .ast7-header {
+    background: linear-gradient(135deg, var(--ast7-primary) 0%, #283593 100%);
+    color: #fff;
+    border-radius: 10px 10px 0 0;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .ast7-header h5 { margin: 0; font-size: 1.1rem; }
+  .ast7-header .badge-sorteo {
+    background: var(--ast7-accent);
+    color: #000;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+
+  /* ── Pestañas de Modalidad ────────────────────────────────────── */
+  .nav-pills-ast7 .nav-link {
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ast7-primary);
+    border: 2px solid transparent;
+    padding: 5px 14px;
+    transition: all .2s;
+  }
+  .nav-pills-ast7 .nav-link.active,
+  .nav-pills-ast7 .nav-link:hover {
+    background: var(--ast7-primary);
+    color: #fff !important;
+    border-color: var(--ast7-primary);
+  }
+
+  /* ── Panel de entrada ─────────────────────────────────────────── */
+  #panel-entrada {
+    background: var(--ast7-card-bg);
+    border: 1px solid #c5cae9;
+    border-radius: 8px;
+    padding: 16px;
+  }
+  #input-numero {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-align: center;
+    border: 2px solid var(--ast7-primary);
+    border-radius: 8px;
+  }
+  #input-monto {
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-align: right;
+    border: 2px solid var(--ast7-primary);
+    border-radius: 8px;
+  }
+
+  /* ── Grid de Animalitos ───────────────────────────────────────── */
+  #grid-animalitos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    gap: 6px;
+    max-height: 420px;
+    overflow-y: auto;
+    padding: 8px;
+    background: var(--ast7-card-bg);
+    border: 1px solid #c5cae9;
+    border-radius: 8px;
+  }
+  .btn-animal {
+    background: #fff;
+    border: 2px solid #c5cae9;
+    border-radius: 8px;
+    padding: 6px 4px;
+    cursor: pointer;
+    transition: all .15s;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--ast7-primary);
+    line-height: 1.2;
+  }
+  .btn-animal:hover { border-color: var(--ast7-primary); background: #e8eaf6; transform: scale(1.04); }
+  .btn-animal.selected { border-color: var(--ast7-success); background: #e8f5e9; }
+  .btn-animal .num-figure { font-size: 0.65rem; color: #888; }
+  .btn-animal .nombre-animal { font-size: 0.68rem; }
+  .btn-animal .emoji-animal { font-size: 1.5rem; display: block; }
+
+  /* ── Panel Ticket ─────────────────────────────────────────────── */
+  .ticket-card {
+    background: var(--ast7-ticket-bg);
+    border: 2px dashed #bcaaa4;
+    border-radius: 10px;
+    font-family: 'Courier New', monospace;
+  }
+  .ticket-header {
+    background: var(--ast7-primary);
+    color: #fff;
+    border-radius: 8px 8px 0 0;
+    padding: 10px 14px;
+    text-align: center;
+  }
+  .ticket-header small { color: var(--ast7-accent); }
+  #tabla-ticket td, #tabla-ticket th { padding: 4px 6px; font-size: 0.82rem; }
+  .badge-tipo {
+    font-size: 0.68rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 700;
+  }
+  .total-bar {
+    background: var(--ast7-primary);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 0 0 8px 8px;
+  }
+  .total-bar h4 { margin: 0; }
+  #total-ticket { color: var(--ast7-accent); }
+
+  /* ── Botón vender ─────────────────────────────────────────────── */
+  #btn-vender {
+    background: var(--ast7-success);
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border-radius: 8px;
+    padding: 12px;
+    width: 100%;
+    color: #fff;
+    margin-top: 8px;
+    transition: all .2s;
+  }
+  #btn-vender:hover { background: #00a043; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,200,83,.4); }
+  #btn-vender:disabled { background: #bdbdbd; transform: none; box-shadow: none; }
+  #btn-limpiar { border-radius: 8px; width: 100%; margin-top: 6px; font-weight: 600; }
+
+  /* ── Alertas ──────────────────────────────────────────────────── */
+  #alert-box { display: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-3">
+
+  <!-- Alerta de errores -->
+  <div id="alert-box" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span id="alert-msg"></span>
+    <button type="button" class="close" onclick="ocultarAlerta()"><span>&times;</span></button>
+  </div>
+
+  <div class="row">
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL IZQUIERDO: Entrada de apuestas
+    ════════════════════════════════════════════════════════════ -->
+    <div class="col-md-8 mb-3">
+      <div class="card shadow-sm" style="border:none;">
+
+        <!-- Header -->
+        <div class="ast7-header">
+          <div>
+            <h5>⭐ <strong>SISTEMA ASTERISCO SIETE (*7)</strong></h5>
+            <div style="font-size:.85rem; color:#b0bec5;">
+              Producto: <strong>EL ARREJUNTAO</strong> &nbsp;|&nbsp;
+              Sorteo: <span class="badge-sorteo" id="badge-sorteo">{{ sorteo_nombre|default:"Sin sorteo" }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+
+          <!-- Pestañas de Modalidad -->
+          <ul class="nav nav-pills-ast7 mb-3 flex-wrap" id="pills-tab">
+            <li class="nav-item mr-1 mb-1">
+              <a class="nav-link active" id="tab-triple" onclick="cambiarModo('TRIPLE')" href="#">
+                🎯 Triples / Terminales
+              </a>
+            </li>
+            <li class="nav-item mr-1 mb-1">
+              <a class="nav-link" id="tab-signo" onclick="cambiarModo('SIGNO')" href="#">
+                ♈ Zodiacal
+              </a>
+            </li>
+            <li class="nav-item mr-1 mb-1">
+              <a class="nav-link" id="tab-especial" onclick="cambiarModo('ESPECIAL')" href="#">
+                🔢 Arrimao / Pegadito
+              </a>
+            </li>
+            <li class="nav-item mb-1">
+              <a class="nav-link" id="tab-animalito" onclick="cambiarModo('ANIMALITO')" href="#">
+                🐅 Animalitos (77)
+              </a>
+            </li>
+          </ul>
+
+          <!-- Panel de entrada de números -->
+          <div id="panel-entrada">
+            <div class="row align-items-end">
+
+              <!-- Selector A / B →  Lotería -->
+              <div class="col-6 col-md-2 mb-2" id="grupo-ab">
+                <label class="font-weight-bold small">Lotería</label>
+                <select class="form-control" id="loteria_tipo">
+                  <option value="TRIPLE_A">Triple A</option>
+                  <option value="TRIPLE_B">Triple B</option>
+                </select>
+              </div>
+
+              <!-- Entrada de número -->
+              <div class="col-6 col-md-3 mb-2">
+                <label class="font-weight-bold small" id="label-numero">Número</label>
+                <input type="text" class="form-control" id="input-numero"
+                       maxlength="3" placeholder="000"
+                       oninput="filtrarSoloDigitos(this)"
+                       onkeyup="if(event.key==='Enter') agregarApuesta()">
+              </div>
+
+              <!-- Selector de Signo (oculto por defecto) -->
+              <div class="col-6 col-md-3 mb-2 d-none" id="grupo-signo">
+                <label class="font-weight-bold small">Signo Astral</label>
+                <select class="form-control" id="select-signo">
+                  <option value="ARIES">♈ Aries</option>
+                  <option value="TAURO">♉ Tauro</option>
+                  <option value="GEMINIS">♊ Géminis</option>
+                  <option value="CANCER">♋ Cáncer</option>
+                  <option value="LEO">♌ Leo</option>
+                  <option value="VIRGO">♍ Virgo</option>
+                  <option value="LIBRA">♎ Libra</option>
+                  <option value="ESCORPIO">♏ Escorpio</option>
+                  <option value="SAGITARIO">♐ Sagitario</option>
+                  <option value="CAPRICORNIO">♑ Capricornio</option>
+                  <option value="ACUARIO">♒ Acuario</option>
+                  <option value="PISCIS">♓ Piscis</option>
+                </select>
+              </div>
+
+              <!-- Monto -->
+              <div class="col-6 col-md-3 mb-2">
+                <label class="font-weight-bold small">Monto Bs.</label>
+                <input type="number" class="form-control" id="input-monto"
+                       placeholder="0.00" min="0.01" step="0.01"
+                       onkeyup="if(event.key==='Enter') agregarApuesta()">
+              </div>
+
+              <!-- Botón agregar -->
+              <div class="col-12 col-md-1 mb-2">
+                <button class="btn btn-success btn-block font-weight-bold"
+                        style="font-size:1.4rem; border-radius:8px;"
+                        onclick="agregarApuesta()" title="Agregar al ticket">+</button>
+              </div>
+
+            </div><!-- /row -->
+          </div><!-- /panel-entrada -->
+
+          <!-- ── Grid de Animalitos ─────────────────────────────── -->
+          <div id="grid-animalitos" class="mt-3 d-none"></div>
+
+          <!-- Monto para animalitos (visible solo en ese modo) -->
+          <div id="panel-monto-animal" class="mt-2 d-none">
+            <div class="row align-items-end justify-content-center">
+              <div class="col-md-4">
+                <label class="font-weight-bold small">
+                  Animal seleccionado: <span id="label-animal-sel" class="text-primary">—</span>
+                </label>
+                <input type="number" class="form-control form-control-lg" id="input-monto-animal"
+                       placeholder="Monto Bs." min="0.01" step="0.01"
+                       onkeyup="if(event.key==='Enter') agregarAnimal()">
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-success btn-block" style="font-size:1.2rem;" onclick="agregarAnimal()">+</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /card-body -->
+      </div><!-- /card -->
+    </div><!-- /col-md-8 -->
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL DERECHO: Ticket
+    ════════════════════════════════════════════════════════════ -->
+    <div class="col-md-4 mb-3">
+      <div class="ticket-card shadow-sm">
+
+        <!-- Header ticket -->
+        <div class="ticket-header">
+          <div style="font-size:1rem; font-weight:700;">🏆 ASTERISCO SIETE (*7)</div>
+          <small>EL ARREJUNTAO &nbsp;|&nbsp; Ticket #<span id="num-ticket">0001</span></small>
+          <div style="font-size:.78rem; color:#b0bec5; margin-top:2px;" id="info-sorteo">
+            {{ sorteo_nombre|default:"" }}
+          </div>
+        </div>
+
+        <!-- Tabla de apuestas -->
+        <div style="padding:8px;">
+          <table class="table table-sm table-borderless mb-0">
+            <thead>
+              <tr style="border-bottom:1px dashed #999;">
+                <th>Jugada</th>
+                <th>Número</th>
+                <th class="text-right">Monto</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tabla-ticket">
+              <tr id="row-vacio">
+                <td colspan="4" class="text-center text-muted py-3">
+                  <em>Sin apuestas aún…</em>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Total y botones -->
+        <div class="total-bar text-center">
+          <h4>TOTAL: Bs. <span id="total-ticket">0.00</span></h4>
+        </div>
+        <div style="padding:10px;">
+          <button id="btn-vender" onclick="venderTicket()" disabled>
+            🖨️ VENDER / IMPRIMIR
+          </button>
+          <button id="btn-limpiar" class="btn btn-outline-secondary btn-sm" onclick="limpiarTicket()">
+            🗑️ Limpiar ticket
+          </button>
+        </div>
+
+      </div><!-- /ticket-card -->
+    </div><!-- /col-md-4 -->
+
+  </div><!-- /row -->
+</div><!-- /container -->
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   SISTEMA ASTERISCO SIETE (*7) — Pantalla de Venta EL ARREJUNTAO
+   ══════════════════════════════════════════════════════════════════ */
+
+// ── Datos de los 77 Animalitos (inyectados desde el backend) ────────
+const ANIMALITOS = {
+  "00":"Ballena","0":"Delfín","1":"Carnero","2":"Toro","3":"Ciempiés",
+  "4":"Alacrán","5":"León","6":"Rana","7":"Perico","8":"Ratón","9":"Águila",
+  "10":"Tigre","11":"Gato","12":"Caballo","13":"Mono","14":"Paloma",
+  "15":"Zorro","16":"Oso","17":"Pavo","18":"Burro","19":"Loro",
+  "20":"Cochino","21":"Gallo","22":"Camello","23":"Cebra","24":"Iguana",
+  "25":"Gallina","26":"Vaca","27":"Perro","28":"Zamuro","29":"Elefante",
+  "30":"Caimán","31":"Lapa","32":"Ardilla","33":"Pescado","34":"Venado",
+  "35":"Jirafa","36":"Conejo","37":"Mariposa","38":"Serpiente",
+  "39":"Cocodrilo","40":"Pelícano","41":"Murciélago","42":"Pato",
+  "43":"Pantera","44":"Dinosaurio","45":"Tortuga","46":"Lobo",
+  "47":"Guacamaya","48":"Flamenco","49":"Langosta","50":"Pulpo",
+  "51":"Tiburón","52":"Cangrejo","53":"Garza","54":"Lechuza","55":"Puma",
+  "56":"Manatí","57":"Cóndor","58":"Avestruz","59":"Pingüino",
+  "60":"Rinoceronte","61":"Hipopótamo","62":"Gorila","63":"Mapache",
+  "64":"Armadillo","65":"Nutria","66":"Colibrí","67":"Halcón",
+  "68":"Búfalo","69":"Llama","70":"Canguro","71":"Koala","72":"Panda",
+  "73":"Hipopótamo","74":"Turpial","75":"Bestia Ganadora"
+};
+
+// Emojis de representación para cada figura
+const ANIMAL_EMOJI = {
+  "00":"🐋","0":"🐬","1":"🐏","2":"🐂","3":"🐛","4":"🦂","5":"🦁",
+  "6":"🐸","7":"🦜","8":"🐭","9":"🦅","10":"🐯","11":"🐱","12":"🐴",
+  "13":"🐒","14":"🕊️","15":"🦊","16":"🐻","17":"🦃","18":"🫏","19":"🦜",
+  "20":"🐷","21":"🐓","22":"🐪","23":"🦓","24":"🦎","25":"🐔","26":"🐄",
+  "27":"🐶","28":"🦅","29":"🐘","30":"🐊","31":"🦫","32":"🐿️","33":"🐟",
+  "34":"🦌","35":"🦒","36":"🐰","37":"🦋","38":"🐍","39":"🐊","40":"🦩",
+  "41":"🦇","42":"🦆","43":"🐆","44":"🦕","45":"🐢","46":"🐺","47":"🦚",
+  "48":"🦢","49":"🦞","50":"🐙","51":"🦈","52":"🦀","53":"🐦","54":"🦉",
+  "55":"🐱","56":"🐬","57":"🦅","58":"🦜","59":"🐧","60":"🦏","61":"🦛",
+  "62":"🦍","63":"🦝","64":"🐾","65":"🦦","66":"🐦","67":"🦅","68":"🐃",
+  "69":"🦙","70":"🦘","71":"🐨","72":"🐼","73":"🦛","74":"🐦","75":"⭐"
+};
+
+// ── Estado del ticket actual ─────────────────────────────────────────
+let ticket = [];     // [{tipo, numero, signo, monto, label}]
+let modoActual = 'TRIPLE';
+let animalSeleccionado = null;   // {figura, nombre}
+let contadorTicket = 1;
+
+// ── Colores de badge por tipo de jugada ──────────────────────────────
+const BADGE_COLORES = {
+  'TRIPLE_A':'#1a237e','TRIPLE_B':'#283593',
+  'TERMINAL_A':'#4a148c','TERMINAL_B':'#6a1b9a',
+  'TRIPLE_SIGNO_A':'#880e4f','TRIPLE_SIGNO_B':'#ad1457',
+  'TERMINAL_SIGNO_A':'#bf360c','TERMINAL_SIGNO_B':'#e64a19',
+  'ARRIMAO':'#1b5e20','PAGADITO':'#004d40','ANIMALITO':'#e65100',
+};
+
+
+// ════════════════════════════════════════════════════════════════════
+// 1. Cambio de Modalidad
+// ════════════════════════════════════════════════════════════════════
+function cambiarModo(modo) {
+  modoActual = modo;
+
+  const inputNum    = document.getElementById('input-numero');
+  const labelNum    = document.getElementById('label-numero');
+  const grupoSigno  = document.getElementById('grupo-signo');
+  const grupoAB     = document.getElementById('grupo-ab');
+  const gridAnimales= document.getElementById('grid-animalitos');
+  const panelEntrada= document.getElementById('panel-entrada');
+  const panelAnimal = document.getElementById('panel-monto-animal');
+  const loteriaSelect = document.getElementById('loteria_tipo');
+
+  // Reset visual
+  document.querySelectorAll('.nav-pills-ast7 .nav-link').forEach(el => el.classList.remove('active'));
+
+  // Reset campos
+  grupoSigno.classList.add('d-none');
+  grupoAB.classList.remove('d-none');
+  gridAnimales.classList.add('d-none');
+  panelEntrada.classList.remove('d-none');
+  panelAnimal.classList.add('d-none');
+  inputNum.value = '';
+
+  if (modo === 'TRIPLE') {
+    document.getElementById('tab-triple').classList.add('active');
+    inputNum.maxLength = 3;
+    inputNum.placeholder = '000';
+    labelNum.textContent = 'Triple (3 dígitos)';
+    // Actualiza opciones de lotería
+    loteriaSelect.innerHTML = `
+      <option value="TRIPLE_A">Triple A</option>
+      <option value="TRIPLE_B">Triple B</option>
+      <option value="TERMINAL_A">Terminal A</option>
+      <option value="TERMINAL_B">Terminal B</option>`;
+
+  } else if (modo === 'SIGNO') {
+    document.getElementById('tab-signo').classList.add('active');
+    grupoSigno.classList.remove('d-none');
+    inputNum.maxLength = 3;
+    inputNum.placeholder = '000';
+    labelNum.textContent = 'Triple (3 dígitos)';
+    loteriaSelect.innerHTML = `
+      <option value="TRIPLE_SIGNO_A">Triple Signo A</option>
+      <option value="TRIPLE_SIGNO_B">Triple Signo B</option>
+      <option value="TERMINAL_SIGNO_A">Terminal Signo A</option>
+      <option value="TERMINAL_SIGNO_B">Terminal Signo B</option>`;
+
+  } else if (modo === 'ESPECIAL') {
+    document.getElementById('tab-especial').classList.add('active');
+    grupoAB.classList.add('d-none');
+    inputNum.maxLength = 5;
+    inputNum.placeholder = '00000';
+    labelNum.textContent = 'Número';
+    loteriaSelect.innerHTML = `
+      <option value="ARRIMAO">El Arrimao (4 díg.)</option>
+      <option value="PAGADITO">El Pegadito (5 díg.)</option>`;
+    grupoAB.classList.remove('d-none');
+
+  } else if (modo === 'ANIMALITO') {
+    document.getElementById('tab-animalito').classList.add('active');
+    panelEntrada.classList.add('d-none');
+    gridAnimales.classList.remove('d-none');
+    panelAnimal.classList.remove('d-none');
+    generarGridAnimalitos();
+  }
+
+  inputNum.focus();
+}
+
+
+// ════════════════════════════════════════════════════════════════════
+// 2. Grid de Animalitos
+// ════════════════════════════════════════════════════════════════════
+function generarGridAnimalitos() {
+  const container = document.getElementById('grid-animalitos');
+  if (container.dataset.generado === '1') return;   // Solo generamos una vez
+
+  const orden = ['00', '0', ...Array.from({length:75},(_,i)=>String(i+1))];
+  let html = '';
+
+  orden.forEach(fig => {
+    const nombre = ANIMALITOS[fig] || 'Animal';
+    const emoji  = ANIMAL_EMOJI[fig] || '🐾';
+    html += `
+      <button class="btn-animal" id="btn-animal-${fig}"
+              onclick="seleccionarAnimal('${fig}')"
+              title="${nombre}">
+        <span class="num-figure">#${fig.padStart(2,'0')}</span>
+        <span class="emoji-animal">${emoji}</span>
+        <span class="nombre-animal">${nombre}</span>
+      </button>`;
+  });
+
+  container.innerHTML = html;
+  container.dataset.generado = '1';
+}
+
+function seleccionarAnimal(figura) {
+  // Deseleccionar anterior
+  if (animalSeleccionado) {
+    const prevBtn = document.getElementById('btn-animal-' + animalSeleccionado.figura);
+    if (prevBtn) prevBtn.classList.remove('selected');
+  }
+  animalSeleccionado = { figura, nombre: ANIMALITOS[figura] || 'Animal' };
+  const btn = document.getElementById('btn-animal-' + figura);
+  if (btn) btn.classList.add('selected');
+
+  document.getElementById('label-animal-sel').textContent =
+    `#${figura.padStart(2,'0')} — ${animalSeleccionado.nombre}`;
+  document.getElementById('input-monto-animal').focus();
+}
+
+function agregarAnimal() {
+  if (!animalSeleccionado) {
+    mostrarAlerta('Selecciona un animalito primero.');
+    return;
+  }
+  const monto = parseFloat(document.getElementById('input-monto-animal').value);
+  if (!monto || monto <= 0) {
+    mostrarAlerta('Ingresa un monto válido.');
+    return;
+  }
+  agregarLineaTicket({
+    tipo:   'ANIMALITO',
+    numero: animalSeleccionado.figura,
+    signo:  null,
+    monto,
+    label:  `Animalito #${animalSeleccionado.figura} (${animalSeleccionado.nombre})`,
+  });
+  document.getElementById('input-monto-animal').value = '';
+  // Deseleccionar
+  const btn = document.getElementById('btn-animal-' + animalSeleccionado.figura);
+  if (btn) btn.classList.remove('selected');
+  animalSeleccionado = null;
+  document.getElementById('label-animal-sel').textContent = '—';
+}
+
+
+// ════════════════════════════════════════════════════════════════════
+// 3. Agregar apuesta al ticket (modo Triple/Signo/Especial)
+// ════════════════════════════════════════════════════════════════════
+function agregarApuesta() {
+  const tipo   = document.getElementById('loteria_tipo').value;
+  const numero = document.getElementById('input-numero').value.trim();
+  const monto  = parseFloat(document.getElementById('input-monto').value);
+  const signo  = document.getElementById('grupo-signo').classList.contains('d-none')
+                 ? null
+                 : document.getElementById('select-signo').value;
+
+  // Validaciones
+  if (!numero) { mostrarAlerta('Ingresa un número.'); return; }
+  if (!numero.match(/^\d+$/)) { mostrarAlerta('Solo se permiten dígitos.'); return; }
+  if (!monto || monto <= 0)  { mostrarAlerta('Ingresa un monto válido.'); return; }
+
+  const digitos = { TRIPLE_A:3, TRIPLE_B:3, TERMINAL_A:2, TERMINAL_B:2,
+                    TRIPLE_SIGNO_A:3, TRIPLE_SIGNO_B:3, TERMINAL_SIGNO_A:2, TERMINAL_SIGNO_B:2,
+                    ARRIMAO:4, PAGADITO:5 };
+  const digEsperados = digitos[tipo];
+  const numLimpio = numero.padStart(digEsperados, '0');
+
+  if (numLimpio.length !== digEsperados) {
+    mostrarAlerta(`El tipo "${tipo}" requiere ${digEsperados} dígito(s). Recibido: ${numero.length}`);
+    return;
+  }
+
+  const labelSigno = signo ? ` / ${signo}` : '';
+  agregarLineaTicket({
+    tipo, numero: numLimpio, signo, monto,
+    label: `${tipo.replace(/_/g,' ')} ${numLimpio}${labelSigno}`,
+  });
+
+  document.getElementById('input-numero').value = '';
+  document.getElementById('input-numero').focus();
+}
+
+
+// ════════════════════════════════════════════════════════════════════
+// 4. Lógica del Ticket
+// ════════════════════════════════════════════════════════════════════
+function agregarLineaTicket(apuesta) {
+  ticket.push(apuesta);
+  renderTicket();
+}
+
+function eliminarLinea(idx) {
+  ticket.splice(idx, 1);
+  renderTicket();
+}
+
+function renderTicket() {
+  const tbody = document.getElementById('tabla-ticket');
+  const rowVacio = document.getElementById('row-vacio');
+  const btnVender = document.getElementById('btn-vender');
+
+  if (ticket.length === 0) {
+    tbody.innerHTML = '';
+    tbody.appendChild(rowVacio);
+    rowVacio.style.display = '';
+    document.getElementById('total-ticket').textContent = '0.00';
+    btnVender.disabled = true;
+    return;
+  }
+
+  rowVacio.style.display = 'none';
+  let total = 0;
+  tbody.innerHTML = ticket.map((ap, i) => {
+    total += ap.monto;
+    const color = BADGE_COLORES[ap.tipo] || '#333';
+    const labelSigno = ap.signo ? ` <small style="color:#888">${ap.signo}</small>` : '';
+    return `
+      <tr>
+        <td>
+          <span class="badge-tipo" style="background:${color};color:#fff;">
+            ${ap.tipo.replace(/_/g,' ')}
+          </span>
+        </td>
+        <td style="font-family:monospace;font-weight:700;">
+          ${ap.numero}${labelSigno}
+        </td>
+        <td class="text-right font-weight-bold">
+          ${ap.monto.toFixed(2)}
+        </td>
+        <td>
+          <button class="btn btn-link btn-sm text-danger p-0" onclick="eliminarLinea(${i})"
+                  title="Eliminar">✕</button>
+        </td>
+      </tr>`;
+  }).join('');
+
+  document.getElementById('total-ticket').textContent = total.toFixed(2);
+  btnVender.disabled = false;
+}
+
+function limpiarTicket() {
+  if (ticket.length > 0 && !confirm('¿Limpiar el ticket?')) return;
+  ticket = [];
+  renderTicket();
+}
+
+
+// ════════════════════════════════════════════════════════════════════
+// 5. Vender / Imprimir ticket
+// ════════════════════════════════════════════════════════════════════
+function venderTicket() {
+  if (ticket.length === 0) return;
+
+  const payload = {
+    sorteo_id: '{{ sorteo_id|default:"" }}',
+    apuestas:  ticket,
+    csrfmiddlewaretoken: '{{ csrf_token }}',
+  };
+
+  document.getElementById('btn-vender').disabled = true;
+  document.getElementById('btn-vender').textContent = '⏳ Procesando…';
+
+  fetch('/asterisco7/vender/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+    body: JSON.stringify(payload),
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.status === 'success') {
+      // Incrementar contador y limpiar
+      contadorTicket++;
+      document.getElementById('num-ticket').textContent = String(contadorTicket).padStart(4, '0');
+      alert(`✅ Ticket vendido!\nSerial: ${data.serial || '—'}\nTotal: Bs. ${data.total || ''}`);
+      limpiarTicket();
+    } else {
+      mostrarAlerta(data.msg || 'Error al vender el ticket.');
+    }
+  })
+  .catch(err => mostrarAlerta('Error de conexión: ' + err))
+  .finally(() => {
+    document.getElementById('btn-vender').disabled = ticket.length === 0;
+    document.getElementById('btn-vender').textContent = '🖨️ VENDER / IMPRIMIR';
+  });
+}
+
+
+// ════════════════════════════════════════════════════════════════════
+// Utilidades
+// ════════════════════════════════════════════════════════════════════
+function filtrarSoloDigitos(input) {
+  input.value = input.value.replace(/\D/g, '');
+}
+
+function mostrarAlerta(msg) {
+  const box = document.getElementById('alert-box');
+  document.getElementById('alert-msg').textContent = msg;
+  box.style.display = 'block';
+  setTimeout(ocultarAlerta, 4000);
+}
+
+function ocultarAlerta() {
+  document.getElementById('alert-box').style.display = 'none';
+}
+
+// Inicializar en modo TRIPLE al cargar
+document.addEventListener('DOMContentLoaded', () => cambiarModo('TRIPLE'));
+</script>
+{% endblock %}

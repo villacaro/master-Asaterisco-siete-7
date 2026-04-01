@@ -1,0 +1,282 @@
+﻿Migrations for 'admin_profiles':
+  admin_profiles\migrations\0001_initial.py
+    + Create model Estados
+    + Create model Paises
+    + Create model Municipios
+    + Add field pais to estados
+    + Create model Parroquias
+    + Create model Direcciones
+Migrations for 'admin_themes':
+  admin_themes\migrations\0001_initial.py
+    + Create model Company
+    + Create model Theme
+    + Create model Color
+Migrations for 'admin_comercializacion':
+  admin_comercializacion\migrations\0001_initial.py
+    + Create model AgenciaDataDefault
+    + Create model Bancas
+    + Create model Bloques
+    + Create model Cupos
+    + Create model DataDefault
+    + Create model DefaultPreferences
+    + Create model Distribuidores
+    + Create model EventNotificationCadena
+    + Create model FactorRiesgo
+    + Create model GroupPreferences
+    + Create model Operadoras
+    + Create model Porcentajes
+    + Create model Preferences
+    + Create model TaquillaDataDefault
+    + Create model Taquillas
+    + Create model TicketsDataDefault
+    + Create model TipoPorcentajes
+    + Create model TypePreferences
+    + Create model UsuariosTaquilla
+    + Create model Agencias
+  admin_comercializacion\migrations\0002_initial.py
+    + Add field status to agencias
+    + Add field direccion to bancas
+    + Add field status to bancas
+    + Add field direccion to bloques
+    + Add field status to bloques
+    + Add field bloque to bancas
+    + Add field agencia to cupos
+    + Add field banca to cupos
+    + Add field bloque to cupos
+    + Add field user_type to datadefault
+    + Add field banca to distribuidores
+    + Add field direccion to distribuidores
+    + Add field status to distribuidores
+    + Add field distribuidor to cupos
+    + Add field distribuidores to agencias
+    + Add field comercializadora to factorriesgo
+    + Add field direccion to operadoras
+    + Add field status to operadoras
+    + Add field operadora to cupos
+    + Add field operadora to bloques
+    + Add field agencia to porcentajes
+    + Add field banca to porcentajes
+    + Add field bloque to porcentajes
+    + Add field distribuidor to porcentajes
+    + Add field operadora to porcentajes
+    + Add field comercializacion to preferences
+    + Add field agencia to taquillas
+    + Add field taquilla to porcentajes
+    + Add field tipo to porcentajes
+    + Add field group to typepreferences
+    + Add field profile to typepreferences
+    + Add field typepreference to preferences
+    + Add field typepreference to defaultpreferences
+    + Add field status to usuariostaquilla
+    + Add field taquilla to usuariostaquilla
+    ~ Alter unique_together for bancas (1 constraint(s))
+    ~ Alter unique_together for distribuidores (1 constraint(s))
+    ~ Alter unique_together for agencias (1 constraint(s))
+    ~ Alter unique_together for operadoras (1 constraint(s))
+    ~ Alter unique_together for bloques (1 constraint(s))
+    ~ Alter unique_together for taquillas (1 constraint(s))
+    ~ Alter unique_together for usuariostaquilla (1 constraint(s))
+Migrations for 'admin_datamart':
+  admin_datamart\migrations\0001_initial.py
+    + Create model Consolidado
+    + Create model DimensionArcoComercializacion
+    + Create model DimensionComercializacion
+    + Create model DimensionJuegos
+    + Create model DimensionJuegosNew
+    + Create model DimensionTiempo
+    + Create model Hecho1_VentasCadenasJuegos
+    + Create model Hecho2_VentasCadenas
+    + Create model Hecho2_VentasCadenasLinea
+    + Create model Hecho5_ComisionesCadena
+    + Create model Hecho6_ComisionesCadenaJuego
+    + Create model Hecho7_ComisionesQuedaCadena
+    + Create model Hecho8_VentasMonitorLinea
+    + Create model Hecho9_VentasSaldosCadena
+  admin_datamart\migrations\0002_initial.py
+    + Add field comercializacion to hecho1_ventascadenasjuegos
+    + Add field juegos to hecho1_ventascadenasjuegos
+    + Add field tiempo to hecho1_ventascadenasjuegos
+    + Add field comercializacion to hecho2_ventascadenas
+    + Add field tiempo to hecho2_ventascadenas
+    + Add field comercializacion to hecho2_ventascadenaslinea
+    + Add field tiempo to hecho2_ventascadenaslinea
+    + Add field comercializacion to hecho5_comisionescadena
+    + Add field tiempo to hecho5_comisionescadena
+    + Add field comercializacion to hecho6_comisionescadenajuego
+    + Add field juegos to hecho6_comisionescadenajuego
+    + Add field tiempo to hecho6_comisionescadenajuego
+    + Add field comercializacion to hecho7_comisionesquedacadena
+    + Add field tiempo to hecho7_comisionesquedacadena
+    + Add field comercializacion to hecho8_ventasmonitorlinea
+    + Add field juegos to hecho8_ventasmonitorlinea
+    + Add field tiempo to hecho8_ventasmonitorlinea
+    + Add field comercializacion to hecho9_ventassaldoscadena
+    + Add field tiempo to hecho9_ventassaldoscadena
+Migrations for 'admin_finanzas':
+  admin_finanzas\migrations\0001_initial.py
+    + Create model Banco
+    + Create model Dia
+    + Create model TipoCuenta
+    + Create model TipoMovimiento
+    + Create model Comercializadora
+    + Create model Cuenta
+    + Create model DiaTrabajo
+    + Create model EstatoCuenta
+    + Create model ResumenAdministrativo
+    + Create model Movimiento
+    + Create model Configuracion
+Migrations for 'admin_juego':
+  admin_juego\migrations\0001_initial.py
+    + Create model AnimalFigura
+    + Create model Animalito
+    + Create model apuesta
+    + Create model ApuestaDetalle
+    + Create model Condiciones
+    + Create model EventNotification
+    + Create model Fechas
+    + Create model GrupoAnimales
+    + Create model GruposApuesta
+    + Create model GruposSorteo
+    + Create model JugadasInformativas
+    + Create model LiquidacionSorteo
+    + Create model Loteria
+    + Create model ModalidadApuesta
+    + Create model ModalidadGrupo
+    + Create model ModalidadJuego
+    + Create model ModalidadJuego_Grupos
+    + Create model ModalidadPeriodo
+    + Create model ModalidadProducto
+    + Create model NumeroSorteo
+    + Create model OperadoraLoteria
+    + Create model PeriodoSorteo
+    + Create model PlantillaJugada
+    + Create model PlantillaProducto
+    + Create model ProductoLoteria
+    + Create model RestriccionesSorteo
+    + Create model ResultadoSorteo
+    + Create model SistemaJuego
+    + Create model Sorteo
+    + Create model SorteoArrejuntao
+    + Create model SorteoDetalle
+    + Create model SorteoModalidades
+    + Create model Ticket
+    + Create model TipoNumeroSorteo
+    + Create model TipoProducto
+    + Create model TipoProducto_Grupos
+  admin_juego\migrations\0002_initial.py
+    + Add field status to apuesta
+    + Add field animalito to apuestadetalle
+    + Add field condicion to apuesta
+    + Add field status to fechas
+    + Add field grupo to animalfigura
+    + Add field condicion to jugadasinformativas
+    + Create index idx_liq_sorteo_banca on field(s) id_sorteo, id_banca of model liquidacionsorteo
+    + Create index idx_liq_sorteo_dis on field(s) id_sorteo, id_distribuidor of model liquidacionsorteo
+    + Create index idx_liq_sorteo_agc on field(s) id_sorteo, id_agencia of model liquidacionsorteo
+    ~ Alter unique_together for liquidacionsorteo (1 constraint(s))
+    + Add field restriction to modalidadapuesta
+    + Add field grupo to modalidadgrupo
+    + Add field equipo to modalidadgrupo
+    + Add field modalidad to condiciones
+    + Add field grupo to modalidadjuego_grupos
+    + Add field modalidad to modalidadjuego_grupos
+    + Add field grupo to modalidadapuesta
+    + Add field equipo to modalidadperiodo
+    + Add field equipo to modalidadproducto
+    + Add field equipos to numerosorteo
+    + Add field status to periodosorteo
+    + Add field temporada to modalidadperiodo
+    + Add field temporada to grupossorteo
+    + Add field temporadas to fechas
+    + Add field producto to plantillajugada
+    + Add field grupo_animales to productoloteria
+    + Add field loteria to productoloteria
+    + Add field condicion to restriccionessorteo
+    + Add field grupo to restriccionessorteo
+    + Add field modalidad to restriccionessorteo
+    + Add field producto to resultadosorteo
+    + Add field comercializadora to sistemajuego
+    + Add field company to sistemajuego
+    + Add field theme to sistemajuego
+    + Add field sistema to jugadasinformativas
+    + Add field sistema to fechas
+    + Add field sistema to apuesta
+    + Add field grupo to sorteo
+    + Add field jornada to sorteo
+    + Add field status to sorteo
+    + Add field detalle_encuentro to jugadasinformativas
+    + Add field origen to jugadasinformativas
+    + Add field detalle_encuentro to apuesta
+    + Add field origen to apuesta
+    + Add field producto to sorteoarrejuntao
+    + Add field encuentro to sorteodetalle
+    + Add field equipos_temporadas to sorteodetalle
+    + Add field jugador to sorteodetalle
+    + Add field encuentro to sorteomodalidades
+    + Add field modalidad_grupo to sorteomodalidades
+    + Add field origen to sorteomodalidades
+    + Add field sistema to sorteomodalidades
+    + Add field encuentros_modalidad to jugadasinformativas
+    + Add field encuentros_modalidad to apuesta
+    + Add field producto to ticket
+    + Add field vendedor to ticket
+    + Add field ticket to apuestadetalle
+    + Add field tipo to numerosorteo
+    + Add field deporte to tipoproducto
+    + Add field deporte to tiponumerosorteo
+    + Add field deporte to restriccionessorteo
+    + Add field torneo to periodosorteo
+    + Add field liga to modalidadproducto
+    + Add field deporte_restriccion to modalidadjuego_grupos
+    + Add field deporte to modalidadjuego
+    + Add field deporte to tipoproducto_grupos
+    + Add field grupo to tipoproducto_grupos
+    + Add field deporte_grupo to sorteomodalidades
+    + Add field deporte to gruposapuesta
+    ~ Alter unique_together for animalfigura (1 constraint(s))
+    ~ Alter unique_together for modalidadgrupo (1 constraint(s))
+    ~ Alter unique_together for modalidadperiodo (1 constraint(s))
+    ~ Alter unique_together for grupossorteo (1 constraint(s))
+    ~ Alter unique_together for plantillajugada (1 constraint(s))
+    ~ Alter unique_together for productoloteria (1 constraint(s))
+    ~ Alter unique_together for fechas (1 constraint(s))
+    ~ Alter unique_together for sorteoarrejuntao (1 constraint(s))
+    ~ Alter unique_together for sorteodetalle (1 constraint(s))
+    + Create index idx_ticket_sorteo_estado on field(s) sorteo_id, anulado of model ticket
+    + Create index idx_apuesta_estado_tipo on field(s) estatus, tipo_jugada of model apuestadetalle
+    + Create index idx_apuesta_ticket_estado on field(s) ticket, estatus of model apuestadetalle
+    ~ Alter unique_together for numerosorteo (1 constraint(s))
+    ~ Alter unique_together for tipoproducto (1 constraint(s))
+    ~ Alter unique_together for tiponumerosorteo (1 constraint(s))
+    ~ Alter unique_together for periodosorteo (1 constraint(s))
+    ~ Alter unique_together for modalidadproducto (1 constraint(s))
+    ~ Alter unique_together for modalidadjuego_grupos (1 constraint(s))
+    ~ Alter unique_together for modalidadjuego (1 constraint(s))
+    ~ Alter unique_together for tipoproducto_grupos (1 constraint(s))
+    ~ Alter unique_together for sorteomodalidades (1 constraint(s))
+Migrations for 'admin_permisologia':
+  admin_permisologia\migrations\0001_initial.py
+    + Create model Groups
+    + Create model PermissionsSales
+    + Create model PermissionsSalesRestrictions
+    + Create model Menu
+    + Create model Permissions
+  admin_permisologia\migrations\0002_initial.py
+    + Add field profiles to permissions
+    + Add field permissions to groups
+    + Add field comercializadora to permissionssales
+    + Add field deporte to permissionssales
+    + Add field grupo to permissionssales
+    + Add field modalidad to permissionssales
+    + Add field comercializadora to permissionssalesrestrictions
+    + Add field deporte to permissionssalesrestrictions
+    ~ Alter unique_together for menu (1 constraint(s))
+Migrations for 'admin_users':
+  admin_users\migrations\0001_initial.py
+    + Create model UserProfile
+    + Create model Users
+Migrations for 'admin_status':
+  admin_status\migrations\0001_initial.py
+    + Create model Status
+    + Create model StatusDetail
+    + Create model TaquillaStatusDetail

@@ -1,0 +1,122 @@
+﻿python : C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djan
+go\db\models\base.py:388: RuntimeWarning: Model 'admin_juego.tipoproducto' 
+was already registered. Reloading models is not advised as it can lead to 
+inconsistencies, most notably with related models.
+En línea: 1 Carácter: 1
++ python manage.py check 2>&1 | Out-File check17.txt -Encoding utf8; Ge ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\villa\...related mod 
+   els.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\django\db\mod
+els\base.py:388: RuntimeWarning: Model 'admin_juego.modalidadjuego' was 
+already registered. Reloading models is not advised as it can lead to 
+inconsistencies, most notably with related models.
+  new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+Traceback (most recent call last):
+  File "C:\Users\villa\OneDrive\Documentos\sistema Parley\proyecto master 
+Asterisco Siete 
+(7)\admin_AsteriscoSiete-server\admin_AsteriscoSiete7\manage.py", line 37, 
+in <module>
+    execute_from_command_line(sys.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djang
+o\core\management\__init__.py", line 443, in execute_from_command_line
+    utility.execute()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djang
+o\core\management\__init__.py", line 437, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djang
+o\core\management\base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djang
+o\core\management\base.py", line 464, in execute
+    output = self.handle(*args, **options)
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djang
+o\core\management\commands\check.py", line 81, in handle
+    self.check(
+    ~~~~~~~~~~^
+        app_configs=app_configs,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        databases=options["databases"],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djang
+o\core\management\base.py", line 496, in check
+    all_issues = checks.run_checks(
+        app_configs=app_configs,
+    ...<2 lines>...
+        databases=databases,
+    )
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djang
+o\core\checks\registry.py", line 89, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djang
+o\core\checks\urls.py", line 136, in check_custom_error_handlers
+    handler = resolver.resolve_error_handler(status_code)
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djang
+o\urls\resolvers.py", line 743, in resolve_error_handler
+    callback = getattr(self.urlconf_module, "handler%s" % view_type, None)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djang
+o\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djang
+o\urls\resolvers.py", line 722, in urlconf_module
+    return import_module(self.urlconf_name)
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in 
+_find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in 
+_call_with_frames_removed
+  File "C:\Users\villa\OneDrive\Documentos\sistema Parley\proyecto master 
+Asterisco Siete (7)\admin_AsteriscoSiete-server\admin_AsteriscoSiete7\admin
+_asterisco7\urls.py", line 16, in <module>
+    re_path(r'^', include('admin_historic.urls')),
+                  ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\villa\AppData\Roaming\Python\Python313\site-packages\djang
+o\urls\conf.py", line 39, in include
+    urlconf_module = import_module(urlconf_module)
+  File "C:\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in 
+_find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in 
+_call_with_frames_removed
+  File "C:\Users\villa\OneDrive\Documentos\sistema Parley\proyecto master 
+Asterisco Siete (7)\admin_AsteriscoSiete-server\admin_AsteriscoSiete7\admin
+_historic\urls.py", line 4, in <module>
+    from admin_historic.views import filter_views, historic_user_views, 
+historic_views
+  File "C:\Users\villa\OneDrive\Documentos\sistema Parley\proyecto master 
+Asterisco Siete (7)\admin_AsteriscoSiete-server\admin_AsteriscoSiete7\admin
+_historic\views\historic_views.py", line 4, in <module>
+    from admin_historic.process_audit import (
+        AdminComercializacionProcess, AdminJuegoProcess, 
+AdminResultadoProcess, ProcessModelGeneric,
+    )
+  File "C:\Users\villa\OneDrive\Documentos\sistema Parley\proyecto master 
+Asterisco Siete (7)\admin_AsteriscoSiete-server\admin_AsteriscoSiete7\admin
+_historic\process_audit.py", line 124
+    model = # REMOVED_SorteoTipoApuesta
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: invalid syntax

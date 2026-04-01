@@ -1,0 +1,145 @@
+﻿python : SystemCheckError: System check identified 
+some issues:
+En línea: 1 Carácter: 1
++ python manage.py check 
+--settings=admin_asterisco7.settings_local 2>& ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (SystemChe 
+   ckErro...ed some issues::String) [], RemoteExcepti  
+  on
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+ERRORS:
+<class 'admin_profiles.admin.DireccionesAdmin'>: 
+(admin.E124) The value of 'list_editable[0]' refers to 
+the first field in 'list_display' ('direccion'), which 
+cannot be used unless 'list_display_links' is set.
+?: (admin.E403) A 
+'django.template.backends.django.DjangoTemplates' 
+instance must be configured in TEMPLATES in order to 
+use the admin application.
+admin_apuestas.Tickets.user: (fields.E305) Reverse 
+query name for 'admin_apuestas.Tickets.user' clashes 
+with reverse query name for 
+'admin_juego.Ticket.vendedor'.
+	HINT: Add or change a related_name argument to the 
+definition for 'admin_apuestas.Tickets.user' or 
+'admin_juego.Ticket.vendedor'.
+admin_finanzas.Movimiento.cuenta: (fields.E304) 
+Reverse accessor 'Banco.movimiento_set' for 
+'admin_finanzas.Movimiento.cuenta' clashes with 
+reverse accessor for 'admin_finanzas.Movimiento.user'.
+	HINT: Add or change a related_name argument to the 
+definition for 'admin_finanzas.Movimiento.cuenta' or 
+'admin_finanzas.Movimiento.user'.
+admin_finanzas.Movimiento.user: (fields.E304) Reverse 
+accessor 'Banco.movimiento_set' for 
+'admin_finanzas.Movimiento.user' clashes with reverse 
+accessor for 'admin_finanzas.Movimiento.cuenta'.
+	HINT: Add or change a related_name argument to the 
+definition for 'admin_finanzas.Movimiento.user' or 
+'admin_finanzas.Movimiento.cuenta'.
+admin_juego.JugadasInformativas.detalle_encuentro: 
+(fields.E304) Reverse accessor 
+'Sorteo.jugadasinformativas_set' for 
+'admin_juego.JugadasInformativas.detalle_encuentro' 
+clashes with reverse accessor for 
+'admin_juego.JugadasInformativas.origen'.
+	HINT: Add or change a related_name argument to the 
+definition for 
+'admin_juego.JugadasInformativas.detalle_encuentro' or 
+'admin_juego.JugadasInformativas.origen'.
+admin_juego.JugadasInformativas.origen: (fields.E304) 
+Reverse accessor 'Sorteo.jugadasinformativas_set' for 
+'admin_juego.JugadasInformativas.origen' clashes with 
+reverse accessor for 
+'admin_juego.JugadasInformativas.detalle_encuentro'.
+	HINT: Add or change a related_name argument to the 
+definition for 
+'admin_juego.JugadasInformativas.origen' or 
+'admin_juego.JugadasInformativas.detalle_encuentro'.
+admin_juego.ModalidadJuego_Grupos: (fields.E336) The 
+model is used as an intermediate model by 
+'admin_juego.ModalidadApuesta.grupo', but it does not 
+have a foreign key to 'ModalidadApuesta' or 
+'GruposApuesta'.
+admin_juego.SistemaJuego.comercializadora: 
+(fields.E304) Reverse accessor 
+'Comercializadora.sistemajuego_set' for 
+'admin_juego.SistemaJuego.comercializadora' clashes 
+with reverse accessor for 
+'admin_juego.SistemaJuego.company'.
+	HINT: Add or change a related_name argument to the 
+definition for 
+'admin_juego.SistemaJuego.comercializadora' or 
+'admin_juego.SistemaJuego.company'.
+admin_juego.SistemaJuego.company: (fields.E304) 
+Reverse accessor 'Comercializadora.sistemajuego_set' 
+for 'admin_juego.SistemaJuego.company' clashes with 
+reverse accessor for 
+'admin_juego.SistemaJuego.comercializadora'.
+	HINT: Add or change a related_name argument to the 
+definition for 'admin_juego.SistemaJuego.company' or 
+'admin_juego.SistemaJuego.comercializadora'.
+admin_juego.SorteoModalidades.encuentro: (fields.E304) 
+Reverse accessor 'Sorteo.sorteomodalidades_set' for 
+'admin_juego.SorteoModalidades.encuentro' clashes with 
+reverse accessor for 
+'admin_juego.SorteoModalidades.origen'.
+	HINT: Add or change a related_name argument to the 
+definition for 
+'admin_juego.SorteoModalidades.encuentro' or 
+'admin_juego.SorteoModalidades.origen'.
+admin_juego.SorteoModalidades.origen: (fields.E304) 
+Reverse accessor 'Sorteo.sorteomodalidades_set' for 
+'admin_juego.SorteoModalidades.origen' clashes with 
+reverse accessor for 
+'admin_juego.SorteoModalidades.encuentro'.
+	HINT: Add or change a related_name argument to the 
+definition for 'admin_juego.SorteoModalidades.origen' 
+or 'admin_juego.SorteoModalidades.encuentro'.
+admin_juego.TipoProducto_Grupos: (fields.E336) The 
+model is used as an intermediate model by 
+'admin_juego.GruposApuesta.deporte', but it does not 
+have a foreign key to 'GruposApuesta' or 
+'TipoProducto'.
+admin_juego.apuesta.detalle_encuentro: (fields.E304) 
+Reverse accessor 'Sorteo.apuesta_set' for 
+'admin_juego.apuesta.detalle_encuentro' clashes with 
+reverse accessor for 'admin_juego.apuesta.origen'.
+	HINT: Add or change a related_name argument to the 
+definition for 'admin_juego.apuesta.detalle_encuentro' 
+or 'admin_juego.apuesta.origen'.
+admin_juego.apuesta.favorito: (fields.E903) 
+NullBooleanField is removed except for support in 
+historical migrations.
+	HINT: Use BooleanField(null=True, blank=True) instead.
+admin_juego.apuesta.origen: (fields.E304) Reverse 
+accessor 'Sorteo.apuesta_set' for 
+'admin_juego.apuesta.origen' clashes with reverse 
+accessor for 'admin_juego.apuesta.detalle_encuentro'.
+	HINT: Add or change a related_name argument to the 
+definition for 'admin_juego.apuesta.origen' or 
+'admin_juego.apuesta.detalle_encuentro'.
+admin_users.Users.comercializadora: (fields.E304) 
+Reverse accessor 'Comercializadora.users_set' for 
+'admin_users.Users.comercializadora' clashes with 
+reverse accessor for 
+'admin_users.Users.comercializadora_session'.
+	HINT: Add or change a related_name argument to the 
+definition for 'admin_users.Users.comercializadora' or 
+'admin_users.Users.comercializadora_session'.
+admin_users.Users.comercializadora_session: 
+(fields.E304) Reverse accessor 
+'Comercializadora.users_set' for 
+'admin_users.Users.comercializadora_session' clashes 
+with reverse accessor for 
+'admin_users.Users.comercializadora'.
+	HINT: Add or change a related_name argument to the 
+definition for 
+'admin_users.Users.comercializadora_session' or 
+'admin_users.Users.comercializadora'.
+
+System check identified 18 issues (0 silenced).
