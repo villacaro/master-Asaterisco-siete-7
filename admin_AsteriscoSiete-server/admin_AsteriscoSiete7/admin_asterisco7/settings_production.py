@@ -196,6 +196,13 @@ SECURE_SSL_REDIRECT     = True
 SESSION_COOKIE_SECURE   = True
 CSRF_COOKIE_SECURE      = True
 
+# ── CSRF dominios confiados ───────────────────────────────────────────────────
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.railway.app',
+    'https://*.up.railway.app',
+    'https://master-asaterisco-siete-7-production.up.railway.app',
+]
+
 # ── Logging en producción ─────────────────────────────────────────────────────
 LOGGING = {
     'version': 1,
