@@ -28,10 +28,6 @@ django-guardian==3.3.1
 django-crequest==2018.5.11
 django-extensions==4.1
 
-# Firebase (notificaciones push)
-# firebase_admin se instala con --prefer-binary para evitar compilación de pycairo
-firebase-admin==6.5.0
-
 # Criptografía (util_crypto.py usa AES)
 pycryptodome==3.21.0
 
