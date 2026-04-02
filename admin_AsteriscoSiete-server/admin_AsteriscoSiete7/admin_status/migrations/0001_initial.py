@@ -29,7 +29,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Estatus',
                 'verbose_name_plural': 'Estatus',
                 'ordering': ['content_type'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -47,7 +46,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Detalle de estatus',
                 'verbose_name_plural': 'Detalle de estatus de los usuario',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -65,7 +63,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Detalle de estatus',
                 'verbose_name_plural': 'Detalle de estatus de las taquillas',
-                'db_tablespace': 'ts_comer',
             },
         ),
     ]

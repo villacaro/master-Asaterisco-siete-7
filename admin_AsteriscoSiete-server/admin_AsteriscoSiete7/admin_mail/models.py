@@ -14,7 +14,6 @@ class MessageAdjunt(models.Model):
     adjunt = models.FileField(upload_to='message_adjunt')
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Adjunto de un mensaje')
         verbose_name_plural = ('Adjuntos de un mensaje')
 
@@ -86,7 +85,6 @@ class Message(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Mensaje')
         verbose_name_plural = ('Mensajes')
 
@@ -133,7 +131,6 @@ class MessageSend(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Mensaje enviados')
         verbose_name_plural = ('Mensajes enviados')
 
@@ -175,7 +172,6 @@ class MessageComer(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Mensaje')
         verbose_name_plural = ('Mensajes')
         ordering = ['-message__send_at']

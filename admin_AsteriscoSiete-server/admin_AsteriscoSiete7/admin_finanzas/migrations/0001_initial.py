@@ -26,7 +26,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Banco',
                 'verbose_name_plural': 'Bancos',
                 'ordering': ['nombre'],
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -40,7 +39,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Dias',
                 'verbose_name_plural': 'Dias',
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -56,7 +54,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Tipo de cuenta',
                 'verbose_name_plural': 'Tipos de cuenta',
                 'ordering': ['nombre'],
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -73,7 +70,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Tipo de movimiento',
                 'verbose_name_plural': 'Tipos de movimientos',
                 'ordering': ['nombre'],
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -97,7 +93,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Comercializadora',
                 'verbose_name_plural': 'Comercializadoras',
                 'ordering': ['operadora', 'bloque', 'banca', 'distribuidor', 'agencia', 'taquilla'],
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -115,7 +110,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Cuenta bancaria',
                 'verbose_name_plural': 'Cuentas bancarias',
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -132,7 +126,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Dia de trabajo',
                 'verbose_name_plural': 'Dia de trabajos',
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -148,7 +141,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Estado de cuenta',
                 'verbose_name_plural': 'Estados de cuenta',
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -178,7 +170,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Resumen administrativo',
                 'verbose_name_plural': 'Resumenes administrativos',
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -201,7 +192,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Movimiento bancario',
                 'verbose_name_plural': 'Movimientos bancarios',
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -218,7 +208,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Configuracion comercializadora',
                 'verbose_name_plural': 'Configuraciones de las comercializadoras',
-                'db_tablespace': 'ts_finance',
                 'unique_together': {('comercializadora', 'tipo')},
             },
         ),

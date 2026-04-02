@@ -170,7 +170,6 @@ class UserProfile(models.Model):
         return self.nombre
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Tipo de usuario')
         verbose_name_plural = ('Tipos de usuarios')
         ordering = ["content_type", ]
@@ -376,7 +375,6 @@ class Users(AbstractBaseUser):
     audit_exclude = ('token', 'token_time', 'last_login', 'comercializadora_session', 'updated_at')
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = "Usuario"
         verbose_name_plural = "Usuarios"
         ordering = ["user", ]

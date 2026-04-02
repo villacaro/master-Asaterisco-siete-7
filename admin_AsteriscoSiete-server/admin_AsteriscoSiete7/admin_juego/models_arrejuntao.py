@@ -127,7 +127,6 @@ class PlantillaProducto(models.Model):
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'Plantilla de TipoProducto'
         verbose_name_plural = 'Plantillas de Productos'
         ordering = ['orden', 'nombre']
@@ -229,7 +228,6 @@ class PlantillaJugada(models.Model):
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'Configuración de Jugada'
         verbose_name_plural = 'Configuraciones de apuesta'
         unique_together = [('producto', 'tipo_jugada')]
@@ -528,7 +526,6 @@ class LiquidacionSorteo(models.Model):
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'Liquidación de SorteoArrejuntao'
         verbose_name_plural = 'Liquidaciones de Sorteos'
         unique_together = [('id_sorteo', 'id_lista', 'id_agencia', 'id_taquilla')]
@@ -597,7 +594,6 @@ class Animalito(models.Model):
     activo = models.BooleanField(default=True, verbose_name='Activo')
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'Animalito'
         verbose_name_plural = 'Animalitos'
         ordering = ['id']
@@ -668,7 +664,6 @@ class Ticket(models.Model):
     id_taquilla = models.IntegerField(null=True, blank=True, verbose_name='ID Taquilla')
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'Ticket'
         verbose_name_plural = 'Tickets'
         ordering = ['-fecha_emision']
@@ -801,7 +796,6 @@ class ApuestaDetalle(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'Apuesta Detalle'
         verbose_name_plural = 'Apuestas Detalle'
         ordering = ['ticket', 'tipo_jugada']
@@ -928,7 +922,6 @@ class ResultadoSorteo(models.Model):
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'Resultado de SorteoArrejuntao'
         verbose_name_plural = 'Resultados de Sorteos'
         ordering = ['-fecha_sorteo']
@@ -1018,7 +1011,6 @@ class LimiteCentro(models.Model):
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'Límite del Centro'
         verbose_name_plural = 'Límites del Centro'
         ordering = ['agencia']
@@ -1090,7 +1082,6 @@ class Loteria(models.Model):
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'Lotería'
         verbose_name_plural = 'Loterías'
         ordering = ['orden', 'nombre']
@@ -1128,7 +1119,6 @@ class GrupoAnimales(models.Model):
     activo = models.BooleanField(default=True, verbose_name='Activo')
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'Grupo de Animalitos'
         verbose_name_plural = 'Grupos de Animalitos'
         ordering = ['nombre']
@@ -1166,7 +1156,6 @@ class AnimalFigura(models.Model):
     activo = models.BooleanField(default=True, verbose_name='Activo')
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'Figura de Animalito'
         verbose_name_plural = 'Figuras de Animalitos'
         unique_together = [('grupo', 'numero')]
@@ -1295,7 +1284,6 @@ class ProductoLoteria(models.Model):
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'TipoProducto de Lotería'
         verbose_name_plural = 'Productos de Lotería'
         unique_together = [('loteria', 'nombre_producto')]
@@ -1369,7 +1357,6 @@ class SorteoArrejuntao(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = 'SorteoArrejuntao'
         verbose_name_plural = 'Sorteos'
         unique_together = [('producto', 'hora_sorteo')]

@@ -25,7 +25,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Empresa',
                 'verbose_name_plural': 'Empresas',
                 'ordering': ['name'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -46,7 +45,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Tema',
                 'verbose_name_plural': 'Temas',
                 'ordering': ['name'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -62,7 +60,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Color',
                 'verbose_name_plural': 'Colores',
-                'db_tablespace': 'ts_comer',
                 'unique_together': {('theme', 'color'), ('theme', 'color_type')},
             },
         ),

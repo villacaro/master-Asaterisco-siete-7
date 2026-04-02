@@ -66,7 +66,6 @@ class Status(models.Model):
         return self.name
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Estatus')
         verbose_name_plural = ('Estatus')
         ordering = ["content_type", ]
@@ -140,7 +139,6 @@ class StatusDetail(models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Detalle de estatus')
         verbose_name_plural = ('Detalle de estatus de los usuario')
 
@@ -224,7 +222,6 @@ class TaquillaStatusDetail(models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Detalle de estatus')
         verbose_name_plural = ('Detalle de estatus de las taquillas')
 

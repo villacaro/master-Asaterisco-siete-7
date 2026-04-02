@@ -202,7 +202,6 @@ class AgenciaDataDefault(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Data por defecto de una agencias')
         verbose_name_plural = ('Data por defecto de las agencias')
         ordering = ['created_at', ]
@@ -267,7 +266,6 @@ class TaquillaDataDefault(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Data por defecto de una taquilla')
         verbose_name_plural = ('Data por defecto de las taquillas')
         ordering = ['user_name', ]
@@ -355,7 +353,6 @@ class TicketsDataDefault(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Data por defecto de impresion')
         verbose_name_plural = ('Data por defecto para la impresion')
         ordering = ['titulo1', 'titulo2', 'titulo3', 'pie1', 'pie2', 'pie3']
@@ -547,7 +544,6 @@ class DataDefault(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Data por defecto por comercializadora')
         verbose_name_plural = ('Data por defecto para las comercializadoras')
         ordering = ['user_type', ]
@@ -630,7 +626,6 @@ class TipoPorcentajes(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Tipo de porcentaje')
         verbose_name_plural = ('Tipos de porcentajes')
         ordering = ['nombre', ]
@@ -1853,7 +1848,6 @@ class Operadoras(BaseGenericProcess, BaseModelCadena):
     user_type_codename = 'userprofile_operadora'
 
     class Meta:
-        db_tablespace = 'ts_comer'
         unique_together = ('nombre',)
         verbose_name = ('Operadora')
         verbose_name_plural = ('Operadoras')
@@ -2026,7 +2020,6 @@ class Bloques(BaseGenericProcess, BaseModelCadena, BaseGenericModeloJuego):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         unique_together = ('nombre', 'operadora')
         verbose_name = ('Multi Banca')
         verbose_name_plural = ('Multi Bancas')
@@ -2146,7 +2139,6 @@ class Bancas(BaseGenericProcess, BaseModelCadena, BaseGenericModeloJuego):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         unique_together = ('nombre', 'bloque', )
         verbose_name = ('Banca')
         verbose_name_plural = ('Bancas')
@@ -2249,7 +2241,6 @@ class Distribuidores(BaseGenericProcess, BaseModelCadena):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         unique_together = ('nombre', 'banca', )
         verbose_name = ('Distribuidor')
         verbose_name_plural = ('Distribuidores')
@@ -2527,7 +2518,6 @@ class Agencias(BaseGenericProcess, BaseModelCadena):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         unique_together = ('nombre', 'distribuidores', )
         verbose_name = ('Centro de apuesta')
         verbose_name_plural = ('Centros de apuesta')
@@ -2715,7 +2705,6 @@ class Taquillas(ProtectDelete, BaseGenericProcess, models.Model):
     audit_exclude = ('updated_at', 'pk_clone')
 
     class Meta:
-        db_tablespace = 'ts_comer'
         unique_together = ('taquilla', 'agencia', )
         verbose_name = ('Taquilla')
         verbose_name_plural = ('Taquillas')
@@ -2876,7 +2865,6 @@ class UsuariosTaquilla(ProtectDelete, AbstractBaseUser):
     audit_exclude = ('updated_at', 'pk_clone')
 
     class Meta:
-        db_tablespace = 'ts_comer'
         unique_together = ('user', 'taquilla', )
         verbose_name = ('Usuario de taquilla')
         verbose_name_plural = ('Usuarios de taquillas')
@@ -3062,7 +3050,6 @@ class Cupos(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Cupo de una comercializadora')
         verbose_name_plural = ('Cupos de las comercializadoras')
         ordering = ['-fecha_inicio']
@@ -3269,7 +3256,6 @@ class Porcentajes(ProtectDelete, models.Model):
     # audit_exclude = ('bloque_porc', 'banca_porc', 'distribuidor_porc', 'agencia_porc', 'taquilla_porc')
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Porcentaje de una comercializadora')
         verbose_name_plural = ('Porcentajes de las comercializadoras')
         ordering = ['-fecha_inicio']
@@ -3411,7 +3397,6 @@ class FactorRiesgo(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         app_label = 'admin_comercializacion'
         verbose_name = ('Factor de riesgo')
         verbose_name_plural = ('Factores de riesgo')
@@ -3535,7 +3520,6 @@ class EventNotificationCadena(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Actualizacion por comercializadora')
         verbose_name_plural = ('Actualizaciones por comercializadoras')
 
@@ -3598,7 +3582,6 @@ class GroupPreferences(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Grupo de preferencia')
         verbose_name_plural = ('Grupos de preferencias')
 
@@ -3749,7 +3732,6 @@ class TypePreferences(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Tipo de preferencia')
         verbose_name_plural = ('Tipos de preferencias')
         ordering = ['name', ]
@@ -3802,7 +3784,6 @@ class DefaultPreferences(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Preferencia por defecto')
         verbose_name_plural = ('Preferencias por defecto')
 
@@ -3854,7 +3835,6 @@ class Preferences(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Preferencia de una comercializadora')
         verbose_name_plural = ('Preferencias de las comercializadoras')
         ordering = ['-created_at']

@@ -70,8 +70,8 @@ except ImportError:
 # from datetime import timedelta
 
 
-DEBUG = True if os.environ.get('PANEL_DEBUG') == 'True' else False
-DEBUG_TOOLBAR = True if os.environ.get('PANEL_DEBUG_TOOLBAR') == 'True' else False
+DEBUG = True if os.environ.get('PANEL_DEBUG', 'True') == 'True' else False
+DEBUG_TOOLBAR = True if os.environ.get('PANEL_DEBUG_TOOLBAR', 'False') == 'True' else False
 ADD_MENU = True if os.environ.get('PANEL_ADD_MENU') == 'True' else False
 
 ACTIVATE_HISTORY = True
@@ -99,6 +99,8 @@ SERVER_EMAIL = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
+import dj_database_url
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -109,6 +111,12 @@ DATABASES = {
         'PORT': os.environ.get('PANEL_DB_PORT'),
     },
 }
+
+if os.environ.get('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=500
+    )
 
 CELERY_RESULT_BACKEND = 'redis://{0}:6379/1'.format(os.environ.get('REDIS_PORT_6379_TCP_ADDR'))
 BROKER_URL = 'amqp://{0}:{1}@{2}:5672//'.format(
@@ -592,3 +600,35 @@ try:
     )
 except Exception:
     pass
+
+# FIREBASE ADMIN SETUP
+import os
+import firebase_admin
+from firebase_admin import credentials
+import base64
+import json
+
+firebase_key_path = os.path.join(BASE_DIR, 'serviceAccountKey.json')
+
+if not firebase_admin._apps:
+    cred = None
+    if os.environ.get('FIREBASE_SERVICE_ACCOUNT_BASE64'):
+        try:
+            decoded_cert = base64.b64decode(os.environ.get('FIREBASE_SERVICE_ACCOUNT_BASE64')).decode('utf-8')
+            cred_dict = json.loads(decoded_cert)
+            cred = credentials.Certificate(cred_dict)
+            print("✅ Firebase Admin SDK Initialized via ENV var (Base64)!")
+        except Exception as e:
+            print(f"⚠️ Failed to init Firebase via ENV var: {e}")
+    elif os.path.exists(firebase_key_path):
+        try:
+            cred = credentials.Certificate(firebase_key_path)
+            print("✅ Firebase Admin SDK Initialized via serviceAccountKey.json!")
+        except Exception as e:
+            print(f"⚠️ Failed to init Firebase Admin via disk: {e}")
+            
+    if cred:
+        try:
+            firebase_admin.initialize_app(cred)
+        except Exception as e:
+            print(f"⚠️ Firebase App initialization failed: {e}")

@@ -44,7 +44,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Data por defecto de una agencias',
                 'verbose_name_plural': 'Data por defecto de las agencias',
                 'ordering': ['created_at'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -68,7 +67,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Banca',
                 'verbose_name_plural': 'Bancas',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -92,7 +90,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Multi Banca',
                 'verbose_name_plural': 'Multi Bancas',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -110,7 +107,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Cupo de una comercializadora',
                 'verbose_name_plural': 'Cupos de las comercializadoras',
                 'ordering': ['-fecha_inicio'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -134,7 +130,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Data por defecto por comercializadora',
                 'verbose_name_plural': 'Data por defecto para las comercializadoras',
                 'ordering': ['user_type'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -149,7 +144,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Preferencia por defecto',
                 'verbose_name_plural': 'Preferencias por defecto',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -168,7 +162,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Distribuidor',
                 'verbose_name_plural': 'Distribuidores',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -187,7 +180,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Actualizacion por comercializadora',
                 'verbose_name_plural': 'Actualizaciones por comercializadoras',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -202,7 +194,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Factor de riesgo',
                 'verbose_name_plural': 'Factores de riesgo',
                 'ordering': ['-created_at'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -218,7 +209,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Grupo de preferencia',
                 'verbose_name_plural': 'Grupos de preferencias',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -237,7 +227,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Operadora',
                 'verbose_name_plural': 'Operadoras',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -261,7 +250,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Porcentaje de una comercializadora',
                 'verbose_name_plural': 'Porcentajes de las comercializadoras',
                 'ordering': ['-fecha_inicio'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -277,7 +265,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Preferencia de una comercializadora',
                 'verbose_name_plural': 'Preferencias de las comercializadoras',
                 'ordering': ['-created_at'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -293,7 +280,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Data por defecto de una taquilla',
                 'verbose_name_plural': 'Data por defecto de las taquillas',
                 'ordering': ['user_name'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -312,7 +298,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Taquilla',
                 'verbose_name_plural': 'Taquillas',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -333,7 +318,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Data por defecto de impresion',
                 'verbose_name_plural': 'Data por defecto para la impresion',
                 'ordering': ['titulo1', 'titulo2', 'titulo3', 'pie1', 'pie2', 'pie3'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -355,7 +339,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Tipo de porcentaje',
                 'verbose_name_plural': 'Tipos de porcentajes',
                 'ordering': ['nombre'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -377,7 +360,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Tipo de preferencia',
                 'verbose_name_plural': 'Tipos de preferencias',
                 'ordering': ['name'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -399,7 +381,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Usuario de taquilla',
                 'verbose_name_plural': 'Usuarios de taquillas',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -439,7 +420,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Centro de apuesta',
                 'verbose_name_plural': 'Centros de apuesta',
-                'db_tablespace': 'ts_comer',
             },
         ),
     ]

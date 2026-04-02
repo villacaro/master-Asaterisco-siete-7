@@ -27,7 +27,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Hecho de conexion',
                 'verbose_name_plural': 'Hecho de conexiones',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -46,7 +45,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Session de usuario',
                 'verbose_name_plural': 'Sessiones por usuario',
                 'ordering': ['-enddate'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -63,7 +61,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Detalle de una session',
                 'verbose_name_plural': 'Detalle de las sessiones por usuario',
                 'ordering': ['-created_at'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -80,7 +77,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Session por taquilla',
                 'verbose_name_plural': 'Sessiones por taquillas',
                 'ordering': ['-enddate'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -96,7 +92,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Detalle de la session por taquilla',
                 'verbose_name_plural': 'Detalle de las sessiones por taquillas',
                 'ordering': ['-created_at'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -113,7 +108,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Tipo de proceso',
                 'verbose_name_plural': 'Tipos de procesos',
                 'ordering': ['content_type'],
-                'db_tablespace': 'ts_comer',
             },
         ),
     ]

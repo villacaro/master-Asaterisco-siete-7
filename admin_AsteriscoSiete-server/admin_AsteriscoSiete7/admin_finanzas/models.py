@@ -33,7 +33,6 @@ class Banco(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Banco')
         verbose_name_plural = ('Bancos')
         ordering = ['nombre']
@@ -72,7 +71,6 @@ class TipoCuenta(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Tipo de cuenta')
         verbose_name_plural = ('Tipos de cuenta')
         ordering = ['nombre']
@@ -116,7 +114,6 @@ class TipoMovimiento(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Tipo de movimiento')
         verbose_name_plural = ('Tipos de movimientos')
         ordering = ['nombre']
@@ -254,7 +251,6 @@ class Comercializadora(models.Model):
     audit_exclude = ('resumen_personalizado_comer',)
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Comercializadora')
         verbose_name_plural = ('Comercializadoras')
         ordering = [
@@ -1193,7 +1189,6 @@ class Configuracion(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         unique_together = ('comercializadora', 'tipo')
         verbose_name = ('Configuracion comercializadora')
         verbose_name_plural = ('Configuraciones de las comercializadoras')
@@ -1262,7 +1257,6 @@ class Cuenta(models.Model):
     audit_exclude = ('updated_at', )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Cuenta bancaria')
         verbose_name_plural = ('Cuentas bancarias')
 
@@ -1311,7 +1305,6 @@ class Dia(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Dias')
         verbose_name_plural = ('Dias')
 
@@ -1356,7 +1349,6 @@ class EstatoCuenta(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Estado de cuenta')
         verbose_name_plural = ('Estados de cuenta')
 
@@ -1432,7 +1424,6 @@ class DiaTrabajo(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Dia de trabajo')
         verbose_name_plural = ('Dia de trabajos')
 
@@ -1532,7 +1523,6 @@ class Movimiento(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Movimiento bancario')
         verbose_name_plural = ('Movimientos bancarios')
 
@@ -1710,7 +1700,6 @@ class ResumenAdministrativo(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Resumen administrativo')
         verbose_name_plural = ('Resumenes administrativos')
 

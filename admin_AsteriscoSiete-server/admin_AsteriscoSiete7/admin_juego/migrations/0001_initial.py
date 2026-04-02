@@ -26,7 +26,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Figura de Animalito',
                 'verbose_name_plural': 'Figuras de Animalitos',
                 'ordering': ['grupo', 'numero'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -42,7 +41,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Animalito',
                 'verbose_name_plural': 'Animalitos',
                 'ordering': ['id'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -61,7 +59,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Jugada por encuentro',
                 'verbose_name_plural': 'apuesta por Sorteo',
-                'db_tablespace': 'ts_parley',
             },
             bases=(admin_juego.models.CachinEvent, models.Model),
         ),
@@ -82,7 +79,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Apuesta Detalle',
                 'verbose_name_plural': 'Apuestas Detalle',
                 'ordering': ['ticket', 'tipo_jugada'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -100,7 +96,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Condicion de apuesta',
                 'verbose_name_plural': 'Condiciones de apuestas',
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -139,7 +134,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Jornada',
                 'verbose_name_plural': 'Fechas',
-                'db_tablespace': 'ts_parley',
             },
             bases=(admin_juego.models.CachinEvent, models.Model),
         ),
@@ -155,7 +149,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Grupo de Animalitos',
                 'verbose_name_plural': 'Grupos de Animalitos',
                 'ordering': ['nombre'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -171,7 +164,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Grupo de apuesta',
                 'verbose_name_plural': 'Grupos de apuestas',
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -188,7 +180,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Grupo de juego',
                 'verbose_name_plural': 'Grupos de juegos',
                 'ordering': ['orden'],
-                'db_tablespace': 'ts_parley',
             },
             bases=(admin_juego.models.CachinEvent, models.Model),
         ),
@@ -206,7 +197,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Jugada informativa',
                 'verbose_name_plural': 'apuesta informativas',
-                'db_tablespace': 'ts_parley',
             },
             bases=(admin_juego.models.CachinEvent, models.Model),
         ),
@@ -265,7 +255,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Liquidación de SorteoArrejuntao',
                 'verbose_name_plural': 'Liquidaciones de Sorteos',
                 'ordering': ['-id_sorteo', 'id_agencia'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -284,7 +273,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Lotería',
                 'verbose_name_plural': 'Loterías',
                 'ordering': ['orden', 'nombre'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -303,7 +291,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Modalidad de apuesta',
                 'verbose_name_plural': 'ModalidadApuesta de apuestas',
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -316,7 +303,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Equipo por grupo de juego',
                 'verbose_name_plural': 'ModalidadJuego por grupos de juego',
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -332,7 +318,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Equipo',
                 'verbose_name_plural': 'ModalidadJuego',
-                'db_tablespace': 'ts_parley',
             },
             bases=(admin_juego.models.CachinEvent, models.Model),
         ),
@@ -344,7 +329,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Modalidad por grupo de apuesta',
                 'verbose_name_plural': 'ModalidadJuego por grupos de apuestas',
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -357,7 +341,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Equipo por temporada',
                 'verbose_name_plural': 'ModalidadJuego por temporadas',
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -370,7 +353,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Equipo por liga',
                 'verbose_name_plural': 'ModalidadJuego por ligas',
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -388,7 +370,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'NumeroSorteo',
                 'verbose_name_plural': 'Jugadores',
                 'ordering': ['nombre', 'lateralidad'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -413,7 +394,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Deporte',
                 'verbose_name_plural': 'OperadoraLoteria',
                 'ordering': ['nombre'],
-                'db_tablespace': 'ts_parley',
             },
             bases=(admin_juego.models.CachinEvent, models.Model),
         ),
@@ -431,7 +411,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Temporada',
                 'verbose_name_plural': 'PeriodoSorteo',
-                'db_tablespace': 'ts_parley',
             },
             bases=(admin_juego.models.CachinEvent, models.Model),
         ),
@@ -451,7 +430,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Configuración de Jugada',
                 'verbose_name_plural': 'Configuraciones de apuesta',
                 'ordering': ['producto', 'tipo_jugada'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -476,7 +454,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Plantilla de TipoProducto',
                 'verbose_name_plural': 'Plantillas de Productos',
                 'ordering': ['orden', 'nombre'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -500,7 +477,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'TipoProducto de Lotería',
                 'verbose_name_plural': 'Productos de Lotería',
                 'ordering': ['loteria', 'orden', 'nombre_producto'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -517,7 +493,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Restriccion de referencia y logro',
                 'verbose_name_plural': 'Restricciones de referencias y logros',
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -542,7 +517,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Resultado de SorteoArrejuntao',
                 'verbose_name_plural': 'Resultados de Sorteos',
                 'ordering': ['-fecha_sorteo'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -562,7 +536,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Sistema de juego',
                 'verbose_name_plural': 'Sistemas de juegos',
                 'ordering': ['nombre'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -581,7 +554,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Encuentro',
                 'verbose_name_plural': 'Sorteo',
                 'ordering': ('horajuego',),
-                'db_tablespace': 'ts_parley',
             },
             bases=(admin_juego.models.CachinEvent, models.Model),
         ),
@@ -598,7 +570,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'SorteoArrejuntao',
                 'verbose_name_plural': 'Sorteos',
                 'ordering': ['producto', 'hora_sorteo'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -614,7 +585,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Detalle de encuentro',
                 'verbose_name_plural': 'Detalle de los Sorteo',
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -629,7 +599,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Modalidad por encuentro',
                 'verbose_name_plural': 'ModalidadJuego por Sorteo',
-                'db_tablespace': 'ts_parley',
             },
             bases=(admin_juego.models.CachinEvent, models.Model),
         ),
@@ -650,7 +619,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Ticket',
                 'verbose_name_plural': 'Tickets',
                 'ordering': ['-fecha_emision'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -666,7 +634,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Tipo de jugador',
                 'verbose_name_plural': 'Tipos de jugadores',
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -686,7 +653,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Liga',
                 'verbose_name_plural': 'Ligas',
                 'ordering': ['nombre'],
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -697,7 +663,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Grupo de apuesta por deporte',
                 'verbose_name_plural': 'Grupos de apuestas  por deportes',
-                'db_tablespace': 'ts_parley',
             },
         ),
     ]

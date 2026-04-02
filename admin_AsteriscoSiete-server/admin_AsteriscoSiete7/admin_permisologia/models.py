@@ -99,7 +99,6 @@ class Menu(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = 'Menu (url)'
         verbose_name_plural = 'Menus (enlaces)'
         unique_together = ('codename', 'url')
@@ -256,7 +255,6 @@ class Permissions(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = 'Permiso'
         verbose_name_plural = 'Permisos'
         ordering = ['content_type', 'name']
@@ -342,7 +340,6 @@ class Groups(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = 'Grupo'
         verbose_name_plural = 'Grupos'
         ordering = ['name', ]
@@ -426,7 +423,6 @@ class PermissionsSales(models.Model):
     audit_exclude = ('breaking',)
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = 'Permiso Venta'
         verbose_name_plural = 'Permisos ventas'
 
@@ -507,7 +503,6 @@ class PermissionsSalesRestrictions(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = 'Permiso Venta (Restricciones)'
         verbose_name_plural = 'Permisos ventas (Restricciones)'
 

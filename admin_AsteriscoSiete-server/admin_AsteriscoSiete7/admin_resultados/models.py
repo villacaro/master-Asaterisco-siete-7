@@ -46,7 +46,6 @@ class Resultados(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('encuentro', 'sistema')
         verbose_name = ('Resultado de un ecuentro')
         verbose_name_plural = ('Resultados por encuentros')
@@ -153,7 +152,6 @@ class ResultadosRestric(models.Model):
         return 'Grupo: {} | Modalidad: {}'.format(self.grupo, self.modalidad)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = ('Restriccion de resultado')
         verbose_name_plural = ('Restricciones de resultados')
 
@@ -201,7 +199,6 @@ class Anotaciones(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = ('Anotacion')
         verbose_name_plural = ('Anotaciones por grupo')
 
@@ -310,7 +307,6 @@ class AnotacionesDetail(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = ('Anotacion')
         verbose_name_plural = ('Anotaciones por grupo')
 

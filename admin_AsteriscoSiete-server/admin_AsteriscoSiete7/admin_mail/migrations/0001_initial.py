@@ -22,7 +22,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Adjunto de un mensaje',
                 'verbose_name_plural': 'Adjuntos de un mensaje',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -39,7 +38,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Mensaje',
                 'verbose_name_plural': 'Mensajes',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -55,7 +53,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Mensaje',
                 'verbose_name_plural': 'Mensajes',
                 'ordering': ['-message__send_at'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -69,7 +66,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Mensaje enviados',
                 'verbose_name_plural': 'Mensajes enviados',
-                'db_tablespace': 'ts_comer',
             },
         ),
     ]

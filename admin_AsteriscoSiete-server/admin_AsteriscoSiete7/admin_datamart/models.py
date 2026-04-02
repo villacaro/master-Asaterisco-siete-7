@@ -23,7 +23,6 @@ class DimensionTiempo(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = ('Dimension de tiempo')
         verbose_name_plural = ('Dimension de tiempos')
 
@@ -92,7 +91,6 @@ class DimensionComercializacion(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = ('Dimension de comercializacion')
         verbose_name_plural = ('Dimension de comercializaciones')
 
@@ -139,7 +137,6 @@ class DimensionJuegos(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = ('Dimension de juego')
         verbose_name_plural = ('Dimension de juegos')
 
@@ -228,7 +225,6 @@ class DimensionJuegosNew(ProtectDelete, models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = "Dimensión de Lotería"
         verbose_name_plural = "Dimensiones de Lotería"
 
@@ -295,7 +291,6 @@ class DimensionArcoComercializacion(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = ('Dimension de arco comercializacion')
         verbose_name_plural = ('Dimension de arco comercializaciones')
 
@@ -487,7 +482,6 @@ class Hecho1_VentasCadenasJuegos(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = ('Hecho 1: Ventas por cadena y juego')
         verbose_name_plural = ('Hecho 1: ventas por toda la cadena y juegos')
 
@@ -638,7 +632,6 @@ class Hecho2_VentasCadenasAbstract(models.Model):
 class Hecho2_VentasCadenas(ProtectDelete, Hecho2_VentasCadenasAbstract):
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = ('Hecho 2: Ventas por cadena')
         verbose_name_plural = ('Hecho 2: ventas por toda la cadena')
 
@@ -646,7 +639,6 @@ class Hecho2_VentasCadenas(ProtectDelete, Hecho2_VentasCadenasAbstract):
 class Hecho2_VentasCadenasLinea(ProtectDelete, Hecho2_VentasCadenasAbstract):
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = ('Hecho 2 en linea: Ventas por cadena')
         verbose_name_plural = ('Hecho 2 en linea: ventas por toda la cadena')
 
@@ -812,7 +804,6 @@ class Hecho5_ComisionesCadena(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = ('Hecho 5: Comisiones por cadena')
         verbose_name_plural = ('Hecho 5: Comisiones por toda la cadena')
 
@@ -953,7 +944,6 @@ class Hecho6_ComisionesCadenaJuego(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = ('Hecho 6: Comisiones por cadena y juegos')
         verbose_name_plural = (
             'Hecho 6: Comisiones por toda la cadena y juegos')
@@ -1030,7 +1020,6 @@ class Hecho7_ComisionesQuedaCadena(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = ('Hecho 7: Comisiones de la queda')
         verbose_name_plural = (
             'Hecho 7: Comisiones de la queda por toda la cadena')
@@ -1081,7 +1070,6 @@ class Hecho8_VentasMonitorLinea(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = ('Hecho 8: Monitor de ventas')
         verbose_name_plural = ('Hecho 8: Monitor de ventas')
 
@@ -1197,7 +1185,6 @@ class Hecho9_VentasSaldosCadena(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_finance"
         verbose_name = ('Hecho 9 Saldos Cadena')
         verbose_name_plural = ('Hecho 9: Saldos Cadena')
 
@@ -1473,7 +1460,6 @@ class Consolidado(models.Model):
     )
 
     class Meta:
-        db_tablespace   = 'ts_finance'
         verbose_name    = 'Consolidado Datamart'
         verbose_name_plural = 'Consolidados Datamart'
         ordering        = ['-dfecha', 'id_sorteo', 'id_taquilla']

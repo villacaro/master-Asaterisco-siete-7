@@ -590,7 +590,6 @@ class SistemaJuego(models.Model):
     audit_exclude = ('updated_at', )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = ('Sistema de juego')
         verbose_name_plural = ('Sistemas de juegos')
         ordering = ['nombre', ]
@@ -827,7 +826,6 @@ class OperadoraLoteria(CachinEvent, models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = ('Deporte')
         verbose_name_plural = ('OperadoraLoteria')
         ordering = ['nombre']
@@ -1006,7 +1004,6 @@ class TipoProducto(models.Model):
     audit_exclude = ('pk_clone',)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('nombre', 'deporte')
         verbose_name = ('Liga')
         verbose_name_plural = ('Ligas')
@@ -1106,7 +1103,6 @@ class PeriodoSorteo(CachinEvent, models.Model):
     audit_exclude = ('pk_clone',)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('nombre', 'torneo')
         verbose_name = ('Temporada')
         verbose_name_plural = ('PeriodoSorteo')
@@ -1202,7 +1198,6 @@ class ModalidadJuego(BaseGenericProcessModelCache, CachinEvent, models.Model):
     audit_exclude = ('pk_clone',)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('nombre', 'deporte')
         verbose_name = ('Equipo')
         verbose_name_plural = ('ModalidadJuego')
@@ -1280,7 +1275,6 @@ class ModalidadProducto(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('equipo', 'liga')
         verbose_name = ('Equipo por liga')
         verbose_name_plural = ('ModalidadJuego por ligas')
@@ -1346,7 +1340,6 @@ class TipoNumeroSorteo(models.Model):
     audit_exclude = ('pk_clone',)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('nombre', 'deporte')
         verbose_name = ('Tipo de jugador')
         verbose_name_plural = ('Tipos de jugadores')
@@ -1431,7 +1424,6 @@ class NumeroSorteo(models.Model):
     audit_exclude = ('pk_clone',)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('nombre', 'tipo')
         verbose_name = ('NumeroSorteo')
         verbose_name_plural = ('Jugadores')
@@ -1497,7 +1489,6 @@ class ModalidadPeriodo(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('equipo', 'temporada')
         verbose_name = ('Equipo por temporada')
         verbose_name_plural = ('ModalidadJuego por temporadas')
@@ -1632,7 +1623,6 @@ class Fechas(CachinEvent, models.Model):
     audit_exclude = ('pk_clone', 'count_encuentros', 'monto_inicial', 'valor',)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('jornada', 'temporadas', 'sistema')
         verbose_name = ('Jornada')
         verbose_name_plural = ('Fechas')
@@ -1810,7 +1800,6 @@ class GruposSorteo(CachinEvent, models.Model):
     audit_exclude = ('pk_clone',)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('nombre', 'temporada')
         verbose_name = ('Grupo de juego')
         verbose_name_plural = ('Grupos de juegos')
@@ -1888,7 +1877,6 @@ class ModalidadGrupo(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('equipo', 'grupo')
         verbose_name = ('Equipo por grupo de juego')
         verbose_name_plural = ('ModalidadJuego por grupos de juego')
@@ -1993,7 +1981,6 @@ class Sorteo(BaseGenericProcessModelCache, CachinEvent, models.Model):
     audit_exclude = ('pk_clone', 'exists_tickets')
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = ('Encuentro')
         verbose_name_plural = ('Sorteo')
         ordering = ('horajuego', )
@@ -2566,7 +2553,6 @@ class SorteoDetalle(ProtectDelete, models.Model):
     audit_exclude = ('pk_clone',)
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('encuentro', 'equipos_temporadas')
         verbose_name = ('Detalle de encuentro')
         verbose_name_plural = ('Detalle de los Sorteo')
@@ -2635,7 +2621,6 @@ class GruposApuesta(BaseGenericProcessModelCache, models.Model):
     objects = BaseGenericProcessManagerCache()
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = ('Grupo de apuesta')
         verbose_name_plural = ('Grupos de apuestas')
 
@@ -2674,7 +2659,6 @@ class TipoProducto_Grupos(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('deporte', 'grupo')
         verbose_name = ('Grupo de apuesta por deporte')
         verbose_name_plural = ('Grupos de apuestas  por deportes')
@@ -2839,7 +2823,6 @@ class ModalidadApuesta(BaseGenericProcessModelCache, models.Model):
     objects = BaseGenericProcessManagerCache()
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = ('Modalidad de apuesta')
         verbose_name_plural = ('ModalidadApuesta de apuestas')
 
@@ -2891,7 +2874,6 @@ class ModalidadJuego_Grupos(ProtectDelete, models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         unique_together = ('modalidad', 'grupo')
         verbose_name = ('Modalidad por grupo de apuesta')
         verbose_name_plural = ('ModalidadJuego por grupos de apuestas')
@@ -2977,7 +2959,6 @@ class SorteoModalidades(CachinEvent, models.Model):
 
     class Meta:
 
-        db_tablespace = 'ts_parley'
         unique_together = (
             'encuentro',
             'deporte_grupo',
@@ -3242,7 +3223,6 @@ class Condiciones(BaseGenericProcessModelCache, models.Model):
     objects = BaseGenericProcessManagerCache()
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = ('Condicion de apuesta')
         verbose_name_plural = ('Condiciones de apuestas')
 
@@ -3341,7 +3321,6 @@ class JugadasInformativas(CachinEvent, models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = ('Jugada informativa')
         verbose_name_plural = ('apuesta informativas')
 
@@ -3571,7 +3550,6 @@ class apuesta(CachinEvent, models.Model):
     audit_exclude = ('admin_status.Status', 'valor_europeo', 'favorito', 'indice', 'pk_clone')
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = ('Jugada por encuentro')
         verbose_name_plural = ('apuesta por Sorteo')
 
@@ -3847,7 +3825,6 @@ class RestriccionesSorteo(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_parley'
         verbose_name = ('Restriccion de referencia y logro')
         verbose_name_plural = ('Restricciones de referencias y logros')
 

@@ -301,6 +301,25 @@ def taquilla_venta_api(request):
     """
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
+        
+    # === FIREBASE AUTHENTICATION CHECK ===
+    auth_header = request.META.get('HTTP_AUTHORIZATION', '')
+    if not auth_header.startswith('Bearer '):
+        return JsonResponse({'error': 'No autorizado. Se requiere token de Firebase (Bearer).'}, status=401)
+        
+    id_token = auth_header.split('Bearer ')[1]
+    decoded_token = None
+    try:
+        from firebase_admin import auth as firebase_auth
+        decoded_token = firebase_auth.verify_id_token(id_token)
+    except Exception as e:
+        return JsonResponse({'error': 'Token inválido o expirado.', 'details': str(e)}, status=401)
+        
+    # Validated
+    firebase_uid = decoded_token.get('uid')
+    firebase_email = decoded_token.get('email', 'desconocido')
+    # ======================================
+
     try:
         body = json.loads(request.body)
     except Exception:

@@ -28,7 +28,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Tipo de usuario',
                 'verbose_name_plural': 'Tipos de usuarios',
                 'ordering': ['content_type'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -56,7 +55,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Usuario',
                 'verbose_name_plural': 'Usuarios',
                 'ordering': ['user'],
-                'db_tablespace': 'ts_comer',
             },
         ),
     ]

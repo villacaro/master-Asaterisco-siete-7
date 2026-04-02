@@ -27,7 +27,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Límite del Centro',
                 'verbose_name_plural': 'Límites del Centro',
                 'ordering': ['agencia'],
-                'db_tablespace': 'ts_parley',
             },
         ),
     ]

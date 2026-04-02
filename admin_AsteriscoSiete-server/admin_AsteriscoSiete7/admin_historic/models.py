@@ -128,7 +128,6 @@ class UsersProcesses(models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Tipo de proceso')
         verbose_name_plural = ('Tipos de procesos')
         ordering = ["content_type", ]
@@ -211,7 +210,6 @@ class Sessions(AbstractBaseUUID):
     )
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Session de usuario')
         verbose_name_plural = ('Sessiones por usuario')
         ordering = ["-enddate", ]
@@ -328,7 +326,6 @@ class SessionsDetail(AbstractBaseUUID):
     )
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Detalle de una session')
         verbose_name_plural = ('Detalle de las sessiones por usuario')
         ordering = ["-created_at", ]
@@ -481,7 +478,6 @@ class TaquillaSessions(AbstractBaseUUID):
     )
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Session por taquilla')
         verbose_name_plural = ('Sessiones por taquillas')
         ordering = ["-enddate", ]
@@ -538,7 +534,6 @@ class TaquillaSessionsDetail(AbstractBaseUUID):
     )
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Detalle de la session por taquilla')
         verbose_name_plural = ('Detalle de las sessiones por taquillas')
         ordering = ["-created_at", ]
@@ -578,7 +573,6 @@ class HechoConnectionsComer(models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Hecho de conexion')
         verbose_name_plural = ('Hecho de conexiones')
 

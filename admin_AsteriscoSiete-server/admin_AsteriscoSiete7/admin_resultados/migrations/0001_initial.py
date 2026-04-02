@@ -25,7 +25,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Anotacion',
                 'verbose_name_plural': 'Anotaciones por grupo',
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -43,7 +42,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Anotacion',
                 'verbose_name_plural': 'Anotaciones por grupo',
-                'db_tablespace': 'ts_parley',
             },
         ),
         migrations.CreateModel(
@@ -61,7 +59,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Resultado de un ecuentro',
                 'verbose_name_plural': 'Resultados por encuentros',
-                'db_tablespace': 'ts_parley',
                 'unique_together': {('encuentro', 'sistema')},
             },
         ),
@@ -81,7 +78,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Restriccion de resultado',
                 'verbose_name_plural': 'Restricciones de resultados',
-                'db_tablespace': 'ts_parley',
             },
         ),
     ]

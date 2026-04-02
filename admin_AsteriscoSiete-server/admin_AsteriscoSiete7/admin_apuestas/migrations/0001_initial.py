@@ -28,7 +28,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Ticket',
                 'verbose_name_plural': 'Tickets',
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -48,7 +47,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Detalle de ticket',
                 'verbose_name_plural': 'Detalle de tickets',
                 'ordering': ['created_at'],
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -64,7 +62,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Estatus de un item de un ticket',
                 'verbose_name_plural': 'Estatus de los items de los tickets',
                 'ordering': ['startdate'],
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -80,7 +77,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Estatus de un ticket',
                 'verbose_name_plural': 'Estatus de los tickets',
                 'ordering': ['startdate'],
-                'db_tablespace': 'ts_finance',
             },
         ),
         migrations.CreateModel(
@@ -97,7 +93,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Tipo de apuesta para un ticket',
                 'verbose_name_plural': 'Tipos de apuestas para los tickes',
                 'ordering': ['nombre'],
-                'db_tablespace': 'ts_finance',
             },
         ),
     ]

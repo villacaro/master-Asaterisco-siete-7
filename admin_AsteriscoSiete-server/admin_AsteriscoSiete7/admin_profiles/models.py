@@ -27,7 +27,6 @@ class Paises(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Pais')
         verbose_name_plural = ('Paises')
         ordering = ['nombre', ]
@@ -65,7 +64,6 @@ class Estados(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Estado')
         verbose_name_plural = ('Estados')
         ordering = ['nombre', ]
@@ -110,7 +108,6 @@ class Municipios(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Municipio')
         verbose_name_plural = ('Municipios')
         ordering = ['nombre', ]
@@ -215,7 +212,6 @@ class Direcciones(models.Model):
     audit_exclude = ('updated_at', )
 
     class Meta:
-        db_tablespace = 'ts_comer'
         verbose_name = ('Direccione')
         verbose_name_plural = ('Direcciones')
 

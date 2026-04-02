@@ -24,7 +24,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Estado',
                 'verbose_name_plural': 'Estados',
                 'ordering': ['nombre'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -39,7 +38,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Pais',
                 'verbose_name_plural': 'Paises',
                 'ordering': ['nombre'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -56,7 +54,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Municipio',
                 'verbose_name_plural': 'Municipios',
                 'ordering': ['nombre'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.AddField(
@@ -95,7 +92,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Direccione',
                 'verbose_name_plural': 'Direcciones',
-                'db_tablespace': 'ts_comer',
             },
         ),
     ]

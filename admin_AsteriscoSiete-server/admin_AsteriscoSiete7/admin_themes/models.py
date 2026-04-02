@@ -31,7 +31,6 @@ class Company(models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Empresa')
         verbose_name_plural = ('Empresas')
         ordering = ["name", ]
@@ -101,7 +100,6 @@ class Theme(models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Tema')
         verbose_name_plural = ('Temas')
         ordering = ["name", ]
@@ -163,7 +161,6 @@ class Color(models.Model):
     )
 
     class Meta:
-        db_tablespace = "ts_comer"
         verbose_name = ('Color')
         verbose_name_plural = ('Colores')
         unique_together = [('theme', 'color_type'), ('theme', 'color')]

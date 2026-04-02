@@ -41,7 +41,6 @@ class TicketsType(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Tipo de apuesta para un ticket')
         verbose_name_plural = ('Tipos de apuestas para los tickes')
         ordering = ['nombre', ]
@@ -143,7 +142,6 @@ class Tickets(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Ticket')
         verbose_name_plural = ('Tickets')
 
@@ -492,7 +490,6 @@ class TicketsDetail(models.Model):
         return '{0}'.format(self.pk)
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Detalle de ticket')
         verbose_name_plural = ('Detalle de tickets')
         ordering = ['created_at', ]
@@ -630,7 +627,6 @@ class TicketStatus(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Estatus de un ticket')
         verbose_name_plural = ('Estatus de los tickets')
         ordering = ['startdate', ]
@@ -675,7 +671,6 @@ class TicketsDetailStatus(models.Model):
     )
 
     class Meta:
-        db_tablespace = 'ts_finance'
         verbose_name = ('Estatus de un item de un ticket')
         verbose_name_plural = ('Estatus de los items de los tickets')
         ordering = ['startdate', ]

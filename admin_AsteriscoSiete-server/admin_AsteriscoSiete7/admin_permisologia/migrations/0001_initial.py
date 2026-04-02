@@ -26,7 +26,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Grupo',
                 'verbose_name_plural': 'Grupos',
                 'ordering': ['name'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -40,7 +39,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Permiso Venta',
                 'verbose_name_plural': 'Permisos ventas',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -54,7 +52,6 @@ class Migration(migrations.Migration):
             options={
                 'verbose_name': 'Permiso Venta (Restricciones)',
                 'verbose_name_plural': 'Permisos ventas (Restricciones)',
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -78,7 +75,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Menu (url)',
                 'verbose_name_plural': 'Menus (enlaces)',
                 'ordering': ['orden'],
-                'db_tablespace': 'ts_comer',
             },
         ),
         migrations.CreateModel(
@@ -96,7 +92,6 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Permiso',
                 'verbose_name_plural': 'Permisos',
                 'ordering': ['content_type', 'name'],
-                'db_tablespace': 'ts_comer',
             },
         ),
     ]
