@@ -1,0 +1,52 @@
+# Asterisco Siete (*7) — Requirements de Producción
+# ====================================================
+# Instalar con: pip install -r requirements.txt
+
+# Django core
+Django==6.0.3
+asgiref==3.11.1
+sqlparse==0.5.5
+
+# Base de datos PostgreSQL (Supabase)
+psycopg2-binary==2.9.10
+dj-database-url==3.1.2
+
+# Servidor WSGI de producción
+gunicorn==23.0.0
+
+# Archivos estáticos en producción (sin Nginx)
+whitenoise==6.12.0
+
+# REST API
+djangorestframework==3.17.1
+djangorestframework_simplejwt==5.5.1
+django-filter==25.2
+django-cors-headers==4.9.0
+
+# Auth y permisos
+django-guardian==3.3.1
+django-crequest==2018.5.11
+django-extensions==4.1
+
+# Firebase (notificaciones)
+firebase_admin==7.1.0
+
+# Utilidades
+requests==2.32.5
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.2
+PyJWT==2.11.0
+six==1.17.0
+jsonfield==3.2.0
+pillow==12.1.1
+
+# Reportes PDF/Excel
+pdfkit==1.0.0
+xhtml2pdf==0.2.17
+reportlab==4.4.10
+lxml==6.0.2
+
+# Celery (opcional — comentado en fase inicial)
+# celery==5.6.3
+# kombu==5.6.2
+# redis==7.4.0

@@ -1,0 +1,2 @@
+web: gunicorn admin_asterisco7.wsgi --log-file - --workers 2 --timeout 120
+release: python manage.py migrate --settings=admin_asterisco7.settings_production --run-syncdb

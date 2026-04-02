@@ -1,9 +1,56 @@
-#admin_banklotsports/media
-#admin_banklotsports/static/themes
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Django ────────────────────────────────────────────────────────────────────
+*.sqlite3
 staticfiles/
-flower*
+media/
+local_settings.py
+settings_local.py
+db.sqlite3
 celerybeat-schedule*
-*.pyc*
-#*.json
+flower*
 core
-#admin_banklotsports/_settings.py
+
+# ── Variables de entorno — NUNCA subir al repo ────────────────────────────────
+.env
+.env.local
+.env.production
+*.env
+
+# ── Archivos temporales y de diagnóstico ─────────────────────────────────────
+check*.txt
+mig*.txt
+migrate*.txt
+fix_*.py
+check_*.py
+debug_*.txt
+fk_todo.txt
+classes_models.txt
+sports_refs.txt
+templates_list.txt
+tmp_paths.txt
+field_lines.txt
+context_lines.txt
+fix_all_result.txt
+missing_fields.txt
+
+# ── IDEs y editores ───────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
