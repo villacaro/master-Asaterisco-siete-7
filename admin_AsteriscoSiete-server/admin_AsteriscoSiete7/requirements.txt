@@ -32,6 +32,9 @@ django-extensions==4.1
 # firebase_admin se instala con --prefer-binary para evitar compilación de pycairo
 firebase-admin==6.5.0
 
+# Criptografía (util_crypto.py usa AES)
+pycryptodome==3.21.0
+
 # Utilidades
 requests==2.32.5
 python-dateutil==2.9.0.post0
@@ -41,7 +44,8 @@ six==1.17.0
 jsonfield==3.2.0
 pillow==11.1.0
 
-# Reportes PDF
+# Reportes PDF (pdfkit wrapper, xhtml2pdf, reportlab)
+pdfkit==1.0.0
 reportlab==4.2.5
 xhtml2pdf==0.2.16
 lxml==5.3.0
