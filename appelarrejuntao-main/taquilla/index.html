@@ -4624,7 +4624,7 @@
 
             try {
                 // Intenta obtener resultados del backend Django
-                const response = await fetch('http://localhost:8000/api/taquilla/resultados-hoy/', {
+                const response = await fetch('/api/taquilla/resultados-hoy/', {
                     signal: AbortSignal.timeout(3000)
                 });
 

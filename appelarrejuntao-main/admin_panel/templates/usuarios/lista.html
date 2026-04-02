@@ -1,29 +1,84 @@
 {% extends "base.html" %}
-{% block title %}Usuarios Firebase – Admin{% endblock %}
+{% block title %}Gestión de Usuarios — El Arrejuntao{% endblock %}
+
 {% block content %}
-<div class="card">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-    <h2>👥 Usuarios de Firebase ({{ usuarios|length }})</h2>
+<!-- ══════════════════ ENCABEZADO CON CONTADORES ══════════════════ -->
+<div class="card" style="margin-bottom:1rem;">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h2 style="margin-bottom:0.25rem;">👥 Gestión de Usuarios Firebase</h2>
+      <p style="font-size:0.8rem;color:var(--muted);">Administra los accesos al sistema Arrejuntao</p>
+    </div>
     <a href="{% url 'crear_usuario' %}" class="btn btn-gold">➕ Nuevo Usuario</a>
   </div>
 
-  {% if usuarios %}
-  <table>
+  <!-- Contadores por estado -->
+  <div id="contadores" style="display:flex;gap:0.75rem;margin-top:1.25rem;flex-wrap:wrap;">
+    <div class="kpi-chip chip-all" onclick="filtrarPor('all')" data-filtro="all">
+      <span class="chip-label">Todos</span>
+      <span id="cnt-all" class="chip-num">{{ usuarios|length }}</span>
+    </div>
+    <div class="kpi-chip chip-active" onclick="filtrarPor('activo')" data-filtro="activo">
+      <span class="chip-label">🟢 Activos</span>
+      <span id="cnt-activo" class="chip-num">-</span>
+    </div>
+    <div class="kpi-chip chip-disabled" onclick="filtrarPor('deshabilitado')" data-filtro="deshabilitado">
+      <span class="chip-label">🔴 Deshabilitados</span>
+      <span id="cnt-deshabilitado" class="chip-num">-</span>
+    </div>
+    <div class="kpi-chip chip-unver" onclick="filtrarPor('noverif')" data-filtro="noverif">
+      <span class="chip-label">⏳ Sin verificar</span>
+      <span id="cnt-noverif" class="chip-num">-</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ BARRA DE BÚSQUEDA ══════════════════ -->
+<div class="card" style="padding:1rem 1.5rem;margin-bottom:1rem;">
+  <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+    <div style="position:relative;flex:1;min-width:220px;">
+      <span style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--muted);">🔍</span>
+      <input type="text" id="busqueda" placeholder="Buscar por email o nombre…"
+             style="padding-left:2.25rem;background:rgba(0,0,0,0.4);"
+             oninput="aplicarFiltros()" />
+    </div>
+    <button class="btn" onclick="exportarCSV()"
+            style="background:rgba(245,208,32,0.1);color:var(--gold);border:1px solid rgba(245,208,32,0.3);">
+      ⬇️ Exportar CSV
+    </button>
+  </div>
+  <p id="resultado-info" style="font-size:0.74rem;color:var(--muted);margin-top:0.5rem;"></p>
+</div>
+
+<!-- ══════════════════ TABLA USUARIOS ══════════════════ -->
+{% if usuarios %}
+<div class="card" style="padding:0;overflow:hidden;">
+  <table id="tabla-usuarios">
     <thead>
       <tr>
-        <th>Email</th>
-        <th>Nombre</th>
+        <th style="padding-left:1.2rem;">#</th>
+        <th onclick="ordenarPor('email')" style="cursor:pointer;">Email ↕</th>
+        <th onclick="ordenarPor('nombre')" style="cursor:pointer;">Nombre ↕</th>
         <th>Proveedor</th>
-        <th>Estado</th>
+        <th onclick="ordenarPor('estado')" style="cursor:pointer;">Estado ↕</th>
         <th>Verificado</th>
-        <th>Acciones</th>
+        <th style="text-align:center;">Acciones</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="tbody-usuarios">
       {% for u in usuarios %}
-      <tr>
-        <td style="font-weight:700;">{{ u.email }}</td>
-        <td>{{ u.nombre }}</td>
+      <tr class="fila-usuario"
+          data-email="{{ u.email|lower }}"
+          data-nombre="{{ u.nombre|lower }}"
+          data-estado="{% if u.deshabilitado %}deshabilitado{% else %}activo{% endif %}"
+          data-verificado="{{ u.verificado }}">
+        <td style="padding-left:1.2rem;color:var(--muted);font-size:0.75rem;">{{ forloop.counter }}</td>
+        <td style="font-weight:700;font-size:0.88rem;">
+          <a href="{% url 'detalle_usuario' u.uid %}" style="color:var(--gold);text-decoration:none;">
+            {{ u.email }}
+          </a>
+        </td>
+        <td>{{ u.nombre|default:"—" }}</td>
         <td>
           {% for p in u.proveedor %}
             <span class="badge badge-purple">{{ p }}</span>
@@ -44,31 +99,29 @@
           {% endif %}
         </td>
         <td>
-          <div class="actions">
-            <a href="{% url 'detalle_usuario' u.uid %}" class="btn btn-purple">📂 Ver datos</a>
+          <div class="actions" style="justify-content:center;">
+            <a href="{% url 'detalle_usuario' u.uid %}" class="btn btn-purple" title="Ver detalle">📂</a>
 
             {% if u.deshabilitado %}
-              <a href="{% url 'toggle_usuario' u.uid %}?deshabilitar=0" class="btn btn-green">✅ Habilitar</a>
+              <a href="{% url 'toggle_usuario' u.uid %}?deshabilitar=0" class="btn btn-green" title="Habilitar">✅</a>
             {% else %}
-              <a href="{% url 'toggle_usuario' u.uid %}?deshabilitar=1" class="btn btn-red">⛔ Deshabilitar</a>
+              <a href="{% url 'toggle_usuario' u.uid %}?deshabilitar=1" class="btn btn-red" title="Deshabilitar">⛔</a>
             {% endif %}
 
-            <!-- Cambiar contraseña -->
             <form method="POST" action="{% url 'cambiar_password' u.uid %}"
                   onsubmit="return confirm('¿Cambiar contraseña de {{ u.email }}?')"
-                  style="display:inline;">
+                  style="display:inline;margin:0;">
               {% csrf_token %}
-              <input type="password" name="nueva_password" placeholder="Nueva contraseña"
-                     style="width:140px;display:inline;padding:0.3rem 0.5rem;font-size:0.78rem;" required />
-              <button type="submit" class="btn btn-purple">🔑</button>
+              <input type="password" name="nueva_password" placeholder="Nueva clave"
+                     style="width:120px;display:inline;padding:0.3rem 0.5rem;font-size:0.78rem;" required />
+              <button type="submit" class="btn btn-purple" title="Cambiar contraseña">🔑</button>
             </form>
 
-            <!-- Eliminar -->
             <form method="POST" action="{% url 'eliminar_usuario' u.uid %}"
                   onsubmit="return confirm('⚠️ ¿Eliminar permanentemente a {{ u.email }}?')"
-                  style="display:inline;">
+                  style="display:inline;margin:0;">
               {% csrf_token %}
-              <button type="submit" class="btn btn-red">🗑 Eliminar</button>
+              <button type="submit" class="btn btn-red" title="Eliminar">🗑</button>
             </form>
           </div>
         </td>
@@ -76,10 +129,137 @@
       {% endfor %}
     </tbody>
   </table>
-  {% else %}
-    <p style="color:var(--muted);text-align:center;padding:2rem;">
-      No hay usuarios en Firebase Auth o las credenciales no están configuradas.
-    </p>
-  {% endif %}
 </div>
+{% else %}
+  <div class="card" style="text-align:center;padding:3rem 2rem;">
+    <div style="font-size:3rem;margin-bottom:1rem;">👤</div>
+    <p style="color:var(--muted);">No hay usuarios en Firebase Auth o las credenciales no están configuradas.</p>
+  </div>
+{% endif %}
+
+<!-- ══════════════════ ESTILOS CHIP ══════════════════ -->
+<style>
+.kpi-chip {
+  display:flex;align-items:center;gap:0.5rem;
+  padding:0.45rem 1rem;border-radius:2rem;
+  cursor:pointer;font-size:0.8rem;font-weight:600;
+  border:1px solid transparent;transition:all 0.2s;user-select:none;
+}
+.kpi-chip:hover { filter:brightness(1.3); }
+.kpi-chip.activo-chip { outline:2px solid var(--gold); }
+.chip-all      { background:rgba(255,255,255,0.07); border-color:rgba(255,255,255,0.15); color:var(--text); }
+.chip-active   { background:rgba(34,197,94,0.12);   border-color:rgba(34,197,94,0.3);   color:#86efac; }
+.chip-disabled { background:rgba(239,68,68,0.12);   border-color:rgba(239,68,68,0.3);   color:#fca5a5; }
+.chip-unver    { background:rgba(245,208,32,0.1);   border-color:rgba(245,208,32,0.25); color:#fde68a; }
+.chip-num { font-weight:900;font-size:1rem; }
+.chip-label { font-size:0.78rem; }
+tr.oculta { display:none; }
+</style>
+
+<!-- ══════════════════ JAVASCRIPT: filtros + ordenar + CSV ══════════════════ -->
+<script>
+// ── Estado
+let filtroActivo = 'all';
+let ordenCol = null;
+let ordenDir = 1;
+
+// ── Calcular y mostrar contadores al cargar
+window.addEventListener('DOMContentLoaded', () => {
+  actualizarContadores();
+  setChipActivo('all');
+});
+
+function actualizarContadores() {
+  const filas = document.querySelectorAll('.fila-usuario');
+  let activos = 0, deshabilitados = 0, noverif = 0;
+  filas.forEach(f => {
+    if (f.dataset.estado === 'activo') activos++;
+    else deshabilitados++;
+    if (f.dataset.verificado === 'False' || f.dataset.verificado === 'false') noverif++;
+  });
+  document.getElementById('cnt-all').textContent          = filas.length;
+  document.getElementById('cnt-activo').textContent       = activos;
+  document.getElementById('cnt-deshabilitado').textContent= deshabilitados;
+  document.getElementById('cnt-noverif').textContent      = noverif;
+}
+
+// ── Filtrar por chip de estado
+function filtrarPor(estado) {
+  filtroActivo = estado;
+  setChipActivo(estado);
+  aplicarFiltros();
+}
+
+function setChipActivo(estado) {
+  document.querySelectorAll('.kpi-chip').forEach(c => c.classList.remove('activo-chip'));
+  const chip = document.querySelector(`.kpi-chip[data-filtro="${estado}"]`);
+  if (chip) chip.classList.add('activo-chip');
+}
+
+// ── Aplicar búsqueda + filtro de estado
+function aplicarFiltros() {
+  const q    = (document.getElementById('busqueda').value || '').toLowerCase().trim();
+  const filas = document.querySelectorAll('.fila-usuario');
+  let visibles = 0;
+
+  filas.forEach(f => {
+    const emailOk  = f.dataset.email.includes(q) || !q;
+    const nombreOk = f.dataset.nombre.includes(q);
+    const textoOk  = emailOk || nombreOk;
+
+    let estadoOk = true;
+    if (filtroActivo === 'activo')        estadoOk = f.dataset.estado === 'activo';
+    if (filtroActivo === 'deshabilitado') estadoOk = f.dataset.estado === 'deshabilitado';
+    if (filtroActivo === 'noverif')       estadoOk = (f.dataset.verificado === 'False' || f.dataset.verificado === 'false');
+
+    if (textoOk && estadoOk) {
+      f.classList.remove('oculta');
+      visibles++;
+    } else {
+      f.classList.add('oculta');
+    }
+  });
+
+  const info = document.getElementById('resultado-info');
+  info.textContent = q ? `Mostrando ${visibles} resultado(s) para "${q}"` : '';
+}
+
+// ── Ordenar columnas
+function ordenarPor(col) {
+  if (ordenCol === col) ordenDir *= -1;
+  else { ordenCol = col; ordenDir = 1; }
+
+  const tbody = document.getElementById('tbody-usuarios');
+  const filas = Array.from(tbody.querySelectorAll('tr'));
+  filas.sort((a, b) => {
+    const va = (a.dataset[col] || '').toLowerCase();
+    const vb = (b.dataset[col] || '').toLowerCase();
+    return va < vb ? -ordenDir : va > vb ? ordenDir : 0;
+  });
+  filas.forEach(f => tbody.appendChild(f));
+}
+
+// ── Exportar tabla visible a CSV
+function exportarCSV() {
+  const filas = document.querySelectorAll('.fila-usuario:not(.oculta)');
+  let csv = 'Email,Nombre,Estado,Verificado\n';
+  filas.forEach(f => {
+    const celdas = f.querySelectorAll('td');
+    if (celdas.length >= 5) {
+      const email  = (celdas[1].textContent.trim()).replace(/,/g, ';');
+      const nombre = (celdas[2].textContent.trim()).replace(/,/g, ';');
+      const estado = (celdas[4].textContent.trim()).replace(/,/g, ';');
+      const verif  = (celdas[5].textContent.trim()).replace(/,/g, ';');
+      csv += `"${email}","${nombre}","${estado}","${verif}"\n`;
+    }
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'usuarios_arrejuntao.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
 {% endblock %}

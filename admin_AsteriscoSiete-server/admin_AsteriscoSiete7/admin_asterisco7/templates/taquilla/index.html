@@ -930,6 +930,89 @@
             <!-- PANEL DERECHO: TICKETS VIRTUALES (Drawer en móvil) -->
             <div id="pos-ticket-panel"
                 class="fixed md:relative top-0 right-0 h-full w-[85%] sm:w-[320px] md:w-[320px] bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 flex flex-col shadow-2xl md:shadow-none z-[55] md:z-10 transform translate-x-full md:translate-x-0 transition-transform duration-300 no-print">
+
+                <!-- ── DESPLEGABLE DE USUARIO (Encima del Ticket en Curso) ── -->
+                <div id="ticket-panel-user-card" class="shrink-0 hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+
+                    <!-- Cabecera clicable para desplegar/colapsar -->
+                    <button onclick="toggleTicketUserPanel()" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors text-left">
+                        <!-- Avatar -->
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md flex-shrink-0">
+                            <span id="ticket-panel-initials">??</span>
+                        </div>
+                        <!-- Nombre + taquilla -->
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold text-slate-800 dark:text-white text-sm truncate leading-tight" id="ticket-panel-name">—</div>
+                            <div class="text-[11px] text-slate-400 dark:text-slate-500 truncate leading-tight" id="ticket-panel-taquilla">—</div>
+                        </div>
+                        <!-- Flecha -->
+                        <svg id="ticket-user-chevron" class="w-4 h-4 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <!-- Cuerpo desplegable (oculto por defecto) -->
+                    <div id="ticket-user-panel-body" class="hidden">
+                        <!-- Badge Operador -->
+                        <div class="px-4 pb-2">
+                            <span class="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300">Operador</span>
+                        </div>
+
+                        <!-- Separador -->
+                        <div class="border-t border-slate-100 dark:border-slate-800 mx-4"></div>
+
+                        <!-- Info: Estado / Turno / Sesión -->
+                        <div class="px-4 py-3 space-y-2.5">
+                            <!-- Estado -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                    <span class="text-base leading-none">🟢</span> Estado
+                                </div>
+                                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">ACTIVO</span>
+                            </div>
+                            <!-- Turno inicio -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                    <span class="text-base leading-none">🕐</span> Turno inicio
+                                </div>
+                                <span class="text-[12px] font-mono font-bold text-slate-700 dark:text-slate-300" id="ticket-panel-turno">—</span>
+                            </div>
+                            <!-- Sesión -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                                    <span class="text-base leading-none">📅</span> Sesión
+                                </div>
+                                <span class="text-[11px] font-mono font-bold text-slate-700 dark:text-slate-300" id="ticket-panel-session">—</span>
+                            </div>
+                        </div>
+
+                        <!-- Separador -->
+                        <div class="border-t border-slate-100 dark:border-slate-800 mx-4"></div>
+
+                        <!-- Acciones -->
+                        <div class="p-2">
+                            <!-- Mis reportes -->
+                            <button onclick="changeView('reports'); toggleTicketUserPanel()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left">
+                                <div class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-xl flex-shrink-0">📊</div>
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Mis reportes</span>
+                            </button>
+                            <!-- Configuración -->
+                            <button onclick="changeView('config'); toggleTicketUserPanel()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left">
+                                <div class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl flex-shrink-0">⚙️</div>
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Configuración</span>
+                            </button>
+                            <!-- Cerrar sesión -->
+                            <div class="border-t border-slate-100 dark:border-slate-800 mt-1 pt-1 mx-1">
+                                <button onclick="doLogout()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-left">
+                                    <div class="w-9 h-9 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-xl flex-shrink-0">🚪</div>
+                                    <span class="text-sm font-medium text-red-600 dark:text-red-400">Cerrar sesión</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ── FIN DESPLEGABLE USUARIO ── -->
+
                 <div
                     class="p-3 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center shrink-0">
                     <h3
@@ -5025,7 +5108,7 @@
 
             try {
                 // Intenta obtener resultados del backend Django
-                const response = await fetch('http://localhost:8000/api/taquilla/resultados-hoy/', {
+                const response = await fetch('/api/taquilla/resultados-hoy/', {
                     signal: AbortSignal.timeout(3000)
                 });
 
@@ -5206,6 +5289,29 @@
                 sessionStorage.setItem('ast7_login_at', elTurno.textContent);
             }
         }
+
+        // ── Actualizar también la tarjeta del panel de ticket ──
+        const tpCard    = document.getElementById('ticket-panel-user-card');
+        const tpInit    = document.getElementById('ticket-panel-initials');
+        const tpName    = document.getElementById('ticket-panel-name');
+        const tpTaq     = document.getElementById('ticket-panel-taquilla');
+        const tpTurno   = document.getElementById('ticket-panel-turno');
+        const tpSession = document.getElementById('ticket-panel-session');
+        if (tpInit)    tpInit.textContent    = ini;
+        if (tpName)    tpName.textContent    = nombre;
+        if (tpTaq)     tpTaq.textContent     = taquilla;
+        if (tpTurno)   tpTurno.textContent   = elTurno ? elTurno.textContent : new Date().toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'});
+        if (tpSession) tpSession.textContent = nowStr;
+        if (tpCard && nombre !== 'Operador') tpCard.classList.remove('hidden');
+    };
+
+    window.toggleTicketUserPanel = function() {
+        const body    = document.getElementById('ticket-user-panel-body');
+        const chevron = document.getElementById('ticket-user-chevron');
+        if (!body) return;
+        const isOpen = !body.classList.contains('hidden');
+        body.classList.toggle('hidden');
+        if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
     };
 
     window.toggleProfileMenu = function() {
