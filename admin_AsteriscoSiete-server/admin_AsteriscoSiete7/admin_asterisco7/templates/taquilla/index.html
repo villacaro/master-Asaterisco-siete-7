@@ -423,18 +423,20 @@
             class="flex flex-row md:flex-col items-center gap-2 md:gap-6 w-full md:w-auto justify-around md:justify-start">
             <!-- Logo (Oculto en móvil para ahorrar espacio) -->
             <div
-                class="hidden md:flex w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg items-center justify-center text-white font-bold text-lg shadow-glow cursor-pointer transform hover:rotate-12 transition-transform">
-                L</div>
+                class="hidden md:flex w-10 h-10 bg-gradient-to-br from-violet-400 to-purple-600 rounded-xl items-center justify-center text-white cursor-pointer transform hover:scale-110 transition-transform shadow-lg shadow-purple-500/40 select-none"
+                title="Asterisco Siete (*7)">
+                <span class="font-black text-white leading-none" style="font-size:13px; letter-spacing:-0.5px;">*7</span>
+            </div>
 
             <div
                 class="flex flex-row md:flex-col gap-1 md:gap-3 w-full md:w-auto px-2 justify-around md:justify-center flex-1">
                 <!-- MENÚ VENTA TAQUILLA -->
                 <button onclick="changeView('pos')"
                     class="nav-btn p-2 md:p-3 rounded-xl bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-white shadow-inner-strong group relative transition-colors"
-                    title="Venta Taquilla">
+                    title="Inicio / Venta Taquilla">
                     <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z">
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
                         </path>
                     </svg>
                 </button>
@@ -1362,12 +1364,23 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2 md:gap-6">
+                        <!-- Botón Inicio -->
+                        <button onclick="toggleAnimalitos(); changeView('pos');"
+                            title="Inicio"
+                            class="text-indigo-500 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-white p-2 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                        </button>
+                        <!-- Botón Cerrar -->
                         <button onclick="toggleAnimalitos()"
-                            class="text-slate-400 hover:text-slate-800 dark:hover:text-white p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"><svg
-                                class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="text-slate-400 hover:text-slate-800 dark:hover:text-white p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12"></path>
-                            </svg></button>
+                            </svg>
+                        </button>
                     </div>
                 </div>
                 <div class="flex-1 flex flex-col overflow-hidden relative">
@@ -1729,6 +1742,16 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2 md:gap-6 relative z-10">
+                        <!-- Botón Inicio -->
+                        <button onclick="closeMultiProductModal(); changeView('pos');"
+                            title="Inicio"
+                            class="text-indigo-500 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/30">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                        </button>
+                        <!-- Botón Cerrar -->
                         <button onclick="closeMultiProductModal()"
                             class="text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1972,7 +1995,7 @@
                 <!-- ── CARD PERFIL USUARIO (encima de Ticket en Curso) ── -->
                 <div id="ticket-user-profile-card" class="shrink-0 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
                     <div class="px-4 pt-4 pb-3">
-                        <!-- Fila: Avatar + nombre + info -->
+                        <!-- Fila: Avatar + nombre + flecha colapsar -->
                         <div class="flex items-center gap-3 mb-4">
                             <div id="tup-avatar"
                                 class="w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-white font-black text-base shadow-md"
@@ -1982,8 +2005,16 @@
                                 <p id="tup-taquilla" class="text-slate-400 dark:text-slate-500 text-[10px] truncate">ASTERISCO SIETE (*7) TAQU...</p>
                                 <span id="tup-rol" class="inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/50">Operador</span>
                             </div>
+                            <!-- Flecha colapsar tarjeta -->
+                            <button onclick="toggleProfileCard()" id="btn-profile-toggle" title="Colapsar/Expandir"
+                                class="shrink-0 text-slate-400 hover:text-slate-700 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <svg id="icon-profile-chevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                </svg>
+                            </button>
                         </div>
-                        <!-- Info: Estado, Turno, Sesión -->
+                        <!-- Cuerpo colapsable (Estado, Turno, Sesión, IP, botones) -->
+                        <div id="profile-card-body" class="hidden">
                         <div class="space-y-2 mb-4">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
@@ -2038,6 +2069,8 @@
                                 <span class="text-red-500 dark:text-red-400 text-xs font-semibold">Cerrar sesión</span>
                             </button>
                         </div>
+                        <!-- Fin cuerpo colapsable -->
+                        </div>
                     </div>
                 </div>
                 <!-- ── FIN CARD PERFIL ─────────────────────────────────── -->
@@ -2090,6 +2123,23 @@
                   document.addEventListener('DOMContentLoaded', populate);
                   if(document.readyState!=='loading') populate();
                 })();
+
+                // Colapsar / expandir tarjeta de perfil del panel derecho
+                function toggleProfileCard() {
+                    const body = document.getElementById('profile-card-body');
+                    const icon = document.getElementById('icon-profile-chevron');
+                    if (!body) return;
+                    const collapsed = body.classList.contains('hidden');
+                    if (collapsed) {
+                        body.classList.remove('hidden');
+                        // Rotar flecha hacia arriba (^ = ya arriba, no rotate)
+                        if (icon) icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        body.classList.add('hidden');
+                        // Rotar flecha hacia abajo
+                        if (icon) icon.style.transform = 'rotate(180deg)';
+                    }
+                }
                 </script>
 
 
@@ -2137,6 +2187,12 @@
                             id="grand-total-live-multi" class="font-bold text-xl text-slate-800 dark:text-white">Bs
                             0,00</span></div>
                     <div class="flex flex-col gap-2">
+                        <!-- Botón APUESTA (nuevo) -->
+                        <button id="btn-apuesta-multi" onclick="addMultiBet()"
+                            class="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-3 md:py-2.5 rounded font-black shadow-lg shadow-orange-600/40 transition-all uppercase tracking-widest text-[11px] flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                            Apuesta
+                        </button>
                         <div class="grid grid-cols-2 gap-2">
                             <button id="btn-verify-multi" onclick="openPrintPreview()"
                                 class="bg-emerald-600 hover:bg-emerald-500 text-white py-3 md:py-2.5 rounded font-bold shadow-lg shadow-emerald-900/50 transition-all uppercase text-[10px] tracking-wider flex items-center justify-center gap-1.5 opacity-50 cursor-not-allowed"
@@ -4421,6 +4477,25 @@
             const modal = document.getElementById('multi-product-modal');
             modal.classList.add('opacity-0');
             setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // Colapsar / expandir panel izquierdo del modal Arrejuntao
+        function toggleMultiLeftPanel() {
+            const leftPanel = document.querySelector('#multi-product-modal .flex-1.flex.flex-col.h-full.overflow-hidden');
+            const icon = document.getElementById('icon-collapse-multi');
+            if (!leftPanel) return;
+            const isCollapsed = leftPanel.style.maxWidth === '0px' || leftPanel.classList.contains('hidden');
+            if (isCollapsed) {
+                // Expandir
+                leftPanel.classList.remove('hidden');
+                leftPanel.style.maxWidth = '';
+                leftPanel.style.overflow = '';
+                if (icon) icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>';
+            } else {
+                // Colapsar
+                leftPanel.classList.add('hidden');
+                if (icon) icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>';
+            }
         }
 
         function renderMultiTimes() {

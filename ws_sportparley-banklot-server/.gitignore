@@ -1,7 +1,0 @@
-ws_sportparley/media
-staticfiles/
-flower*
-celerybeat-schedule*
-*.pyc
-core
-ws_sportparley/_settings.py

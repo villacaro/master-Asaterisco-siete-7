@@ -1,0 +1,2338 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EL ARREJUNTAO — Panel Administrativo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="{% static 'js/chart.umd.min.js' %}"></script>
+  <style>
+    :root {
+      --sidebar-bg: #0b0f1a;
+      --sidebar-border: rgba(255,255,255,0.07);
+      --sidebar-w: 230px;
+      --accent: #22c55e;
+      --accent2: #16a34a;
+      --gold: #f5d020;
+      --purple: #7c3aed;
+      --blue: #3b82f6;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --bg: #0d111e;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.09);
+      --text: #e8edf5;
+      --muted: rgba(255,255,255,0.42);
+      --header-h: 54px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ─────────────────────────────────── */
+    .header {
+      height: var(--header-h);
+      background: linear-gradient(135deg, #0b0f1a, #111827);
+      border-bottom: 1px solid rgba(34,197,94,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.25rem;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    }
+    .header-brand { display: flex; align-items: center; gap: 0.6rem; }
+    .header-brand .logo-icon { font-size: 1.4rem; }
+    .header-brand .brand-text {
+      font-size: 0.82rem; font-weight: 900; letter-spacing: 0.06em; line-height: 1.15;
+      color: var(--text);
+    }
+    .header-brand .brand-sub { font-size: 0.6rem; color: var(--muted); font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+    .header-ip { font-size: 0.72rem; color: var(--muted); }
+    .header-ip span { color: var(--accent); font-weight: 600; }
+    .header-user {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      border-radius: 2rem; padding: 0.3rem 0.75rem;
+      font-size: 0.78rem; font-weight: 600;
+    }
+    .header-user .avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700;
+    }
+    .btn-logout {
+      background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25);
+      color: #fca5a5; border-radius: 0.4rem; padding: 0.3rem 0.65rem;
+      font-size: 0.72rem; font-weight: 600; cursor: pointer; text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover { background: rgba(239,68,68,0.22); }
+
+    /* ── LAYOUT ─────────────────────────────────── */
+    .layout {
+      display: flex;
+      margin-top: var(--header-h);
+      min-height: calc(100vh - var(--header-h));
+    }
+
+    /* ── SIDEBAR ─────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--sidebar-border);
+      flex-shrink: 0;
+      padding: 1rem 0;
+      position: fixed;
+      top: var(--header-h);
+      left: 0;
+      bottom: 0;
+      overflow-y: auto;
+    }
+    .sidebar::-webkit-scrollbar { width: 3px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+    .nav-section-label {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.9rem 1rem 0.35rem 1rem;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.62);
+      text-decoration: none;
+      border-radius: 0;
+      transition: all 0.18s;
+      position: relative;
+      cursor: pointer;
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .nav-item:hover {
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+    }
+    .nav-item.active {
+      background: rgba(34,197,94,0.1);
+      color: var(--accent);
+      border-left: 3px solid var(--accent);
+    }
+    .nav-item .nav-icon {
+      width: 20px; text-align: center; font-size: 0.85rem; flex-shrink: 0;
+    }
+    .nav-badge {
+      margin-left: auto; background: rgba(124,58,237,0.25); color: #c4b5fd;
+      border-radius: 9999px; padding: 0.1rem 0.45rem; font-size: 0.6rem; font-weight: 700;
+      border: 1px solid rgba(124,58,237,0.3);
+    }
+    .nav-sep { margin: 0.5rem 0; border-top: 1px solid var(--sidebar-border); }
+
+    /* ── MAIN CONTENT ─────────────────────────────── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── TABS ─────────────────────────────────────── */
+    .tabs-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.6rem 1.5rem;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .tab {
+      display: flex; align-items: center; gap: 0.35rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 0.45rem;
+      font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.18s;
+      color: var(--muted);
+      background: transparent; border: 1px solid transparent;
+    }
+    .tab:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .tab.active { color: var(--accent); background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); }
+    .tab-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .tab-dot.green { background: var(--accent); }
+    .tab-dot.amber { background: var(--amber); }
+    .tab-dot.red   { background: var(--red); }
+    .tab-dot.blue  { background: var(--blue); }
+    .tab-dot.purple{ background: var(--purple); }
+
+    /* ── PAGE CONTENT ─────────────────────────────── */
+    .page-content {
+      padding: 1.25rem 1.5rem;
+      flex: 1;
+    }
+
+    /* ── SECTION PANELS ───────────────────────────── */
+    .section-panel { display: none; }
+    .section-panel.visible { display: block; }
+
+    /* ── PAGE HEADER ──────────────────────────────── */
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;
+    }
+    .page-header h2 { font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; }
+    .breadcrumb { font-size: 0.72rem; color: var(--muted); }
+    .breadcrumb span { color: var(--accent); }
+
+    /* ── STATS CARDS ──────────────────────────────── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.9rem; margin-bottom: 1.25rem; }
+    @media (max-width: 900px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 0.75rem; padding: 1rem 1.1rem;
+    }
+    .stat-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem; font-weight: 600; }
+    .stat-value { font-size: 1.5rem; font-weight: 900; line-height: 1; }
+    .stat-value.green { color: var(--accent); }
+    .stat-value.amber { color: var(--amber); }
+    .stat-value.blue  { color: var(--blue); }
+    .stat-value.muted { color: var(--muted); }
+    .stat-sub { font-size: 0.65rem; color: var(--muted); margin-top: 0.3rem; }
+
+    /* ── DATE FILTERS ─────────────────────────────── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1rem; flex-wrap: wrap;
+    }
+    .filter-bar label { font-size: 0.7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; }
+    .filter-bar input[type=date] {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+      color: var(--text); border-radius: 0.4rem; padding: 0.35rem 0.65rem;
+      font-size: 0.78rem; outline: none; font-family: inherit;
+    }
+    .filter-bar input[type=date]:focus { border-color: var(--accent); }
+
+    /* ── SORTEO CARD ──────────────────────────────── */
+    .sorteo-cards { display: flex; flex-direction: column; gap: 0.75rem; }
+    .sorteo-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 0.75rem; overflow: hidden;
+    }
+    .sorteo-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .sorteo-name { font-size: 0.85rem; font-weight: 700; }
+    .sorteo-meta { display: flex; align-items: center; gap: 0.6rem; }
+    .badge-open   { background: rgba(34,197,94,0.18); color: #86efac; border: 1px solid rgba(34,197,94,0.3); border-radius: 9999px; padding: 0.15rem 0.55rem; font-size: 0.65rem; font-weight: 700; }
+    .badge-closed { background: rgba(239,68,68,0.18); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); border-radius: 9999px; padding: 0.15rem 0.55rem; font-size: 0.65rem; font-weight: 700; }
+    .btn-action { padding: 0.28rem 0.7rem; border-radius: 0.4rem; font-size: 0.72rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.18s; font-family: inherit; }
+    .btn-cerrar { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+    .btn-abrir  { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
+    .btn-action:hover { filter: brightness(1.25); }
+
+    /* sorteo table */
+    .sorteo-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .sorteo-table th { padding: 0.45rem 0.9rem; color: var(--muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; border-bottom: 1px solid var(--border); text-align: left; }
+    .sorteo-table td { padding: 0.45rem 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.04); color: rgba(255,255,255,0.75); }
+    .sorteo-table tr:last-child td { border-bottom: none; }
+    .sorteo-table .total-row td { font-weight: 700; color: var(--gold); background: rgba(245,208,32,0.04); }
+    .col-num { font-weight: 700; color: var(--accent); }
+    .col-zero { color: var(--muted); }
+
+    /* ── SORTEO FOOTER ─────────────────────────────── */
+    .sorteo-card-footer {
+      padding: 0.5rem 1rem;
+      background: rgba(0,0,0,0.15);
+      font-size: 0.7rem; color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .notas-input {
+      background: transparent; border: none; outline: none;
+      color: var(--muted); font-size: 0.7rem; width: 100%; font-family: inherit;
+    }
+    .notas-input::placeholder { color: rgba(255,255,255,0.2); }
+
+    /* ── DASHBOARD ────────────────────────────────── */
+    .dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.25rem; }
+    @media (max-width: 800px) { .dash-grid { grid-template-columns: 1fr; } }
+    .dash-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.1rem;
+    }
+    .dash-card h3 { font-size: 0.75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.7rem; }
+    .dash-card .big-num { font-size: 2rem; font-weight: 900; color: var(--accent); }
+    .dash-card .big-num.amber { color: var(--amber); }
+    .dash-card .big-num.blue { color: var(--blue); }
+    .dash-links { display: flex; flex-direction: column; gap: 0.35rem; }
+    .dash-link { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.65rem; border-radius: 0.4rem; font-size: 0.78rem; color: rgba(255,255,255,0.65); text-decoration: none; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); transition: all 0.18s; cursor: pointer; border-left: none; width: 100%; text-align: left; font-family: inherit; }
+    .dash-link:hover { background: rgba(255,255,255,0.07); color: var(--text); }
+    .dash-link .dl-icon { font-size: 0.9rem; }
+
+    /* ── TABLA USUARIOS ─────────────────────────── */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .data-table th { padding: 0.55rem 0.85rem; color: var(--muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; border-bottom: 1px solid var(--border); text-align: left; }
+    .data-table td { padding: 0.6rem 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .card-box { background: var(--card); border: 1px solid var(--border); border-radius: 0.75rem; overflow: hidden; }
+
+    /* ── BUTTONS ──────────────────────────────────── */
+    .btn-sm { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.7rem; border-radius: 0.4rem; font-size: 0.72rem; font-weight: 600; cursor: pointer; text-decoration: none; border: none; transition: all 0.18s; font-family: inherit; }
+    .btn-primary { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
+    .btn-danger  { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+    .btn-purple2 { background: rgba(124,58,237,0.15); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.3); }
+    .btn-sm:hover { filter: brightness(1.2); }
+    .actions-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+    /* ── EMPTY STATE ──────────────────────────────── */
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 0.85rem; }
+    .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+
+    /* ── LOADING ──────────────────────────────────── */
+    .loading-spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.1); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── SELECT / INPUT FILTERS ─────────────────── */
+    .select-input { background:rgba(0,0,0,0.35); border:1px solid var(--border); color:var(--text); border-radius:0.4rem; padding:0.38rem 0.65rem; font-size:0.78rem; outline:none; font-family:inherit; cursor:pointer; }
+    .select-input:focus { border-color:var(--accent); }
+    .input-filter  { background:rgba(0,0,0,0.35); border:1px solid var(--border); color:var(--text); border-radius:0.4rem; padding:0.38rem 0.65rem; font-size:0.78rem; outline:none; font-family:inherit; }
+    .input-filter:focus { border-color:var(--accent); }
+    .filter-label  { font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; font-weight:700; margin-bottom:0.25rem; }
+
+    /* ── NUMBERS GRID ─────────────────────────────── */
+    .num-grid-table { border-collapse:collapse; font-size:0.67rem; white-space:nowrap; }
+    .num-grid-table th { padding:0.28rem 0.38rem; font-size:0.57rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; border-bottom:1px solid var(--border); border-right:1px solid rgba(255,255,255,0.04); font-weight:700; text-align:center; }
+    .num-grid-table td { padding:0.15rem 0.35rem; border-bottom:1px solid rgba(255,255,255,0.03); border-right:1px solid rgba(255,255,255,0.04); text-align:center; }
+    .num-grid-table .g-sep { border-right:2px solid rgba(255,255,255,0.1) !important; }
+    .ng-p   { color:var(--muted); font-size:0.58rem !important; }
+    .ng-num { font-weight:700; color:rgba(255,255,255,0.75); font-family:monospace; }
+    .ng-num.has-bet { color:var(--accent); }
+    .ng-amt { color:var(--amber); font-weight:600; }
+    .ng-amt.zero { color:rgba(255,255,255,0.12); }
+
+    /* ── CRM SUB-TABS ─────────────────────────────── */
+    .crm-subtabs { display:flex; overflow-x:auto; border-bottom:1px solid var(--border); background:rgba(0,0,0,0.12); }
+    .crm-subtab  { padding:0.52rem 1rem; font-size:0.74rem; font-weight:600; color:var(--muted); cursor:pointer; border:none; border-bottom:2px solid transparent; transition:all 0.18s; white-space:nowrap; background:none; font-family:inherit; }
+    .crm-subtab:hover  { color:var(--text); background:rgba(255,255,255,0.03); }
+    .crm-subtab.active { color:var(--accent); border-bottom-color:var(--accent); }
+    .crm-subpanel { display:none; }
+    .crm-subpanel.visible { display:block; }
+
+    /* ── LOTES GRID ───────────────────────────────── */
+    .lote-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:0.4rem; padding:1rem; }
+    .lote-card  { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); border-radius:0.45rem; padding:0.5rem 0.55rem; cursor:pointer; transition:all 0.15s; }
+    .lote-card:hover { background:rgba(124,58,237,0.12); border-color:rgba(124,58,237,0.35); }
+    .lote-card .ln { font-size:0.7rem; font-weight:800; color:var(--accent); }
+    .lote-card .lr { font-size:0.58rem; color:var(--muted); margin-top:0.12rem; }
+    .lote-card .lc { font-size:0.6rem; color:rgba(255,255,255,0.38); margin-top:0.08rem; }
+
+    /* ── BLOQUEO / RIESGO BADGES ─────────────────── */
+    .toggle-on  { background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); color:#86efac; border-radius:9999px; padding:0.12rem 0.5rem; font-size:0.65rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .toggle-off { background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3);  color:#fca5a5; border-radius:9999px; padding:0.12rem 0.5rem; font-size:0.65rem; font-weight:700; cursor:pointer; font-family:inherit; }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="logo-icon">🎰</div>
+      <div>
+        <div class="brand-text">EL ARREJUNTAO</div>
+        <div class="brand-sub">Panel Administrativo</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-ip">IP: <span id="user-ip">—</span></div>
+      <div class="header-user">
+        <div class="avatar">AD</div>
+        <span>{{ request.user.username|default:"admin" }}</span>
+      </div>
+      <a class="btn-logout" href="/admin/logout/">⏻ Salir</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="nav-section-label">Principal</div>
+      <button class="nav-item active" onclick="showSection('dashboard', this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </button>
+
+      <div class="nav-sep"></div>
+      <div class="nav-section-label">Usuarios</div>
+      <button class="nav-item" onclick="showSection('gestion-usuarios', this)">
+        <span class="nav-icon">👥</span> Gestión de Usuarios
+      </button>
+      <button class="nav-item" onclick="showSection('nuevo-usuario', this)">
+        <span class="nav-icon">➕</span> Nuevo Usuario
+      </button>
+      <button class="nav-item" onclick="showSection('contactos', this)">
+        <span class="nav-icon">📇</span> Contactos
+        <span class="nav-badge">VCF</span>
+      </button>
+      <button class="nav-item" onclick="showSection('crm', this)">
+        <span class="nav-icon">🤝</span> CRM & Contactos
+      </button>
+
+      <div class="nav-sep"></div>
+      <div class="nav-section-label">Lotería El Arrejuntao</div>
+      <button class="nav-item" onclick="showSection('lista-linea', this)">
+        <span class="nav-icon">📋</span> Lista en Línea
+      </button>
+      <button class="nav-item" onclick="showSection('control-riesgo', this)">
+        <span class="nav-icon">⚠️</span> Control de Riesgo
+      </button>
+      <button class="nav-item" onclick="showSection('bloqueo-ventas', this)">
+        <span class="nav-icon">🔒</span> Bloqueo de Ventas
+      </button>
+      <button class="nav-item" onclick="showSection('cierre-sorteos', this)">
+        <span class="nav-icon">🏁</span> Cierre de Sorteos
+      </button>
+
+      <div class="nav-sep"></div>
+      <div class="nav-section-label">Contabilidad</div>
+      <button class="nav-item" onclick="showSection('cuadre', this)">
+        <span class="nav-icon">💰</span> Cuadre Nivel Superior
+      </button>
+
+      <div class="nav-sep"></div>
+      <div class="nav-section-label">Sistema</div>
+      <a class="nav-item" href="/admin/" target="_blank">
+        <span class="nav-icon">⚙️</span> Django Admin
+      </a>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <!-- TABS -->
+      <div class="tabs-bar" id="tabs-bar">
+        <a class="tab active" href="#" onclick="showSection('lista-linea', null, this); return false;">
+          <span class="tab-dot green"></span> Lista en Línea
+        </a>
+        <a class="tab" href="#" onclick="showSection('control-riesgo', null, this); return false;">
+          <span class="tab-dot amber"></span> Control de Riesgo
+        </a>
+        <a class="tab" href="#" onclick="showSection('bloqueo-ventas', null, this); return false;">
+          <span class="tab-dot red"></span> Bloqueo de Ventas
+        </a>
+        <a class="tab" href="#" onclick="showSection('contactos', null, this); return false;">
+          <span class="tab-dot blue"></span> Contactos
+        </a>
+        <a class="tab" href="#" onclick="showSection('cierre-sorteos', null, this); return false;">
+          <span class="tab-dot purple"></span> Cierre de Sorteos
+        </a>
+      </div>
+
+      <div class="page-content">
+
+        <!-- ── DASHBOARD ─────────────────────────────── -->
+        <div id="section-dashboard" class="section-panel visible">
+          <!-- Welcome bar -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:0.5rem;">
+            <div>
+              <div style="font-size:1.35rem;font-weight:800;color:var(--text);letter-spacing:-0.02em;">¡Bienvenido, Admin! 👋</div>
+              <div style="font-size:0.78rem;color:var(--muted);margin-top:0.15rem;">Panel de control · El Arrejuntao</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.6rem;">
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0.45rem 0.85rem;display:flex;align-items:center;gap:0.5rem;">
+                <span style="font-size:1.1rem;">📅</span>
+                <span id="dash-fecha-hoy" style="font-size:0.78rem;font-weight:600;color:var(--text);"></span>
+              </div>
+              <button class="btn-sm btn-primary" onclick="showSection('cierre-sorteos',null)" style="padding:0.42rem 1rem;font-weight:700;">Ver Sorteos →</button>
+            </div>
+          </div>
+
+          <!-- KPI Cards row -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.85rem;margin-bottom:1rem;">
+
+            <!-- Card 1: Ventas -->
+            <div style="border-radius:16px;padding:1.25rem 1.4rem;background:linear-gradient(135deg,#6366f1 0%,#a78bfa 100%);position:relative;overflow:hidden;cursor:pointer;" onclick="showSection('cierre-sorteos',null)">
+              <div style="position:absolute;top:-18px;right:-18px;width:80px;height:80px;background:rgba(255,255,255,0.08);border-radius:50%;"></div>
+              <div style="position:absolute;bottom:-10px;right:12px;font-size:2.8rem;opacity:0.18;">💰</div>
+              <div style="font-size:0.65rem;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,0.7);margin-bottom:0.55rem;">VENTAS HOY</div>
+              <div style="font-size:2rem;font-weight:800;color:#fff;line-height:1;" id="dash-ventas">Bs. 0</div>
+              <div style="font-size:0.68rem;color:rgba(255,255,255,0.65);margin-top:0.4rem;">acumulado del día</div>
+            </div>
+
+            <!-- Card 2: Contactos -->
+            <div style="border-radius:16px;padding:1.25rem 1.4rem;background:linear-gradient(135deg,#06b6d4 0%,#22d3ee 100%);position:relative;overflow:hidden;cursor:pointer;" onclick="showSection('crm-contactos',document.querySelector('[data-section=crm-contactos]'))">
+              <div style="position:absolute;top:-18px;right:-18px;width:80px;height:80px;background:rgba(255,255,255,0.08);border-radius:50%;"></div>
+              <div style="position:absolute;bottom:-10px;right:12px;font-size:2.8rem;opacity:0.18;">👥</div>
+              <div style="font-size:0.65rem;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,0.7);margin-bottom:0.55rem;">CONTACTOS CRM</div>
+              <div style="font-size:2rem;font-weight:800;color:#fff;line-height:1;" id="dash-contactos">0</div>
+              <div style="font-size:0.68rem;color:rgba(255,255,255,0.65);margin-top:0.4rem;">importados</div>
+            </div>
+
+            <!-- Card 3: Bloqueos -->
+            <div style="border-radius:16px;padding:1.25rem 1.4rem;background:linear-gradient(135deg,#f59e0b 0%,#fbbf24 100%);position:relative;overflow:hidden;cursor:pointer;" onclick="showSection('bloqueo-ventas',null)">
+              <div style="position:absolute;top:-18px;right:-18px;width:80px;height:80px;background:rgba(255,255,255,0.08);border-radius:50%;"></div>
+              <div style="position:absolute;bottom:-10px;right:12px;font-size:2.8rem;opacity:0.18;">🚫</div>
+              <div style="font-size:0.65rem;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,0.7);margin-bottom:0.55rem;">BLOQUEOS ACTIVOS</div>
+              <div style="font-size:2rem;font-weight:800;color:#fff;line-height:1;" id="dash-bloqueos">0</div>
+              <div style="font-size:0.68rem;color:rgba(255,255,255,0.65);margin-top:0.4rem;">números bloqueados</div>
+            </div>
+
+            <!-- Card 4: Sorteos -->
+            <div style="border-radius:16px;padding:1.25rem 1.4rem;background:linear-gradient(135deg,#10b981 0%,#34d399 100%);position:relative;overflow:hidden;cursor:pointer;" onclick="showSection('cierre-sorteos',null)">
+              <div style="position:absolute;top:-18px;right:-18px;width:80px;height:80px;background:rgba(255,255,255,0.08);border-radius:50%;"></div>
+              <div style="position:absolute;bottom:-10px;right:12px;font-size:2.8rem;opacity:0.18;">🎯</div>
+              <div style="font-size:0.65rem;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,0.7);margin-bottom:0.55rem;">SORTEOS DEL DÍA</div>
+              <div style="font-size:2rem;font-weight:800;color:#fff;line-height:1;">5</div>
+              <div style="font-size:0.68rem;color:rgba(255,255,255,0.65);margin-top:0.4rem;">10AM · 1PM · 4PM · 7PM · 11PM</div>
+            </div>
+
+          </div>
+
+          <!-- Middle row: Sorteos timeline + Actividad reciente -->
+          <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:0.85rem;margin-bottom:1rem;">
+
+            <!-- Sorteos del día -->
+            <div class="card-box" style="padding:1.1rem 1.2rem;">
+              <div style="font-size:0.78rem;font-weight:700;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:0.4rem;">
+                <span>🕐</span> Sorteos del Día
+                <span style="margin-left:auto;font-size:0.62rem;background:rgba(16,185,129,0.15);color:#34d399;padding:0.12rem 0.45rem;border-radius:8px;">5 sorteos</span>
+              </div>
+              <!-- Mañana -->
+              <div style="font-size:0.6rem;color:var(--muted);font-weight:700;letter-spacing:.07em;margin-bottom:0.5rem;">☀️ MAÑANA</div>
+              <div class="dash-sorteo-row" onclick="showSection('cierre-sorteos',null)">
+                <span class="sorteo-dot" style="background:#fbbf24;"></span>
+                <span style="color:var(--text);font-weight:600;font-size:0.78rem;flex:1;">10:00 AM</span>
+                <span style="font-size:0.7rem;color:var(--muted);">Triple A · B · Signo · Arrimao · Pegadito · Animal</span>
+                <span style="font-size:0.62rem;background:rgba(251,191,36,0.12);color:#fbbf24;padding:0.1rem 0.4rem;border-radius:5px;margin-left:0.4rem;">Abierto</span>
+              </div>
+              <!-- Tarde -->
+              <div style="font-size:0.6rem;color:var(--muted);font-weight:700;letter-spacing:.07em;margin:0.8rem 0 0.5rem;">🌤 TARDE</div>
+              <div class="dash-sorteo-row" onclick="showSection('cierre-sorteos',null)">
+                <span class="sorteo-dot" style="background:#60a5fa;"></span>
+                <span style="color:var(--text);font-weight:600;font-size:0.78rem;flex:1;">1:00 PM</span>
+                <span style="font-size:0.7rem;color:var(--muted);">Triple A · B · Signo · Arrimao · Pegadito · Animal</span>
+                <span style="font-size:0.62rem;background:rgba(96,165,250,0.12);color:#60a5fa;padding:0.1rem 0.4rem;border-radius:5px;margin-left:0.4rem;">Abierto</span>
+              </div>
+              <div class="dash-sorteo-row" onclick="showSection('cierre-sorteos',null)">
+                <span class="sorteo-dot" style="background:#f97316;"></span>
+                <span style="color:var(--text);font-weight:600;font-size:0.78rem;flex:1;">4:00 PM</span>
+                <span style="font-size:0.7rem;color:var(--muted);">Triple A · B · Signo · Arrimao · Pegadito · Animal</span>
+                <span style="font-size:0.62rem;background:rgba(249,115,22,0.12);color:#f97316;padding:0.1rem 0.4rem;border-radius:5px;margin-left:0.4rem;">Abierto</span>
+              </div>
+              <!-- Noche -->
+              <div style="font-size:0.6rem;color:var(--muted);font-weight:700;letter-spacing:.07em;margin:0.8rem 0 0.5rem;">🌙 NOCHE</div>
+              <div class="dash-sorteo-row" onclick="showSection('cierre-sorteos',null)">
+                <span class="sorteo-dot" style="background:#a78bfa;"></span>
+                <span style="color:var(--text);font-weight:600;font-size:0.78rem;flex:1;">7:00 PM</span>
+                <span style="font-size:0.7rem;color:var(--muted);">Triple A · B · Signo · Arrimao · Pegadito · Animal</span>
+                <span style="font-size:0.62rem;background:rgba(167,139,250,0.12);color:#a78bfa;padding:0.1rem 0.4rem;border-radius:5px;margin-left:0.4rem;">Abierto</span>
+              </div>
+              <div class="dash-sorteo-row" onclick="showSection('cierre-sorteos',null)">
+                <span class="sorteo-dot" style="background:#4ade80;"></span>
+                <span style="color:var(--text);font-weight:600;font-size:0.78rem;flex:1;">11:00 PM</span>
+                <span style="font-size:0.7rem;color:var(--muted);">Triple A · B · Signo · Arrimao · Pegadito · Animal</span>
+                <span style="font-size:0.62rem;background:rgba(74,222,128,0.12);color:#4ade80;padding:0.1rem 0.4rem;border-radius:5px;margin-left:0.4rem;">Abierto</span>
+              </div>
+            </div>
+
+            <!-- Actividad reciente -->
+            <div class="card-box" style="padding:1.1rem 1.2rem;display:flex;flex-direction:column;">
+              <div style="font-size:0.78rem;font-weight:700;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:0.4rem;">
+                <span>⚡</span> Actividad Reciente
+              </div>
+              <div id="dash-actividad" style="flex:1;display:flex;flex-direction:column;gap:0.42rem;">
+                <div class="dash-act-row"><span style="background:rgba(99,102,241,0.15);color:#a78bfa;border-radius:6px;padding:0.15rem 0.4rem;font-size:0.65rem;font-weight:700;">BLOQUEO</span><span style="font-size:0.73rem;color:var(--muted);">Sin actividad reciente</span></div>
+              </div>
+              <!-- Mini stat strip -->
+              <div style="margin-top:auto;padding-top:0.85rem;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                <div style="background:rgba(99,102,241,0.07);border-radius:8px;padding:0.55rem 0.7rem;">
+                  <div style="font-size:0.6rem;color:var(--muted);font-weight:700;letter-spacing:.06em;">CONTACTOS</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:#a78bfa;" id="dash-mini-contactos">0</div>
+                </div>
+                <div style="background:rgba(248,113,113,0.07);border-radius:8px;padding:0.55rem 0.7rem;">
+                  <div style="font-size:0.6rem;color:var(--muted);font-weight:700;letter-spacing:.06em;">BLOQUEOS</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:#f87171;" id="dash-mini-bloqueos">0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accesos rápidos -->
+          <div class="card-box" style="padding:0.8rem 1rem;">
+            <div style="font-size:0.72rem;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:0.65rem;">ACCESOS RÁPIDOS</div>
+            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0.5rem;">
+              <button class="dash-link" onclick="showSection('cierre-sorteos',null)"><span class="dl-icon">🏁</span>Cierre Sorteos</button>
+              <button class="dash-link" onclick="showSection('lista-linea',null)"><span class="dl-icon">📋</span>Lista en Línea</button>
+              <button class="dash-link" onclick="showSection('control-riesgo',null)"><span class="dl-icon">⚠️</span>Control Riesgo</button>
+              <button class="dash-link" onclick="showSection('bloqueo-ventas',null)"><span class="dl-icon">🚫</span>Bloqueo Ventas</button>
+              <button class="dash-link" onclick="showSection('crm-contactos',null)"><span class="dl-icon">👥</span>CRM Contactos</button>
+              <button class="dash-link" onclick="showSection('cuadre',null)"><span class="dl-icon">💰</span>Cuadre Superior</button>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ── CIERRE DE SORTEOS ──────────────────────── -->
+        <div id="section-cierre-sorteos" class="section-panel">
+          <div class="page-header">
+            <div>
+              <div class="breadcrumb">El Arrejuntao › Lotería</div>
+              <h2>🏁 Cierre de Sorteos</h2>
+              <div style="font-size:0.7rem;color:var(--muted);margin-top:0.2rem;">Control de apertura y cierre por sorteo — El Arrejuntao</div>
+            </div>
+            <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+              <div class="filter-bar" style="margin:0;">
+                <label>Desde</label>
+                <input type="date" id="fecha-desde">
+                <label>Hasta</label>
+                <input type="date" id="fecha-hasta">
+              </div>
+              <button class="btn-sm btn-danger" onclick="accionMasiva('cerrar')">🔴 Cerrar Todos</button>
+              <button class="btn-sm btn-primary" onclick="accionMasiva('abrir')">🟢 Abrir Todos</button>
+              <button class="btn-sm btn-purple2" onclick="window.print()">🖨️ Imprimir</button>
+            </div>
+          </div>
+          <div class="stats-row" id="sorteos-stats">
+            <div class="stat-card">
+              <div class="stat-label">Venta Total Día</div>
+              <div class="stat-value green">Bs. 0,00</div>
+              <div class="stat-sub">acumulado del día</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Premios Total Día</div>
+              <div class="stat-value amber">Bs. 0,00</div>
+              <div class="stat-sub">premios pagados</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Saldo Neto Día</div>
+              <div class="stat-value green">Bs. 0,00</div>
+              <div class="stat-sub">venta - premios</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Sorteos Cerrados</div>
+              <div class="stat-value muted" id="sorteos-cerrados-count">— / —</div>
+              <div class="stat-sub">de los sorteos del día</div>
+            </div>
+          </div>
+          <div class="sorteo-cards" id="sorteo-cards-container">
+            <div class="empty-state"><div class="loading-spinner"></div><br>Cargando sorteos…</div>
+          </div>
+        </div>
+
+        <!-- ── LISTA EN LÍNEA ─────────────────────────── -->
+        <div id="section-lista-linea" class="section-panel">
+          <div class="page-header">
+            <div>
+              <div class="breadcrumb">El Arrejuntao › Lotería</div>
+              <h2>📋 Lista en Línea</h2>
+              <div style="font-size:0.7rem;color:var(--muted);margin-top:0.15rem;">Lista de números apostados por sorteo — El Arrejuntao</div>
+            </div>
+            <div style="display:flex;gap:0.4rem;">
+              <button class="btn-sm btn-purple2" onclick="window.print()">🖨️ Imprimir</button>
+              <button class="btn-sm" style="background:rgba(59,130,246,0.15);color:#93c5fd;border:1px solid rgba(59,130,246,0.3);">📷 Captura</button>
+            </div>
+          </div>
+          <!-- Filtros -->
+          <div class="card-box" style="padding:0.8rem 1rem;margin-bottom:0.7rem;">
+            <div style="display:flex;align-items:flex-end;gap:0.7rem;flex-wrap:wrap;">
+              <div><div class="filter-label">Desde</div><input type="date" id="ll-desde" class="input-filter"></div>
+              <div><div class="filter-label">Hasta</div><input type="date" id="ll-hasta" class="input-filter"></div>
+              <div>
+                <div class="filter-label">Sorteo</div>
+                <select id="ll-sorteo" class="select-input">
+                  <option value="">Todos</option>
+                  <option>El Arrejuntao 11:00 PM</option>
+                  <option>El Arrejuntao 07:00 PM</option>
+                  <option>El Arrejuntao 12:49 PM</option>
+                </select>
+              </div>
+              <div>
+                <div class="filter-label">Modalidad</div>
+                <select id="ll-modalidad" class="select-input">
+                  <option>Triple A (100-999)</option>
+                  <option>Triple B</option>
+                  <option>Terminal</option>
+                  <option>Animalito</option>
+                  <option>Todos</option>
+                </select>
+              </div>
+              <div style="display:flex;gap:0.4rem;">
+                <button class="btn-sm btn-primary" onclick="consultarListaLinea()">🔍 Consultar</button>
+                <button class="btn-sm btn-purple2" onclick="window.print()">🖨️ Imprimir</button>
+              </div>
+            </div>
+          </div>
+          <!-- Stats -->
+          <div class="stats-row" style="margin-bottom:0.7rem;">
+            <div class="stat-card"><div class="stat-label">Números con Apuesta</div><div class="stat-value green" id="ll-con-apuesta">0</div></div>
+            <div class="stat-card"><div class="stat-label">Monto Total Bs</div><div class="stat-value amber" id="ll-monto-total">0,00</div></div>
+            <div class="stat-card"><div class="stat-label">Modalidad</div><div class="stat-value blue" id="ll-modal-label" style="font-size:0.9rem;">Triple A</div></div>
+            <div class="stat-card"><div class="stat-label">Sorteo</div><div class="stat-value muted" id="ll-sorteo-label" style="font-size:0.9rem;">Todos</div></div>
+          </div>
+          <!-- Grid -->
+          <div class="card-box">
+            <div style="padding:0.6rem 1rem;border-bottom:1px solid var(--border);font-size:0.72rem;color:var(--muted);">
+              Números 000–999 — <span id="ll-num-date" style="color:var(--accent);">selecciona filtros y presiona Consultar</span>
+            </div>
+            <div id="ll-grid-wrap" style="overflow-x:auto;">
+              <div class="empty-state"><div class="empty-icon">📋</div>Selecciona los filtros y presiona Consultar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── CONTROL DE RIESGO ──────────────────────── -->
+        <div id="section-control-riesgo" class="section-panel">
+          <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+            <div>
+              <h2 style="margin:0 0 0.15rem;">⚠️ Control de Riesgo</h2>
+              <div class="breadcrumb">El Arrejuntao › <span>Lotería</span></div>
+            </div>
+            <div style="display:flex;gap:0.6rem;">
+              <button class="btn-sm" onclick="imprimirRiesgo()" style="padding:0.42rem 0.9rem;font-size:0.75rem;background:var(--surface2);border:1px solid var(--border);color:var(--text);">→ Imprimir</button>
+              <button class="btn-sm btn-purple2" onclick="exportarRiesgoPDF()" style="padding:0.42rem 0.9rem;font-size:0.75rem;">&#x1F4C4; PDF</button>
+            </div>
+          </div>
+
+          <!-- Date filter row -->
+          <div class="card-box" style="padding:0.75rem 1rem;margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:0.4rem;">
+                <span style="font-size:0.65rem;color:var(--muted);font-weight:700;letter-spacing:.06em;">DESDE</span>
+                <input type="date" id="cr-desde" style="padding:0.35rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.73rem;">
+              </div>
+              <div style="display:flex;align-items:center;gap:0.4rem;">
+                <span style="font-size:0.65rem;color:var(--muted);font-weight:700;letter-spacing:.06em;">HASTA</span>
+                <input type="date" id="cr-hasta" style="padding:0.35rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.73rem;">
+              </div>
+              <button class="btn-sm btn-primary" onclick="crConsultar()" style="padding:0.38rem 0.85rem;font-size:0.73rem;">+ Consultar</button>
+              <button class="btn-sm" onclick="crLimpiar()" style="padding:0.38rem 0.75rem;font-size:0.73rem;background:var(--surface2);border:1px solid var(--border);color:var(--muted);">✕ Limpiar</button>
+            </div>
+          </div>
+
+          <!-- Entry form -->
+          <div class="card-box" style="padding:0.85rem 1rem;margin-bottom:0.75rem;">
+            <div style="display:grid;grid-template-columns:1.8fr 1.8fr 1fr 1fr;gap:0.6rem;margin-bottom:0.65rem;">
+              <div>
+                <div style="font-size:0.62rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.3rem;">MODALIDAD</div>
+                <select id="cr-modalidad"
+                  onchange="onModalidadChange(this,'cr-animal-grid','cr-numero');renderAnimalesGrid('cr-animal-grid-inner','cr-numero');"
+                  style="width:100%;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.73rem;">
+                  <option>Triple A</option>
+                  <option>Triple B</option>
+                  <option>Triple Signo</option>
+                  <option>El Arrimao</option>
+                  <option>El Pegadito</option>
+                  <option>El Animal</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:0.62rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.3rem;">SORTEO</div>
+                <select id="cr-sorteo" style="width:100%;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.73rem;">
+                  <optgroup label="☀️ Mañana">
+                    <option>10:00 AM</option>
+                  </optgroup>
+                  <optgroup label="🌤 Tarde">
+                    <option>1:00 PM</option>
+                    <option>4:00 PM</option>
+                  </optgroup>
+                  <optgroup label="🌙 Noche">
+                    <option>7:00 PM</option>
+                    <option>11:00 PM</option>
+                  </optgroup>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:0.62rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.3rem;">TIPO</div>
+                <select id="cr-tipo" style="width:100%;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.73rem;">
+                  <option>General</option><option>Individual</option><option>Grupal</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:0.62rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.3rem;">ESTADO</div>
+                <div style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;">
+                  <span id="cr-estado-badge" style="font-size:0.65rem;font-weight:700;background:rgba(74,222,128,0.15);color:#4ade80;padding:0.1rem 0.45rem;border-radius:4px;">ABIERTO</span>
+                  <span style="font-size:0.65rem;color:#6366f1;cursor:pointer;" onclick="crToggleEstado()">/ Cambia</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1.5fr auto;gap:0.6rem;align-items:flex-end;">
+              <div>
+                <div style="font-size:0.62rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.3rem;">NUMERO</div>
+                <input type="text" id="cr-numero" placeholder="# 1,437" maxlength="5"
+                  style="width:100%;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.78rem;font-weight:700;box-sizing:border-box;">
+              </div>
+              <div>
+                <div style="font-size:0.62rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.3rem;">MONTO TOTAL</div>
+                <input type="number" id="cr-monto" placeholder="0.00" step="0.01" min="0"
+                  style="width:100%;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.78rem;box-sizing:border-box;"
+                  oninput="crActualizarRiesgo()">
+              </div>
+              <div>
+                <div style="font-size:0.62rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.3rem;">MONTO RIESGO</div>
+                <input type="number" id="cr-riesgo" placeholder="0.00" step="0.01" min="0" readonly
+                  style="width:100%;padding:0.4rem 0.6rem;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:6px;color:#a5b4fc;font-size:0.78rem;box-sizing:border-box;">
+              </div>
+              <div>
+                <div style="font-size:0.62rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.3rem;">LISTA</div>
+                <select id="cr-lista" style="width:100%;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.73rem;">
+                  <option>Principal</option><option>Secundaria</option><option>VIP</option>
+                </select>
+              </div>
+              <div>
+                <button class="btn-sm btn-primary" onclick="crAgregar()" style="padding:0.42rem 1.1rem;font-size:0.75rem;white-space:nowrap;">+ Agregar</button>
+              </div>
+            </div>
+
+            <!-- Limite global -->
+            <div style="margin-top:0.65rem;padding:0.45rem 0.7rem;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2);border-radius:6px;display:flex;align-items:center;gap:0.5rem;">
+              <span style="font-size:0.72rem;color:#fbbf24;">⚠️ Límite Global:</span>
+              <input type="number" id="cr-limite" value="10000" style="width:80px;padding:0.2rem 0.4rem;background:transparent;border:none;border-bottom:1px solid rgba(251,191,36,0.4);color:#fbbf24;font-size:0.78rem;font-weight:700;text-align:right;">
+              <span id="cr-limite-pct" style="font-size:0.68rem;color:var(--muted);">0%</span>
+            </div>
+          </div>
+
+          <!-- Risk table -->
+          <div class="card-box" style="padding:0;overflow:hidden;">
+            <table class="data-table" id="cr-table" style="margin:0;">
+              <thead><tr>
+                <th style="width:2rem;"><input type="checkbox" id="cr-all" onchange="document.querySelectorAll('.cr-cb').forEach(c=>c.checked=this.checked)"></th>
+                <th>NÚMERO</th>
+                <th>MONTO TOTAL</th>
+                <th>MONTO RIESGO</th>
+                <th>ALERTA</th>
+                <th>ACCIONES</th>
+              </tr></thead>
+              <tbody id="cr-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted);font-size:0.82rem;">Sin registros — agrega un número para comenzar</td></tr>
+              </tbody>
+            </table>
+            <div style="padding:0.5rem 1rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.4rem;">
+              <span id="cr-count" style="font-size:0.72rem;color:var(--muted);">Mostrando 0 de 0 registros</span>
+              <div style="display:flex;gap:0.5rem;">
+                <button class="btn-sm" onclick="crEliminarSel()" style="font-size:0.68rem;padding:0.25rem 0.65rem;background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2);">Eliminar sel.</button>
+                <button class="btn-sm" onclick="crLimpiarTabla()" style="font-size:0.68rem;padding:0.25rem 0.65rem;background:var(--surface2);border:1px solid var(--border);color:var(--muted);">Limpiar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ── BLOQUEO DE VENTAS ──────────────────────── -->
+        <div id="section-bloqueo-ventas" class="section-panel">
+          <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+            <div>
+              <h2 style="margin:0 0 0.15rem;">🚫 Bloqueo de Ventas</h2>
+              <div class="breadcrumb">Crea bloqueos, límites, verificar e inhabilitados son Anulados</div>
+            </div>
+            <button class="btn-sm" onclick="bvLimpiarTodo()" style="padding:0.42rem 0.9rem;font-size:0.75rem;background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);border-radius:6px;">Limpiar todo</button>
+          </div>
+
+          <!-- Date filter row -->
+          <div class="card-box" style="padding:0.65rem 1rem;margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:0.4rem;">
+                <span style="font-size:0.62rem;color:var(--muted);font-weight:700;letter-spacing:.06em;">DESDE</span>
+                <select id="bv-desde" style="padding:0.35rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.72rem;">
+                  <option value="">Seleccionar…</option>
+                </select>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.4rem;">
+                <span style="font-size:0.62rem;color:var(--muted);font-weight:700;letter-spacing:.06em;">HASTA</span>
+                <select id="bv-hasta" style="padding:0.35rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.72rem;">
+                  <option value="">Seleccionar…</option>
+                </select>
+              </div>
+              <button class="btn-sm btn-primary" onclick="bvConsultar()" style="padding:0.38rem 0.85rem;font-size:0.73rem;">+ Consultar</button>
+              <button class="btn-sm" onclick="bvLimpiarFiltro()" style="padding:0.38rem 0.75rem;font-size:0.73rem;background:var(--surface2);border:1px solid var(--border);color:var(--muted);">✕ Limpiar</button>
+            </div>
+          </div>
+
+          <!-- Nuevo Bloqueo form -->
+          <div class="card-box" style="padding:0.9rem 1.1rem;margin-bottom:0.75rem;">
+            <div style="font-size:0.72rem;font-weight:700;color:var(--text);margin-bottom:0.75rem;">Nuevo Bloqueo</div>
+            <div style="display:grid;grid-template-columns:2fr 1.5fr 1.8fr 1.2fr;gap:0.65rem;margin-bottom:0.7rem;">
+              <div>
+                <div style="font-size:0.6rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.28rem;">MODALIDAD</div>
+                <select id="bv-modalidad"
+                  onchange="onModalidadChange(this,'bv-animal-grid','bv-numero');renderAnimalesGrid('bv-animal-grid-inner','bv-numero');"
+                  style="width:100%;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.73rem;">
+                  <option>Triple A</option>
+                  <option>Triple B</option>
+                  <option>Triple Signo</option>
+                  <option>El Arrimao</option>
+                  <option>El Pegadito</option>
+                  <option>El Animal</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:0.6rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.28rem;">NÚMERO LOTERÍA</div>
+                <select id="bv-sorteo" style="width:100%;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.73rem;">
+                  <optgroup label="☀️ Mañana">
+                    <option>10:00 AM</option>
+                  </optgroup>
+                  <optgroup label="🌤 Tarde">
+                    <option>1:00 PM</option>
+                    <option>4:00 PM</option>
+                  </optgroup>
+                  <optgroup label="🌙 Noche">
+                    <option>7:00 PM</option>
+                    <option>11:00 PM</option>
+                  </optgroup>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:0.6rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.28rem;">TIPO DE CUADRE</div>
+                <select id="bv-tipo" style="width:100%;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.73rem;">
+                  <option>Número Exacto</option>
+                  <option>Rango</option>
+                  <option>Todas las jugadas</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:0.6rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.28rem;">NÚMERO</div>
+                <input type="text" id="bv-numero" placeholder="1-124"
+                  style="width:100%;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.78rem;font-weight:700;box-sizing:border-box;">
+              </div>
+            </div>
+            <!-- Grid animalitos BV -->
+            <div id="bv-animal-grid" style="display:none;margin-top:0.55rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:0.7rem 0.8rem;">
+              <div id="bv-animal-grid-inner"></div>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:0.65rem;">
+              <div style="flex:1;">
+                <div style="font-size:0.6rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.28rem;">MOTIVO OPCIONAL</div>
+                <input type="text" id="bv-motivo" placeholder="Ej: límite alcanzado"
+                  style="width:100%;padding:0.4rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.73rem;box-sizing:border-box;">
+              </div>
+              <button onclick="bvAplicarBloqueo()"
+                style="padding:0.45rem 1.1rem;font-size:0.78rem;font-weight:700;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;">
+                ⊕ Aplicar Bloqueo
+              </button>
+            </div>
+          </div>
+
+          <!-- Bloqueos Activos table -->
+          <div class="card-box" style="padding:0;overflow:hidden;">
+            <div style="padding:0.65rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:0.78rem;font-weight:700;color:var(--text);">Bloqueos Activos</span>
+              <span id="bv-count-badge" style="font-size:0.65rem;background:rgba(248,113,113,0.15);color:#f87171;padding:0.15rem 0.55rem;border-radius:10px;font-weight:700;">
+                0 bloqueados
+              </span>
+            </div>
+            <table class="data-table" id="bv-table" style="margin:0;">
+              <thead><tr>
+                <th>MODALIDAD</th>
+                <th>TIPO</th>
+                <th>SORTEO</th>
+                <th>VALOR</th>
+                <th>MOTIVO</th>
+                <th>FECHA</th>
+                <th>ACCIÓN</th>
+              </tr></thead>
+              <tbody id="bv-tbody">
+                <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted);font-size:0.82rem;">
+                  Sin bloqueos activos — aplica uno arriba
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+        <!-- ── GESTIÓN DE USUARIOS ──────────────────── -->
+        <div id="section-gestion-usuarios" class="section-panel">
+          <div class="page-header">
+            <div>
+              <div class="breadcrumb">El Arrejuntao › Usuarios</div>
+              <h2>👥 Gestión de Usuarios Firebase</h2>
+            </div>
+            <button class="btn-sm btn-primary" onclick="showSection('nuevo-usuario', null)">➕ Nuevo Usuario</button>
+          </div>
+          <div class="card-box">
+            <div style="padding:0.75rem 1rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+              <span style="font-size:0.75rem; color:var(--muted);">Total: <strong id="usr-total" style="color:var(--accent);">—</strong> usuarios en Firebase Auth</span>
+              <button class="btn-sm btn-purple2" onclick="cargarUsuarios()">🔄 Actualizar</button>
+            </div>
+            <div id="usuarios-table-wrap">
+              <div class="empty-state"><div class="loading-spinner"></div><br>Cargando usuarios…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── NUEVO USUARIO ────────────────────────── -->
+        <div id="section-nuevo-usuario" class="section-panel">
+          <div class="page-header">
+            <div>
+              <div class="breadcrumb">El Arrejuntao › Usuarios</div>
+              <h2>➕ Nuevo Usuario Firebase</h2>
+            </div>
+            <button class="btn-sm" style="background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border);" onclick="showSection('gestion-usuarios', null)">← Volver a lista</button>
+          </div>
+          <div class="card-box" style="max-width:500px;">
+            <div style="padding:0.85rem 1.1rem; border-bottom:1px solid var(--border); background:rgba(34,197,94,0.05);">
+              <div style="font-size:0.75rem; color:var(--accent); font-weight:700;">🔐 Firebase Authentication</div>
+              <div style="font-size:0.68rem; color:var(--muted); margin-top:0.2rem;">El usuario se creará directamente en Firebase Auth del proyecto El Arrejuntao.</div>
+            </div>
+            <form action="/usuarios/crear/" method="post" style="padding:1.25rem;">
+              {% csrf_token %}
+              <div style="margin-bottom:0.85rem;">
+                <label style="display:block; font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem; font-weight:600;">📧 Correo Electrónico *</label>
+                <input type="email" name="email" placeholder="usuario@ejemplo.com" required style="display:block; width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); color:var(--text); border-radius:0.5rem; padding:0.6rem 0.85rem; font-size:0.85rem; outline:none; font-family:inherit;">
+              </div>
+              <div style="margin-bottom:0.85rem;">
+                <label style="display:block; font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem; font-weight:600;">🔑 Contraseña *</label>
+                <input type="password" name="password" placeholder="mínimo 6 caracteres" required style="display:block; width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); color:var(--text); border-radius:0.5rem; padding:0.6rem 0.85rem; font-size:0.85rem; outline:none; font-family:inherit;">
+              </div>
+              <div style="margin-bottom:1.1rem;">
+                <label style="display:block; font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.35rem; font-weight:600;">👤 Nombre Completo (opcional)</label>
+                <input type="text" name="nombre" placeholder="Nombre del usuario" style="display:block; width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); color:var(--text); border-radius:0.5rem; padding:0.6rem 0.85rem; font-size:0.85rem; outline:none; font-family:inherit;">
+              </div>
+              <button type="submit" style="display:block; width:100%; background:rgba(34,197,94,0.18); color:#86efac; border:1px solid rgba(34,197,94,0.35); border-radius:0.5rem; padding:0.65rem 1rem; font-size:0.82rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.2s;">➕ Crear Usuario en Firebase</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ── CONTACTOS / CRM (unified) ─────────────────────────── -->
+        <div id="section-contactos" class="section-panel">
+          <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+            <div>
+              <h2 style="margin:0 0 0.15rem;">&#x1F4CB; CRM &amp; Contactos</h2>
+              <div class="breadcrumb">Gestion integral de red de ventas y taquilleros</div>
+            </div>
+            <div style="display:flex;gap:0.6rem;flex-shrink:0;">
+              <button class="btn-sm btn-purple2" onclick="showCrmTab('vcf',document.getElementById('cst-vcf'))" style="padding:0.45rem 0.9rem;font-size:0.78rem;">&#x1F4E4; Importar VCF</button>
+              <button class="btn-sm btn-primary" onclick="crmNuevoContacto()" style="padding:0.45rem 0.9rem;font-size:0.78rem;">+ Nuevo Contacto</button>
+            </div>
+          </div>
+
+          <!-- Stats row -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1rem;">
+            <div class="card-box" style="padding:1rem 1.2rem;">
+              <div style="font-size:0.65rem;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:0.4rem;">TOTAL</div>
+              <div id="crm-total" style="font-size:1.6rem;font-weight:800;color:var(--text);">0</div>
+            </div>
+            <div class="card-box" style="padding:1rem 1.2rem;">
+              <div style="font-size:0.65rem;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:0.4rem;">ACTIVOS</div>
+              <div id="crm-activos" style="font-size:1.6rem;font-weight:800;color:#4ade80;">0</div>
+            </div>
+            <div class="card-box" style="padding:1rem 1.2rem;">
+              <div style="font-size:0.65rem;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:0.4rem;">PROVEEDORES</div>
+              <div id="crm-prov" style="font-size:1.6rem;font-weight:800;color:#a78bfa;">0</div>
+            </div>
+            <div class="card-box" style="padding:1rem 1.2rem;">
+              <div style="font-size:0.65rem;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:0.4rem;">DEVUELTOS</div>
+              <div id="crm-dev" style="font-size:1.6rem;font-weight:800;color:#f87171;">0</div>
+            </div>
+          </div>
+
+          <!-- Search + filters -->
+          <div style="display:flex;gap:0.6rem;align-items:center;margin-bottom:0.75rem;flex-wrap:wrap;">
+            <input type="text" placeholder="Nombre, telefono, ciudad..." id="crm-search"
+              style="flex:1;min-width:180px;padding:0.42rem 0.8rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.78rem;"
+              oninput="filtrarContactos()">
+            <div style="display:flex;align-items:center;gap:0.4rem;">
+              <span style="font-size:0.7rem;color:var(--muted);">ROL</span>
+              <select id="crm-rol" onchange="filtrarContactos()" style="padding:0.38rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.75rem;">
+                <option>Todos</option><option>Taquillero</option><option>Proveedor</option><option>Cliente</option>
+              </select>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.4rem;">
+              <span style="font-size:0.7rem;color:var(--muted);">ESTADO</span>
+              <select id="crm-estado" onchange="filtrarContactos()" style="padding:0.38rem 0.6rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.75rem;">
+                <option>Todos</option><option>Activo</option><option>Inactivo</option>
+              </select>
+            </div>
+            <button class="btn-sm" onclick="exportarVCF()" style="padding:0.38rem 0.75rem;font-size:0.72rem;background:rgba(167,139,250,0.12);color:#a78bfa;border:1px solid rgba(167,139,250,0.25);border-radius:6px;">&#x1F4C2; VCF</button>
+          </div>
+
+          <!-- Contact table -->
+          <div class="card-box" style="padding:0;overflow:hidden;margin-bottom:1rem;">
+            <table class="data-table" id="crm-table" style="margin:0;">
+              <thead><tr>
+                <th style="width:2rem;"><input type="checkbox" id="crm-all" onchange="document.querySelectorAll('.crm-cb').forEach(c=>c.checked=this.checked)"></th>
+                <th>#</th><th>NOMBRE</th><th>TELEFONO</th><th>ROL</th><th>CIUDAD</th><th>ESTADO</th><th>NOTAS</th><th>ACCIONES</th>
+              </tr></thead>
+              <tbody id="crm-tbody">
+                <tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--muted);font-size:0.82rem;">Sin contactos que coincidan</td></tr>
+              </tbody>
+            </table>
+            <div style="padding:0.5rem 1rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+              <span id="crm-count" style="font-size:0.72rem;color:var(--muted);">0 contactos</span>
+              <button class="btn-sm btn-danger" style="font-size:0.68rem;padding:0.25rem 0.65rem;" onclick="eliminarSeleccionados()">Eliminar seleccion</button>
+            </div>
+          </div>
+
+          <!-- Sub-tabs -->
+          <div class="crm-subtabs">
+            <button class="crm-subtab active" id="cst-resumen" onclick="showCrmTab('resumen',this)">Resumen</button>
+            <button class="crm-subtab" id="cst-vcf" onclick="showCrmTab('vcf',this)">Contactos VCF</button>
+            <button class="crm-subtab" id="cst-lotes" onclick="showCrmTab('lotes',this)">Lista de Envio</button>
+            <button class="crm-subtab" id="cst-analitica" onclick="showCrmTab('analitica',this)">Analitica</button>
+            <button class="crm-subtab" id="cst-config" onclick="showCrmTab('config',this)">Configuracion VCF</button>
+          </div>
+
+          <!-- Sub-tab panels -->
+          <div id="csp-resumen" class="crm-subpanel" style="display:block;">
+            <!-- 4 stat cards -->
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;padding:1rem 0 0.75rem;">
+              <div class="card-box" style="padding:1rem 1.2rem;">
+                <div style="font-size:0.62rem;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:0.3rem;">TOTAL CONTACTOS VCF</div>
+                <div style="font-size:1.8rem;font-weight:800;color:var(--text);">36850</div>
+              </div>
+              <div class="card-box" style="padding:1rem 1.2rem;">
+                <div style="font-size:0.62rem;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:0.3rem;">VALIDOS DIRECTOS</div>
+                <div style="font-size:1.8rem;font-weight:800;color:#4ade80;">36835</div>
+              </div>
+              <div class="card-box" style="padding:1rem 1.2rem;">
+                <div style="font-size:0.62rem;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:0.3rem;">PENDIENTES</div>
+                <div style="font-size:1.8rem;font-weight:800;color:#fbbf24;">36850</div>
+              </div>
+              <div class="card-box" style="padding:1rem 1.2rem;position:relative;">
+                <div style="font-size:0.62rem;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:0.3rem;">LOTES CREADOS</div>
+                <div style="font-size:1.8rem;font-weight:800;color:#a78bfa;">369</div>
+                <span style="position:absolute;top:0.7rem;right:0.7rem;font-size:0.65rem;background:rgba(124,58,237,0.2);color:#c4b5fd;padding:0.1rem 0.45rem;border-radius:4px;">Ver +</span>
+              </div>
+            </div>
+            <!-- Charts row -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+              <!-- Donut chart -->
+              <div class="card-box" style="padding:1rem 1.2rem;">
+                <div style="font-size:0.72rem;font-weight:700;color:var(--text);margin-bottom:1rem;">Estado de Envios</div>
+                <div style="display:flex;align-items:center;gap:2rem;justify-content:center;">
+                  <div style="width:110px;height:110px;border-radius:50%;background:conic-gradient(#f59e0b 0% 99.96%,#1e1b4b 99.96% 100%);position:relative;flex-shrink:0;">
+                    <div style="position:absolute;inset:18px;border-radius:50%;background:var(--surface1);display:flex;align-items:center;justify-content:center;flex-direction:column;">
+                      <span style="font-size:1.1rem;font-weight:800;color:#f59e0b;">99%</span>
+                    </div>
+                  </div>
+                  <div style="font-size:0.72rem;">
+                    <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem;"><span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;display:inline-block;"></span> Enviados</div>
+                    <div style="display:flex;align-items:center;gap:0.4rem;"><span style="width:10px;height:10px;border-radius:50%;background:#1e1b4b;border:1px solid #4338ca;display:inline-block;"></span> Pendientes</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Bar chart -->
+              <div class="card-box" style="padding:1rem 1.2rem;">
+                <div style="font-size:0.72rem;font-weight:700;color:var(--text);margin-bottom:1rem;">Calidad de la Base</div>
+                <div style="display:flex;align-items:flex-end;gap:1.5rem;height:90px;padding:0 1rem;">
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+                    <div style="width:100%;background:#6366f1;border-radius:4px 4px 0 0;height:80px;"></div>
+                    <span style="font-size:0.65rem;color:var(--muted);">Valido</span>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+                    <div style="width:100%;background:#374151;border-radius:4px 4px 0 0;height:4px;"></div>
+                    <span style="font-size:0.65rem;color:var(--muted);">Sin Dato</span>
+                  </div>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:0 1rem;margin-top:0.3rem;">
+                  <span style="font-size:0.62rem;color:var(--muted);">0</span>
+                  <span style="font-size:0.62rem;color:var(--muted);">40.000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="csp-vcf" class="crm-subpanel" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:1rem 0;">
+              <!-- Drag-drop VCF upload -->
+              <div class="card-box" style="padding:1.2rem;">
+                <div style="font-size:0.73rem;font-weight:700;color:var(--text);margin-bottom:0.8rem;">&#x1F4E4; Cargar Archivo VCF</div>
+                <div id="crm-dropzone"
+                     style="border:2px dashed var(--border);border-radius:10px;padding:2.5rem 1rem;text-align:center;cursor:pointer;transition:border-color .2s;"
+                     ondragover="event.preventDefault();this.style.borderColor='#6366f1';"
+                     ondragleave="this.style.borderColor='var(--border)';"
+                     ondrop="crmDropVcf(event);"
+                     onclick="document.getElementById('crm-file-input').click()">
+                  <div style="font-size:2rem;margin-bottom:0.5rem;">&#x1F4C2;</div>
+                  <div style="font-size:0.78rem;color:var(--muted);">Arrastra un archivo <b style="color:#a78bfa;">.vcf</b> aqui o haz clic</div>
+                  <input type="file" id="crm-file-input" accept=".vcf" style="display:none;" onchange="crmLoadVcf(this.files[0])">
+                </div>
+                <div id="crm-vcf-progress" style="display:none;margin-top:0.8rem;">
+                  <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.3rem;" id="crm-vcf-progress-label">Procesando...</div>
+                  <div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;">
+                    <div id="crm-vcf-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#6366f1,#a78bfa);transition:width .4s;"></div>
+                  </div>
+                </div>
+                <div id="crm-vcf-result" style="display:none;margin-top:0.8rem;padding:0.8rem;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.25);border-radius:8px;font-size:0.75rem;color:#4ade80;"></div>
+              </div>
+              <!-- Batch info + history -->
+              <div class="card-box" style="padding:1.2rem;">
+                <div style="font-size:0.73rem;font-weight:700;color:var(--text);margin-bottom:0.8rem;">&#x1F4CA; Lotes Procesados</div>
+                <div id="crm-batch-list" style="max-height:210px;overflow-y:auto;">
+                  <div style="font-size:0.75rem;color:var(--muted);text-align:center;padding:1.5rem 0;">Sin lotes cargados aun</div>
+                </div>
+                <div style="margin-top:0.8rem;display:flex;gap:0.5rem;">
+                  <button class="btn-sm btn-primary" style="flex:1;font-size:0.72rem;" onclick="crmGenerarLote()">&#x2728; Generar Lote</button>
+                  <button class="btn-sm" style="flex:1;font-size:0.72rem;background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);" onclick="crmLimpiarLotes()">Limpiar</button>
+                </div>
+              </div>
+            </div>
+            <!-- Dedup + normalize options -->
+            <div class="card-box" style="padding:1rem;margin-top:0;">
+              <div style="font-size:0.72rem;font-weight:700;color:var(--text);margin-bottom:0.7rem;">&#x2699;&#xFE0F; Opciones de Importacion</div>
+              <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+                <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.73rem;cursor:pointer;">
+                  <input type="checkbox" id="vcf-dedup" checked> Eliminar duplicados automaticamente
+                </label>
+                <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.73rem;cursor:pointer;">
+                  <input type="checkbox" id="vcf-normalize" checked> Normalizar telefonos (+58)
+                </label>
+                <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.73rem;cursor:pointer;">
+                  <input type="checkbox" id="vcf-skip-empty"> Ignorar contactos sin numero
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div id="csp-lotes" class="crm-subpanel" style="display:none;">
+            <div style="padding:0.4rem 0 0.5rem;font-size:1.1rem;font-weight:700;color:var(--text);">Centro de Envíos</div>
+            <div style="font-size:0.78rem;color:var(--muted);margin-bottom:1rem;">Gestiona tus listas de difusión.</div>
+
+            <div style="display:grid;grid-template-columns:1fr 320px;gap:1rem;align-items:start;">
+              <!-- Lotes grid -->
+              <div class="card-box" style="padding:1.1rem 1.2rem;">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
+                  <span style="font-size:0.88rem;">📦</span>
+                  <span style="font-size:0.82rem;font-weight:700;color:var(--text);">Lotes Disponibles</span>
+                  <span id="lotes-count-badge" style="margin-left:auto;font-size:0.65rem;background:rgba(99,102,241,0.15);color:#a78bfa;padding:0.15rem 0.5rem;border-radius:10px;"></span>
+                </div>
+                <div id="crm-lotes-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.55rem;">
+                  <div style="color:var(--muted);font-size:0.78rem;grid-column:1/-1;text-align:center;padding:2rem 0;">
+                    Importa contactos para generar los lotes automáticamente
+                  </div>
+                </div>
+                <div style="margin-top:0.8rem;display:flex;gap:0.5rem;">
+                  <button class="btn-sm btn-primary" style="font-size:0.72rem;padding:0.35rem 0.9rem;" onclick="crmGenerarLotes()">✨ Generar Lotes</button>
+                  <button class="btn-sm" style="font-size:0.72rem;padding:0.35rem 0.75rem;background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25);" onclick="crmLimpiarLotes()">Limpiar</button>
+                </div>
+              </div>
+
+              <!-- Envío de Imágenes panel -->
+              <div class="card-box" style="padding:1.1rem 1.2rem;">
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.85rem;">
+                  <span style="font-size:0.88rem;">🖼</span>
+                  <span style="font-size:0.82rem;font-weight:700;color:var(--text);">Envío de Imágenes</span>
+                </div>
+                <div style="font-size:0.72rem;color:var(--muted);margin-bottom:0.75rem;">Funcionalidad manual debido a restricciones del navegador.</div>
+                <ol style="padding-left:1.1rem;margin:0;display:flex;flex-direction:column;gap:0.55rem;">
+                  <li style="font-size:0.75rem;color:var(--muted);">Carga imagen en <span style="color:var(--text);font-weight:600;">Configuración.</span></li>
+                  <li style="font-size:0.75rem;color:var(--muted);">Ve a <span style="color:var(--text);font-weight:600;">Contactos &gt; Compartir.</span></li>
+                  <li style="font-size:0.75rem;color:var(--muted);">Descarga la imagen.</li>
+                  <li style="font-size:0.75rem;color:var(--muted);">Copia el lote y adjunta en <span style="color:var(--text);font-weight:600;">WA.</span></li>
+                </ol>
+                <!-- Promo image preview if loaded -->
+                <div id="lotes-promo-preview" style="margin-top:0.9rem;display:none;">
+                  <img id="lotes-promo-thumb" src="" alt="Promo" style="width:100%;border-radius:8px;border:1px solid var(--border);">
+                </div>
+                <div style="margin-top:1rem;">
+                  <button class="btn-sm" style="width:100%;font-size:0.73rem;padding:0.4rem 0.7rem;background:rgba(99,102,241,0.12);color:#a78bfa;border:1px solid rgba(99,102,241,0.25);" onclick="crmExportarTodosLotes()">
+                    📤 Exportar todos como VCF
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div id="csp-analitica" class="crm-subpanel" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;padding:0.5rem 0 0;">
+              <div class="card-box" style="padding:1.2rem;">
+                <div style="font-size:0.73rem;font-weight:700;color:var(--text);margin-bottom:1rem;">Estado de Envios</div>
+                <canvas id="crm-chart-donut" height="180"></canvas>
+              </div>
+              <div class="card-box" style="padding:1.2rem;">
+                <div style="font-size:0.73rem;font-weight:700;color:var(--text);margin-bottom:1rem;">Calidad de la Base</div>
+                <canvas id="crm-chart-bar" height="180"></canvas>
+              </div>
+              <div class="card-box" style="padding:1.2rem;">
+                <div style="font-size:0.73rem;font-weight:700;color:var(--text);margin-bottom:1rem;">Contactos por Rol</div>
+                <canvas id="crm-chart-pie" height="180"></canvas>
+              </div>
+              <div class="card-box" style="padding:1.2rem;">
+                <div style="font-size:0.73rem;font-weight:700;color:var(--text);margin-bottom:1rem;">Crecimiento Mensual</div>
+                <canvas id="crm-chart-line" height="180"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div id="csp-config" class="crm-subpanel" style="display:none;">
+            <div style="padding:0.5rem 0 0;">
+              <div style="font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:0.25rem;">Configuración</div>
+              <div style="font-size:0.78rem;color:var(--muted);margin-bottom:1.2rem;">Ajustes del sistema.</div>
+
+              <!-- Section 1: Importar VCF multi-archivo -->
+              <div class="card-box" style="padding:1.2rem;margin-bottom:0.85rem;border-radius:12px;">
+                <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem;">
+                  <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:#fff;flex-shrink:0;">1</div>
+                  <span style="font-size:0.9rem;font-weight:700;color:var(--text);">Importar Contactos (.vcf)</span>
+                </div>
+                <div style="border:1.5px dashed var(--border);border-radius:8px;padding:0.85rem 1rem;display:flex;align-items:center;gap:0.75rem;"
+                     ondragover="event.preventDefault();this.style.borderColor='#6366f1';"
+                     ondragleave="this.style.borderColor='var(--border)';"
+                     ondrop="cfgDropVcf(event);">
+                  <button onclick="document.getElementById('cfg-vcf-input').click()"
+                    style="padding:0.45rem 1rem;font-size:0.78rem;font-weight:600;background:linear-gradient(135deg,rgba(99,102,241,0.25),rgba(167,139,250,0.2));color:#a78bfa;border:1px solid rgba(167,139,250,0.4);border-radius:6px;cursor:pointer;white-space:nowrap;">
+                    Elegir archivos
+                  </button>
+                  <input type="file" id="cfg-vcf-input" accept=".vcf" multiple style="display:none;"
+                         onchange="cfgLoadMultiVcf(this.files)">
+                  <span id="cfg-vcf-label" style="font-size:0.78rem;color:var(--muted);">Sin archivos seleccionados</span>
+                </div>
+                <!-- Multi-file progress list -->
+                <div id="cfg-vcf-file-list" style="margin-top:0.7rem;display:flex;flex-direction:column;gap:0.4rem;"></div>
+                <!-- Overall summary -->
+                <div id="cfg-vcf-summary" style="display:none;margin-top:0.7rem;padding:0.65rem 0.8rem;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:8px;font-size:0.75rem;color:#4ade80;"></div>
+              </div>
+
+              <!-- Section 2: Imagen Promocional -->
+              <div class="card-box" style="padding:1.2rem;margin-bottom:0.85rem;border-radius:12px;">
+                <div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem;">
+                  <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:#fff;flex-shrink:0;">2</div>
+                  <span style="font-size:0.9rem;font-weight:700;color:var(--text);">Imagen Promocional</span>
+                </div>
+                <div style="border:1.5px dashed var(--border);border-radius:8px;padding:0.85rem 1rem;display:flex;align-items:center;gap:0.75rem;">
+                  <button onclick="document.getElementById('cfg-img-input').click()"
+                    style="padding:0.45rem 1rem;font-size:0.78rem;font-weight:600;background:linear-gradient(135deg,rgba(99,102,241,0.25),rgba(167,139,250,0.2));color:#a78bfa;border:1px solid rgba(167,139,250,0.4);border-radius:6px;cursor:pointer;white-space:nowrap;">
+                    Seleccionar archivo
+                  </button>
+                  <input type="file" id="cfg-img-input" accept="image/*" style="display:none;"
+                         onchange="cfgLoadImg(this.files[0])">
+                  <span id="cfg-img-label" style="font-size:0.78rem;color:var(--muted);">Sin archivos seleccionados</span>
+                </div>
+                <div id="cfg-img-preview" style="margin-top:0.7rem;display:none;">
+                  <img id="cfg-img-thumb" src="" alt="Promo" style="max-width:180px;max-height:100px;border-radius:8px;border:1px solid var(--border);">
+                </div>
+              </div>
+
+              <!-- Section 3: Zona de Peligro -->
+              <div style="padding:1.2rem;border-radius:12px;border:1.5px solid rgba(248,113,113,0.3);background:rgba(248,113,113,0.05);">
+                <div style="font-size:0.85rem;font-weight:700;color:#f87171;margin-bottom:0.3rem;">Zona de Peligro</div>
+                <div style="font-size:0.75rem;color:rgba(248,113,113,0.7);margin-bottom:0.9rem;">Esta acción eliminará todos los datos almacenados localmente.</div>
+                <button onclick="cfgResetear()"
+                  style="padding:0.55rem 1.3rem;font-size:0.82rem;font-weight:700;background:#ef4444;color:#fff;border:none;border-radius:8px;cursor:pointer;letter-spacing:0.01em;">
+                  Resetear Sistema
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+
+        <!-- ── CRM (alias → same view) ─────────────────────────── -->
+        <div id="section-crm" class="section-panel">
+          <div class="page-header"><h2>&#x1F91D; CRM &amp; Contactos</h2><div class="breadcrumb">El Arrejuntao &rsaquo; <span>CRM</span></div></div>
+          <div class="card-box" style="padding:1.5rem;text-align:center;color:var(--muted);">
+            <div style="font-size:2rem;margin-bottom:.5rem;">&#x1F91D;</div>
+            <div style="font-size:.85rem;">Usa el menu lateral &rarr; Contactos para acceder al CRM completo.</div>
+          </div>
+        </div>
+
+
+
+        <!-- ── CUADRE NIVEL SUPERIOR ─────────────────── -->
+        <div id="section-cuadre" class="section-panel">
+          <div class="page-header">
+            <h2>💰 Cuadre Nivel Superior</h2>
+            <div class="breadcrumb">El Arrejuntao › <span>Contabilidad</span></div>
+          </div>
+          <div class="card-box" style="padding:1.5rem; text-align:center; color:var(--muted);">
+            <div style="font-size:2.5rem; margin-bottom:0.5rem;">💰</div>
+            <div style="font-size:0.85rem;">Cuadre de nivel superior</div>
+            <div style="font-size:0.75rem; margin-top:0.35rem;">Balance consolidado por operadora y comercializadora.</div>
+          </div>
+        </div>
+
+      </div><!-- /page-content -->
+    </main>
+  </div><!-- /layout -->
+
+  <script>
+    // ── NAVEGACIÓN ──────────────────────────────────────────────
+    function showSection(id, navBtn, tabBtn) {
+      // Ocultar todos los paneles
+      document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('visible'));
+      const panel = document.getElementById('section-' + id);
+      if (panel) panel.classList.add('visible');
+
+      // Actualizar nav items sidebar
+      document.querySelectorAll('.sidebar .nav-item').forEach(n => n.classList.remove('active'));
+      if (navBtn) navBtn.classList.add('active');
+
+      // Actualizar tabs
+      if (tabBtn) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tabBtn.classList.add('active');
+      }
+
+      // Cargar datos según sección
+      if (id === 'cierre-sorteos') cargarSorteos();
+      if (id === 'dashboard') cargarDashboard();
+      if (id === 'gestion-usuarios') cargarUsuarios();
+      if (id === 'lista-linea') { initFechas(); consultarListaLinea(); }
+      if (id === 'control-riesgo') { initFechas(); const d = document.getElementById('cr-fecha'); if(d) d.textContent = new Date().toLocaleDateString('es-VE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).toUpperCase(); }
+      if (id === 'bloqueo-ventas') renderBV();
+    }
+
+
+    // ── DATOS: USUARIOS ─────────────────────────────────
+    async function cargarUsuarios() {
+      const wrap = document.getElementById('usuarios-table-wrap');
+      if (!wrap) return;
+      wrap.innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><br>Cargando usuarios…</div>';
+      try {
+        const data = await fetch('/api/django-users/').then(r => r.json());
+        const lista = data.usuarios || [];
+        const total = document.getElementById('usr-total');
+        if (total) total.textContent = lista.length;
+        if (lista.length === 0) {
+          wrap.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div>Sin usuarios registrados</div>';
+          return;
+        }
+        let html = `<table class="data-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="usr-all" onchange="toggleAll(this)"></th>
+              <th>Nombre de Usuario</th>
+              <th>Correo Electrónico</th>
+              <th>Nombre</th>
+              <th>Apellidos</th>
+              <th>Staff</th>
+              <th>Superusuario</th>
+              <th>Activo</th>
+              <th>Último acceso</th>
+              <th>Registrado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead><tbody>`;
+        lista.forEach((u, i) => {
+          const staffBadge    = u.is_staff      ? '<span style="color:#86efac;font-size:0.75rem;">✔</span>' : '<span style="color:rgba(255,255,255,0.2);font-size:0.75rem;">—</span>';
+          const superBadge    = u.is_superuser  ? '<span style="color:#fde68a;font-size:0.75rem;">★</span>' : '<span style="color:rgba(255,255,255,0.2);font-size:0.75rem;">—</span>';
+          const activeBadge   = u.is_active     ? '<span class="badge-abierto">Activo</span>' : '<span style="background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);border-radius:9999px;padding:0.1rem 0.45rem;font-size:0.62rem;font-weight:700;">Inactivo</span>';
+          html += `<tr>
+            <td><input type="checkbox" class="usr-cb" value="${u.id}"></td>
+            <td><a href="/admin/auth/user/${u.id}/change/" style="color:var(--accent);font-weight:600;text-decoration:none;" target="_blank">${u.username}</a></td>
+            <td style="color:var(--muted);">${u.email || '—'}</td>
+            <td>${u.first_name || '—'}</td>
+            <td>${u.last_name  || '—'}</td>
+            <td style="text-align:center;">${staffBadge}</td>
+            <td style="text-align:center;">${superBadge}</td>
+            <td style="text-align:center;">${activeBadge}</td>
+            <td style="color:var(--muted);font-size:0.74rem;">${u.last_login}</td>
+            <td style="color:var(--muted);font-size:0.74rem;">${u.date_joined}</td>
+            <td>
+              <div style="display:flex;gap:0.3rem;">
+                <a href="/admin/auth/user/${u.id}/change/" target="_blank" class="btn-action" style="font-size:0.7rem;">✏️ Editar</a>
+                <a href="/admin/auth/user/${u.id}/password/" target="_blank" class="btn-action" style="background:rgba(245,208,32,0.12);color:#fde68a;border-color:rgba(245,208,32,0.3);font-size:0.7rem;">🔑 Pass</a>
+              </div>
+            </td>
+          </tr>`;
+        });
+        html += '</tbody></table>';
+        // Footer resumen
+        html += `<div style="padding:0.6rem 1rem;border-top:1px solid var(--border);font-size:0.72rem;color:var(--muted);">${lista.length} usuario${lista.length !== 1 ? 's' : ''} en el sistema</div>`;
+        wrap.innerHTML = html;
+      } catch (err) {
+        wrap.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div>Error al cargar usuarios: ' + err.message + '</div>';
+      }
+    }
+
+    function toggleAll(cb) {
+      document.querySelectorAll('.usr-cb').forEach(c => c.checked = cb.checked);
+    }
+
+
+
+
+    // ── CRM & CONTACTOS ─────────────────────────────────────────
+    let crmContactos = [];
+    let crmListas = [];
+    let crmBatches = [];
+    let crmChartInstances = {};
+
+    function showCrmTab(tab, btn) {
+      document.querySelectorAll('.crm-subpanel').forEach(p => p.style.display = 'none');
+      const p = document.getElementById('csp-' + tab);
+      if (p) p.style.display = 'block';
+      document.querySelectorAll('.crm-subtab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      if (tab === 'analitica') setTimeout(initCrmCharts, 50);
+    }
+
+    function filtrarContactos() {
+      const q = (document.getElementById('crm-search')?.value || '').toLowerCase();
+      const rol = document.getElementById('crm-rol')?.value || 'Todos';
+      const est = document.getElementById('crm-estado')?.value || 'Todos';
+      const rows = document.querySelectorAll('#crm-tbody tr[data-id]');
+      let vis = 0;
+      rows.forEach(r => {
+        const txt = r.textContent.toLowerCase();
+        const rRol = r.dataset.rol || '';
+        const rEst = r.dataset.estado || '';
+        const show = txt.includes(q) && (rol==='Todos'||rRol===rol) && (est==='Todos'||rEst===est);
+        r.style.display = show ? '' : 'none';
+        if (show) vis++;
+      });
+      const cnt = document.getElementById('crm-count');
+      if (cnt) cnt.textContent = vis + ' contacto' + (vis!==1?'s':'');
+    }
+
+    function crmNuevoContacto() {
+      const nombre = prompt('Nombre del contacto:');
+      if (!nombre) return;
+      const tel = prompt('Telefono:');
+      const rol = prompt('Rol (Taquillero/Proveedor/Cliente):') || 'Cliente';
+      const ciudad = prompt('Ciudad:') || '';
+      const id = Date.now();
+      crmContactos.push({id, nombre, tel: tel||'', rol, ciudad, estado:'Activo', notas:''});
+      crmRenderTable();
+      crmUpdateStats();
+    }
+
+    function crmRenderTable() {
+      const tbody = document.getElementById('crm-tbody');
+      if (!tbody) return;
+      if (!crmContactos.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--muted);font-size:0.82rem;">Sin contactos que coincidan</td></tr>';
+        document.getElementById('crm-count').textContent = '0 contactos';
+        return;
+      }
+      tbody.innerHTML = crmContactos.map((c,i) => `
+        <tr data-id="${c.id}" data-rol="${c.rol}" data-estado="${c.estado}">
+          <td><input type="checkbox" class="crm-cb"></td>
+          <td style="color:var(--muted);font-size:0.72rem;">${i+1}</td>
+          <td style="font-weight:500;">${c.nombre}</td>
+          <td style="color:var(--muted);">${c.tel}</td>
+          <td><span style="padding:0.15rem 0.5rem;border-radius:4px;font-size:0.68rem;font-weight:600;background:rgba(99,102,241,0.15);color:#a5b4fc;">${c.rol}</span></td>
+          <td style="color:var(--muted);">${c.ciudad}</td>
+          <td><span style="padding:0.15rem 0.5rem;border-radius:4px;font-size:0.68rem;font-weight:600;${c.estado==='Activo'?'background:rgba(74,222,128,0.12);color:#4ade80;':'background:rgba(248,113,113,0.12);color:#f87171;'}">${c.estado}</span></td>
+          <td style="color:var(--muted);font-size:0.72rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.notas}</td>
+          <td>
+            <button onclick="crmEliminar(${c.id})" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.75rem;">&#x1F5D1;</button>
+            <button onclick="crmToggleEstado(${c.id})" style="background:none;border:none;color:#fbbf24;cursor:pointer;font-size:0.75rem;">&#x21C5;</button>
+          </td>
+        </tr>`).join('');
+      document.getElementById('crm-count').textContent = crmContactos.length + ' contacto' + (crmContactos.length!==1?'s':'');
+      document.getElementById('crm-all').onchange = (e) => document.querySelectorAll('.crm-cb').forEach(c=>c.checked=e.target.checked);
+    }
+
+    function crmEliminar(id) {
+      if (confirm('Eliminar este contacto?')) {
+        crmContactos = crmContactos.filter(c=>c.id!==id);
+        crmRenderTable(); crmUpdateStats();
+      }
+    }
+    function crmToggleEstado(id) {
+      const c = crmContactos.find(x=>x.id===id);
+      if (c) { c.estado = c.estado==='Activo'?'Inactivo':'Activo'; crmRenderTable(); crmUpdateStats(); }
+    }
+
+    function crmUpdateStats() {
+      const t = crmContactos.length;
+      const ac = crmContactos.filter(c=>c.estado==='Activo').length;
+      const pr = crmContactos.filter(c=>c.rol==='Proveedor').length;
+      const dev = crmContactos.filter(c=>c.estado==='Inactivo').length;
+      const el = (id,v) => { const e=document.getElementById(id); if(e)e.textContent=v; };
+      el('crm-total',t); el('crm-activos',ac); el('crm-prov',pr); el('crm-dev',dev);
+    }
+
+    function exportarVCF() {
+      if (!crmContactos.length) { alert('No hay contactos para exportar'); return; }
+      const vcf = crmContactos.map(c => [
+        'BEGIN:VCARD','VERSION:3.0',
+        `FN:${c.nombre}`,`N:${c.nombre};;;`,
+        c.tel ? `TEL;TYPE=CELL:${c.tel}` : '',
+        c.ciudad ? `ADR:;;${c.ciudad};;;;` : '',
+        c.rol ? `CATEGORIES:${c.rol}` : '',
+        c.notas ? `NOTE:${c.notas}` : '',
+        'END:VCARD'
+      ].filter(Boolean).join('\n')).join('\n\n');
+      const blob = new Blob([vcf], {type:'text/vcard'});
+      const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='contactos_crm.vcf'; a.click();
+    }
+
+    function eliminarSeleccionados() {
+      const sel = [...document.querySelectorAll('.crm-cb:checked')];
+      if (!sel.length) { alert('Selecciona al menos un contacto'); return; }
+      if (confirm('Eliminar ' + sel.length + ' contacto(s)?')) {
+        const ids = sel.map(cb => parseInt(cb.closest('tr').dataset.id));
+        crmContactos = crmContactos.filter(c => !ids.includes(c.id));
+        crmRenderTable(); crmUpdateStats();
+      }
+    }
+
+    // ── VCF PARSER ──────────────────────────────────────────────
+    function crmDropVcf(e) {
+      e.preventDefault();
+      document.getElementById('crm-dropzone').style.borderColor = 'var(--border)';
+      const file = e.dataTransfer?.files[0];
+      if (file) crmLoadVcf(file);
+    }
+    function crmLoadVcf(file) {
+      if (!file || !file.name.endsWith('.vcf')) { alert('Selecciona un archivo .vcf valido'); return; }
+      const progEl = document.getElementById('crm-vcf-progress');
+      const barEl = document.getElementById('crm-vcf-bar');
+      const labelEl = document.getElementById('crm-vcf-progress-label');
+      const resultEl = document.getElementById('crm-vcf-result');
+      progEl.style.display = 'block'; resultEl.style.display = 'none';
+      barEl.style.width = '0%';
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const text = ev.target.result;
+        const dedup = document.getElementById('vcf-dedup')?.checked;
+        const normalize = document.getElementById('vcf-normalize')?.checked;
+        const skipEmpty = document.getElementById('vcf-skip-empty')?.checked;
+        // Simulate progress
+        let pct = 0;
+        const timer = setInterval(() => {
+          pct = Math.min(pct + 10, 90);
+          barEl.style.width = pct + '%';
+          labelEl.textContent = 'Procesando... ' + pct + '%';
+        }, 80);
+        setTimeout(() => {
+          clearInterval(timer);
+          const parsed = parseVcf(text, {dedup, normalize, skipEmpty});
+          const nuevo = parsed.filter(p => !crmContactos.some(c=>c.tel===p.tel&&p.tel));
+          crmContactos = [...crmContactos, ...nuevo];
+          barEl.style.width = '100%';
+          labelEl.textContent = 'Completado';
+          resultEl.style.display = 'block';
+          resultEl.innerHTML = `&#x2705; <b>${parsed.length}</b> contactos leidos &nbsp;|&nbsp; <b>${nuevo.length}</b> nuevos importados &nbsp;|&nbsp; <b>${parsed.length - nuevo.length}</b> duplicados omitidos`;
+          crmRenderTable(); crmUpdateStats();
+          // Add to batch history
+          const batch = { id: Date.now(), file: file.name, total: parsed.length, nuevos: nuevo.length, fecha: new Date().toLocaleString() };
+          crmBatches.unshift(batch);
+          crmRenderBatches();
+        }, 900);
+      };
+      reader.readAsText(file);
+    }
+
+    function parseVcf(text, {dedup, normalize, skipEmpty}) {
+      const cards = text.split(/BEGIN:VCARD/i).slice(1);
+      const seen = new Set();
+      const result = [];
+      cards.forEach(card => {
+        const getName = () => { const m = card.match(/FN[^:]*:([^\r\n]+)/i); return m?m[1].trim():''; };
+        const getTel = () => { const m = card.match(/TEL[^:]*:([^\r\n]+)/i); let t = m?m[1].trim().replace(/\s+/g,''):''; if(normalize&&t&&!t.startsWith('+'))t='+58'+t.replace(/^0/,''); return t; };
+        const getNota = () => { const m = card.match(/NOTE[^:]*:([^\r\n]+)/i); return m?m[1].trim():''; };
+        const nombre = getName(); const tel = getTel(); const notas = getNota();
+        if (skipEmpty && !tel) return;
+        if (dedup && tel && seen.has(tel)) return;
+        if (tel) seen.add(tel);
+        result.push({id: Date.now() + Math.random(), nombre: nombre||'Sin nombre', tel, rol:'Cliente', ciudad:'', estado:'Activo', notas});
+      });
+      return result;
+    }
+
+    function crmRenderBatches() {
+      const el = document.getElementById('crm-batch-list');
+      if (!el) return;
+      if (!crmBatches.length) { el.innerHTML = '<div style="font-size:0.75rem;color:var(--muted);text-align:center;padding:1.5rem 0;">Sin lotes cargados aun</div>'; return; }
+      el.innerHTML = crmBatches.map(b=>`
+        <div style="padding:0.5rem 0.6rem;border-radius:6px;background:var(--surface2);margin-bottom:0.4rem;">
+          <div style="font-size:0.72rem;font-weight:600;color:var(--text);margin-bottom:0.15rem;">${b.file}</div>
+          <div style="font-size:0.68rem;color:var(--muted);">${b.fecha} &nbsp;|&nbsp; ${b.total} leidos &nbsp;|&nbsp; <span style="color:#4ade80;">${b.nuevos} nuevos</span></div>
+        </div>`).join('');
+    }
+
+    function crmGenerarLotes() {
+      if (!crmContactos.length) { alert('Importa contactos primero'); return; }
+      const SIZE = 100;
+      const total = crmContactos.length;
+      const numLotes = Math.ceil(total / SIZE);
+      const grid = document.getElementById('crm-lotes-grid');
+      const badge = document.getElementById('lotes-count-badge');
+      if (!grid) return;
+      grid.innerHTML = Array.from({length: numLotes}, (_, i) => {
+        const start = i * SIZE + 1;
+        const end   = Math.min((i+1)*SIZE, total);
+        const count = end - start + 1;
+        return `
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:0.75rem 0.85rem;cursor:pointer;transition:border-color .2s;"
+               onmouseenter="this.style.borderColor='#6366f1'" onmouseleave="this.style.borderColor='var(--border)'"
+               onclick="crmExportarLote(${i},${SIZE})">
+            <div style="font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:0.2rem;">Lote ${i+1}</div>
+            <div style="font-size:0.68rem;color:var(--muted);margin-bottom:0.5rem;">${start}-${end}</div>
+            <span style="font-size:0.62rem;background:rgba(99,102,241,0.15);color:#a78bfa;padding:0.1rem 0.45rem;border-radius:10px;">${count} contactos</span>
+          </div>`;
+      }).join('');
+      if (badge) badge.textContent = `${numLotes} lotes`;
+    }
+
+    function crmExportarLote(idx, size) {
+      const slice = crmContactos.slice(idx*size, (idx+1)*size);
+      if (!slice.length) return;
+      const vcf = slice.map(c => [
+        'BEGIN:VCARD','VERSION:3.0',
+        `FN:${c.nombre}`,`N:${c.nombre};;;`,
+        c.tel ? `TEL;TYPE=CELL:${c.tel}` : '',
+        'END:VCARD'
+      ].filter(Boolean).join('\n')).join('\n\n');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([vcf],{type:'text/vcard'}));
+      a.download = `lote_${idx+1}.vcf`; a.click();
+    }
+
+    function crmExportarTodosLotes() {
+      if (!crmContactos.length) { alert('No hay contactos'); return; }
+      const vcf = crmContactos.map(c => [
+        'BEGIN:VCARD','VERSION:3.0',
+        `FN:${c.nombre}`,`N:${c.nombre};;;`,
+        c.tel ? `TEL;TYPE=CELL:${c.tel}` : '',
+        'END:VCARD'
+      ].filter(Boolean).join('\n')).join('\n\n');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([vcf],{type:'text/vcard'}));
+      a.download = 'todos_los_lotes.vcf'; a.click();
+    }
+
+    function crmLimpiarLotes() {
+      if (confirm('Limpiar lotes generados?')) {
+        crmBatches = [];
+        const grid = document.getElementById('crm-lotes-grid');
+        if (grid) grid.innerHTML = '<div style="color:var(--muted);font-size:0.78rem;grid-column:1/-1;text-align:center;padding:2rem 0;">Importa contactos para generar los lotes automáticamente</div>';
+        const badge = document.getElementById('lotes-count-badge');
+        if (badge) badge.textContent = '';
+      }
+    }
+
+    // ── CONFIGURACIÓN – Multi-VCF + Imagen Promocional ───────────
+    function cfgDropVcf(e) {
+      e.preventDefault();
+      e.currentTarget.style.borderColor = 'var(--border)';
+      const files = e.dataTransfer?.files;
+      if (files && files.length) cfgLoadMultiVcf(files);
+    }
+
+    function cfgLoadMultiVcf(files) {
+      if (!files || !files.length) return;
+      const vcfFiles = [...files].filter(f => f.name.endsWith('.vcf'));
+      if (!vcfFiles.length) { alert('Selecciona archivos .vcf'); return; }
+      const label = document.getElementById('cfg-vcf-label');
+      const listEl = document.getElementById('cfg-vcf-file-list');
+      const summaryEl = document.getElementById('cfg-vcf-summary');
+      if (label) label.textContent = `${vcfFiles.length} archivo(s) seleccionado(s)`;
+      if (listEl) listEl.innerHTML = '';
+      if (summaryEl) summaryEl.style.display = 'none';
+
+      let totalParsed = 0, totalNuevos = 0, done = 0;
+
+      vcfFiles.forEach((file, fi) => {
+        // Create per-file row
+        const rowId = `cfg-row-${fi}`;
+        const row = document.createElement('div');
+        row.id = rowId;
+        row.style.cssText = 'padding:0.45rem 0.7rem;background:var(--surface2);border-radius:7px;font-size:0.72rem;';
+        row.innerHTML = `
+          <div style="display:flex;justify-content:space-between;margin-bottom:0.2rem;">
+            <span style="color:var(--text);font-weight:600;">${file.name}</span>
+            <span id="${rowId}-status" style="color:var(--muted);">Pendiente</span>
+          </div>
+          <div style="height:4px;background:var(--surface);border-radius:2px;overflow:hidden;">
+            <div id="${rowId}-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#6366f1,#a78bfa);transition:width .3s;"></div>
+          </div>`;
+        if (listEl) listEl.appendChild(row);
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const bar  = document.getElementById(`${rowId}-bar`);
+          const stat = document.getElementById(`${rowId}-status`);
+          if (bar) bar.style.width = '60%';
+          if (stat) stat.textContent = 'Procesando...';
+
+          setTimeout(() => {
+            const parsed = parseVcf(ev.target.result, {
+              dedup: document.getElementById('vcf-dedup')?.checked ?? true,
+              normalize: document.getElementById('vcf-normalize')?.checked ?? true,
+              skipEmpty: document.getElementById('vcf-skip-empty')?.checked ?? false
+            });
+            const nuevo = parsed.filter(p => !crmContactos.some(c => c.tel === p.tel && p.tel));
+            crmContactos = [...crmContactos, ...nuevo];
+            totalParsed += parsed.length; totalNuevos += nuevo.length;
+            if (bar) bar.style.width = '100%';
+            if (stat) { stat.textContent = `✅ ${nuevo.length} nuevos`; stat.style.color = '#4ade80'; }
+            crmBatches.unshift({ id: Date.now(), file: file.name, total: parsed.length, nuevos: nuevo.length, fecha: new Date().toLocaleString() });
+            done++;
+            if (done === vcfFiles.length) {
+              crmRenderTable(); crmUpdateStats(); crmRenderBatches();
+              if (summaryEl) {
+                summaryEl.style.display = 'block';
+                summaryEl.innerHTML = `✅ <b>${vcfFiles.length}</b> archivos procesados &nbsp;|&nbsp; <b>${totalParsed}</b> contactos leídos &nbsp;|&nbsp; <b>${totalNuevos}</b> nuevos importados`;
+              }
+            }
+          }, 400 + fi * 200);
+        };
+        reader.readAsText(file);
+      });
+    }
+
+    function cfgLoadImg(file) {
+      if (!file) return;
+      const label = document.getElementById('cfg-img-label');
+      if (label) label.textContent = file.name;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        ['cfg-img-thumb','lotes-promo-thumb'].forEach(id => { const e=document.getElementById(id); if(e) e.src=ev.target.result; });
+        ['cfg-img-preview','lotes-promo-preview'].forEach(id => { const e=document.getElementById(id); if(e) e.style.display='block'; });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function cfgResetear() {
+      if (!confirm('¿Eliminar TODOS los datos del CRM? Esta acción no se puede deshacer.')) return;
+      crmContactos = []; crmBatches = []; crmListas = [];
+      crmRenderTable(); crmUpdateStats(); crmRenderBatches();
+      const grid = document.getElementById('crm-lotes-grid');
+      if (grid) grid.innerHTML = '<div style="color:var(--muted);font-size:0.78rem;grid-column:1/-1;text-align:center;padding:2rem 0;">Importa contactos para generar los lotes automáticamente</div>';
+      const badge = document.getElementById('lotes-count-badge'); if (badge) badge.textContent = '';
+      const lbl = document.getElementById('cfg-vcf-label'); if (lbl) lbl.textContent = 'Sin archivos seleccionados';
+      const lst = document.getElementById('cfg-vcf-file-list'); if (lst) lst.innerHTML = '';
+      const sum = document.getElementById('cfg-vcf-summary'); if (sum) sum.style.display = 'none';
+      alert('✅ Sistema reseteado correctamente.');
+    }
+
+
+    // ── LISTAS DE ENVIO ─────────────────────────────────────────
+    function crmCrearLista() {
+      showCrmTab('lotes', document.getElementById('cst-lotes'));
+      setTimeout(()=>document.getElementById('crm-lista-nombre')?.focus(), 100);
+    }
+    function crmPreviewLista() {
+      const rol = document.getElementById('crm-lista-rol')?.value || 'Todos los roles';
+      const est = document.getElementById('crm-lista-estado')?.value || 'Todos los estados';
+      let filtered = crmContactos;
+      if (rol !== 'Todos los roles') filtered = filtered.filter(c=>c.rol===rol);
+      if (est !== 'Todos los estados') filtered = filtered.filter(c=>c.estado===est);
+      const el = document.getElementById('crm-lista-preview');
+      if (!filtered.length) { el.textContent = 'Sin contactos con esos filtros'; return; }
+      el.innerHTML = `<b style="color:var(--text);">${filtered.length} contactos</b><br><span style="font-size:0.68rem;color:var(--muted);">${filtered.slice(0,5).map(c=>c.nombre).join(', ')}${filtered.length>5?', …':''}</span>`;
+    }
+    function crmGuardarLista() {
+      const nombre = document.getElementById('crm-lista-nombre')?.value.trim();
+      if (!nombre) { alert('Escribe un nombre para la lista'); return; }
+      const rol = document.getElementById('crm-lista-rol')?.value || '';
+      const est = document.getElementById('crm-lista-estado')?.value || '';
+      let filtered = crmContactos;
+      if (rol && rol !== 'Todos los roles') filtered = filtered.filter(c=>c.rol===rol);
+      if (est && est !== 'Todos los estados') filtered = filtered.filter(c=>c.estado===est);
+      crmListas.push({id:Date.now(), nombre, total:filtered.length, fecha:new Date().toLocaleString(), contactos: filtered});
+      crmRenderListas();
+      document.getElementById('crm-lista-nombre').value = '';
+    }
+    function crmRenderListas() {
+      const el = document.getElementById('crm-listas-list');
+      if (!el) return;
+      if (!crmListas.length) { el.innerHTML = '<div style="font-size:0.75rem;color:var(--muted);text-align:center;padding:1.5rem 0;">Sin listas creadas</div>'; return; }
+      el.innerHTML = crmListas.map(l=>`
+        <div style="padding:0.5rem 0.6rem;border-radius:6px;background:var(--surface2);margin-bottom:0.4rem;cursor:pointer;">
+          <div style="font-size:0.72rem;font-weight:600;color:var(--text);">${l.nombre} <span style="color:#a78bfa;">(${l.total})</span></div>
+          <div style="font-size:0.65rem;color:var(--muted);">${l.fecha}</div>
+        </div>`).join('');
+    }
+    function crmExportarLista() {
+      const nombre = document.getElementById('crm-lista-nombre')?.value.trim();
+      const lista = crmListas.find(l=>l.nombre===nombre) || {contactos: crmContactos};
+      if (!lista.contactos.length) { alert('No hay contactos en esta lista'); return; }
+      const vcf = lista.contactos.map(c => [
+        'BEGIN:VCARD','VERSION:3.0',
+        `FN:${c.nombre}`,`N:${c.nombre};;;`,
+        c.tel ? `TEL;TYPE=CELL:${c.tel}` : '',
+        c.ciudad ? `ADR:;;${c.ciudad};;;;` : '',
+        c.rol ? `CATEGORIES:${c.rol}` : '',
+        'END:VCARD'
+      ].filter(Boolean).join('\n')).join('\n\n');
+      const blob = new Blob([vcf], {type:'text/vcard'});
+      const lname = (nombre || 'lista_envio').replace(/\s+/g,'_');
+      const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=lname+'.vcf'; a.click();
+    }
+
+    // ── ANALYTICS CHARTS ────────────────────────────────────────
+    function initCrmCharts() {
+      const defaults = { color:'rgba(255,255,255,0.7)', grid:'rgba(255,255,255,0.06)', font:'Inter,sans-serif' };
+      const mkOpts = (extra={}) => ({ responsive:true, maintainAspectRatio:true, plugins:{legend:{labels:{color:defaults.color,font:{family:defaults.font,size:10}}}}, ...extra });
+
+      function mkChart(id, type, labels, datasets, extra={}) {
+        const canvas = document.getElementById(id);
+        if (!canvas) return;
+        if (crmChartInstances[id]) crmChartInstances[id].destroy();
+        crmChartInstances[id] = new Chart(canvas, { type, data:{labels,datasets}, options: mkOpts({scales: type!=='doughnut'&&type!=='pie'?{x:{ticks:{color:defaults.color,font:{size:9}},grid:{color:defaults.grid}},y:{ticks:{color:defaults.color,font:{size:9}},grid:{color:defaults.grid}}}:undefined, ...extra}) });
+      }
+
+      // Donut — Estado de Envios
+      const env = crmContactos.length || 36850;
+      const pend = Math.max(0, Math.round(env*0.002));
+      mkChart('crm-chart-donut','doughnut',['Enviados','Pendientes'],[{data:[env-pend,pend],backgroundColor:['#f59e0b','#312e81'],borderWidth:0}]);
+
+      // Bar — Calidad de la Base
+      const valido = crmContactos.filter(c=>c.tel).length || 36835;
+      const sinDato = crmContactos.filter(c=>!c.tel).length || 15;
+      mkChart('crm-chart-bar','bar',['Valido','Sin Dato'],[{data:[valido,sinDato],backgroundColor:['#6366f1','#374151'],borderRadius:4,label:'Contactos'}],{plugins:{legend:{display:false}}});
+
+      // Pie — Contactos por Rol
+      const roles = ['Taquillero','Proveedor','Cliente'];
+      const rolData = roles.map(r => crmContactos.filter(c=>c.rol===r).length || [80,15,5][roles.indexOf(r)]*Math.round(crmContactos.length/100||1));
+      mkChart('crm-chart-pie','pie',roles,[{data:rolData,backgroundColor:['#6366f1','#a78bfa','#f59e0b'],borderWidth:0}]);
+
+      // Line — Crecimiento Mensual
+      const meses = ['Oct','Nov','Dic','Ene','Feb','Mar'];
+      const base = Math.max(crmContactos.length, 1000);
+      const lineData = meses.map((_,i)=>Math.round(base*(0.5+i*0.1)));
+      mkChart('crm-chart-line','line',meses,[{data:lineData,borderColor:'#6366f1',backgroundColor:'rgba(99,102,241,0.15)',tension:0.4,pointRadius:3,fill:true,label:'Contactos'}]);
+    }
+
+
+    // ── DATOS: SORTEOS ──────────────────────────────────────────
+    async function cargarSorteos() {
+
+      const container = document.getElementById('sorteo-cards-container');
+      container.innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><br>Cargando sorteos…</div>';
+      try {
+        const res = await fetch('/api/sorteos/');
+        const data = await res.json();
+        if (!data.sorteos || data.sorteos.length === 0) {
+          container.innerHTML = '<div class="empty-state"><div class="empty-icon">🎲</div>No hay sorteos configurados.<br><a href="/admin/api_rest/controlsorteo/add/" style="color:var(--accent);">Crear sorteos en el admin →</a></div>';
+          return;
+        }
+        // Agrupar por horario
+        const byHorario = {};
+        data.sorteos.forEach(s => {
+          if (!byHorario[s.horario]) byHorario[s.horario] = [];
+          byHorario[s.horario].push(s);
+        });
+        let cerrados = 0, total = 0;
+        let html = '';
+        for (const [horario, sorteos] of Object.entries(byHorario)) {
+          const estaAbierto = sorteos.some(s => s.abierto);
+          const estado = estaAbierto ? 'ABIERTO' : 'CERRADO';
+          const badgeClass = estaAbierto ? 'badge-open' : 'badge-closed';
+          const venta = sorteos.reduce((a,s)=> a + (s.ventas_hoy || 0),0);
+          cerrados += sorteos.filter(s => !s.abierto).length;
+          total += sorteos.length;
+          html += `
+          <div class="sorteo-card">
+            <div class="sorteo-card-header">
+              <div class="sorteo-name">EL ARREJUNTAO ${horario}</div>
+              <div class="sorteo-meta">
+                <span class="badge-info" style="font-size:0.7rem;color:var(--muted);">Bs. ${venta.toFixed(2)} / ${sorteos[0]?.cupo_venta || 0}</span>
+                <span class="${badgeClass}">${estado}</span>
+                <button class="btn-action ${estaAbierto ? 'btn-cerrar' : 'btn-abrir'}"
+                  onclick="toggleHorario('${horario}', ${estaAbierto})">
+                  ${estaAbierto ? '🔴 Cerrar Sorteo' : '🟢 Abrir Sorteo'}
+                </button>
+              </div>
+            </div>
+            <table class="sorteo-table">
+              <thead>
+                <tr>
+                  <th>Modalidad</th>
+                  <th>Venta Bs.</th>
+                  <th>Premio Bs.</th>
+                  <th>Saldo Bs.</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${sorteos.map(s => `
+                <tr>
+                  <td>${s.sorteo_nombre}</td>
+                  <td class="${s.ventas_hoy > 0 ? 'col-num' : 'col-zero'}">${s.ventas_hoy > 0 ? s.ventas_hoy.toFixed(2) : '0,00'}</td>
+                  <td class="col-zero">0</td>
+                  <td class="${s.ventas_hoy > 0 ? 'col-num' : 'col-zero'}">${s.ventas_hoy > 0 ? s.ventas_hoy.toFixed(2) : '0,00'}</td>
+                </tr>`).join('')}
+                <tr class="total-row">
+                  <td><strong>TOTAL SORTEO</strong></td>
+                  <td>${sorteos.reduce((a,s)=>a+(s.ventas_hoy||0),0).toFixed(2)}</td>
+                  <td>0,00</td>
+                  <td>${sorteos.reduce((a,s)=>a+(s.ventas_hoy||0),0).toFixed(2)}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="sorteo-card-footer">
+              <input class="notas-input" placeholder="Observaciones del sorteo..." type="text">
+            </div>
+          </div>`;
+        }
+        container.innerHTML = html;
+        document.getElementById('sorteos-cerrados-count').textContent = cerrados + '/' + total;
+      } catch(e) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div>Error al cargar sorteos.<br><small>' + e.message + '</small></div>';
+      }
+    }
+
+    async function toggleHorario(horario, estaAbierto) {
+      // Por ahora navega al admin Django para realizar la acción
+      window.open('/admin/api_rest/controlsorteo/', '_blank');
+    }
+
+    function accionMasiva(accion) {
+      window.open('/admin/api_rest/controlsorteo/', '_blank');
+    }
+
+    // ── DASHBOARD DATA ──────────────────────────────────────────
+    async function cargarDashboard() {
+      try {
+        const [health, sorteos] = await Promise.all([
+          fetch('/api/health/').then(r => r.json()),
+          fetch('/api/sorteos/').then(r => r.json())
+        ]);
+        const activos = (sorteos.sorteos || []).filter(s => s.abierto).length;
+        document.getElementById('dash-sorteos-activos').textContent = activos;
+        document.getElementById('dash-estado').textContent = health.firebase === 'conectado' ? 'OK ✓' : 'Sin Firebase';
+      } catch(e) {
+        document.getElementById('dash-estado').textContent = 'Error';
+      }
+
+      try {
+        const usuarios = await fetch('/api/usuarios/').then(r => r.json());
+        document.getElementById('dash-usuarios').textContent = usuarios.total || 0;
+      } catch(e) {
+        document.getElementById('dash-usuarios').textContent = '—';
+      }
+    }
+
+    // ── IP DEL CLIENTE ──────────────────────────────────────────
+    async function detectarIP() {
+      try {
+        const r = await fetch('https://api.ipify.org?format=json');
+        const d = await r.json();
+        document.getElementById('user-ip').textContent = d.ip;
+      } catch(e) {
+        document.getElementById('user-ip').textContent = '127.0.0.1';
+      }
+    }
+
+
+    // ── INIT ────────────────────────────────────────────────────
+    function initFechas() {
+      const hoy = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      const toISO = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+      const inicio = new Date(hoy); inicio.setDate(1);
+      ['ll-desde','cr-desde','bv-desde'].forEach(id => { const el=document.getElementById(id); if(el&&!el.value)el.value=toISO(inicio); });
+      ['ll-hasta','cr-hasta','bv-hasta'].forEach(id => { const el=document.getElementById(id); if(el&&!el.value)el.value=toISO(hoy); });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initFechas();
+      showSection('cierre-sorteos', null);
+    });
+
+    function consultarListaLinea() {
+
+      const wrap = document.getElementById('ll-grid-wrap');
+      if (!wrap) return;
+      wrap.innerHTML = '<div class="empty-state"><div class="loading-spinner"></div><br>Generando grilla…</div>';
+      const sorteoSel = document.getElementById('ll-sorteo')?.value || 'Todos';
+      const modSel    = document.getElementById('ll-modalidad')?.value || 'Triple A';
+      const hoy       = new Date().toLocaleDateString('es-VE', {day:'2-digit',month:'long',year:'numeric'});
+      const fechaEl   = document.getElementById('ll-num-date');
+      if (fechaEl) fechaEl.textContent = hoy;
+      const lSorteo = document.getElementById('ll-sorteo-label');
+      const lModal  = document.getElementById('ll-modal-label');
+      if (lSorteo) lSorteo.textContent = sorteoSel || 'Todos';
+      if (lModal)  lModal.textContent  = modSel;
+      setTimeout(() => {
+        const COLS = 10, PER = 100;
+        let html = '<table class="num-grid-table" style="width:100%;"><thead><tr>';
+        for (let c = 0; c < COLS; c++) {
+          const last = c === COLS - 1;
+          html += `<th class="ng-p">P</th><th class="ng-num">NUM</th><th class="${last ? 'ng-amt' : 'ng-amt g-sep'}">MONTO</th>`;
+        }
+        html += '</tr></thead><tbody>';
+        for (let row = 0; row < PER; row++) {
+          html += '<tr>';
+          for (let col = 0; col < COLS; col++) {
+            const num = col * PER + row;
+            const ns  = String(num).padStart(3, '0');
+            const last = col === COLS - 1;
+            html += `<td class="ng-p">${row + 1}</td><td class="ng-num">${ns}</td><td class="ng-amt zero${last ? '' : ' g-sep'}">—</td>`;
+          }
+          html += '</tr>';
+        }
+        html += '</tbody></table>';
+        wrap.innerHTML = html;
+        const ca = document.getElementById('ll-con-apuesta');
+        const mt = document.getElementById('ll-monto-total');
+        if (ca) ca.textContent = '0';
+        if (mt) mt.textContent = '0,00';
+      }, 400);
+    }
+
+
+    // ── TABLA DE ANIMALITOS ────────────────────────────────────────────────
+    const ANIMALES = {
+       0:'Delfín',   1:'Carnero',     2:'Toro',        3:'Ciempiés',   4:'Alacrán',
+       5:'León',     6:'Rana',        7:'Perico',       8:'Ratón',      9:'Águila',
+      10:'Tigre',   11:'Gato',       12:'Caballo',     13:'Mono',      14:'Paloma',
+      15:'Zorro',   16:'Oso',        17:'Pavo',        18:'Burro',     19:'Chivo',
+      20:'Cochino', 21:'Gallo',      22:'Camello',     23:'Cebra',     24:'Iguana',
+      25:'Gallina', 26:'Vaca',       27:'Perro',       28:'Zamuro',    29:'Elefante',
+      30:'Caimán',  31:'Lapa',       32:'Ardilla',     33:'Pez',       34:'Venado',
+      35:'Jirafa',  36:'Culebra',    37:'Tortuga',     38:'Búfalo',    39:'Lechuza',
+      40:'Avispa',  42:'Tucán',      43:'Mariposa',    44:'Chigüire',  45:'Garza',
+      46:'Puma',    47:'Pavoreal',   48:'Puercoespín', 49:'Pereza',    50:'Canario',
+      51:'Pelícano',52:'Pulpo',      53:'Caracol',     54:'Grillo',    55:'Oso Hormiguero',
+      56:'Tiburón', 57:'Pato',       58:'Hormiga',     59:'Pantera',   60:'Camaleón',
+      61:'Panda',   62:'Cachicamo',  63:'Cangrejo',    64:'Gavilán',   65:'Araña',
+      66:'Lobo',    67:'Avestruz',   68:'Jaguar',      69:'Conejo',    70:'Bisonte',
+      71:'Guayama', 72:'Gorila',     73:'Hipopótamo',  74:'Turpial',   75:'Bestia Ganadora',
+      // Especial
+      '00':'Ballena'
+    };
+
+    function animalNombre(num) {
+      return ANIMALES[parseInt(num)] || ANIMALES[num] || '';
+    }
+
+    function modalidadRequiereAnimal(valor) {
+      return valor === 'El Animal' || valor === 'El Pegadito';
+    }
+
+    /** Muestra / oculta el grid de animalitos según la modalidad seleccionada */
+    function onModalidadChange(selectEl, gridContId, numFieldId) {
+      const grid = document.getElementById(gridContId);
+      const numField = document.getElementById(numFieldId);
+      if (!grid) return;
+      if (modalidadRequiereAnimal(selectEl.value)) {
+        grid.style.display = 'block';
+        if (numField) numField.placeholder = 'N° animal (0-75)';
+      } else {
+        grid.style.display = 'none';
+        if (numField) numField.placeholder = 'Ej: 123 o 1-50';
+      }
+    }
+
+    /** Renderiza la cuadrícula compacta de animalitos en el contenedor dado */
+    function renderAnimalesGrid(containerId, numFieldId) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      const nums = Object.keys(ANIMALES);
+      el.innerHTML = `
+        <div style="font-size:0.62rem;color:var(--muted);font-weight:700;letter-spacing:.06em;margin-bottom:0.5rem;">TABLA ANIMALITOS — clic para seleccionar</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:0.3rem;max-height:220px;overflow-y:auto;padding-right:2px;">
+          ${nums.map(n => `
+            <div onclick="document.getElementById('${numFieldId}').value='${n}';this.parentElement.querySelectorAll('.animal-chip').forEach(x=>x.style.background='var(--surface2)');this.style.background='rgba(99,102,241,0.25)';"
+                 class="animal-chip"
+                 title="${ANIMALES[n]}"
+                 style="display:flex;align-items:center;gap:0.3rem;padding:0.22rem 0.4rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:background .15s;font-size:0.64rem;">
+              <span style="color:var(--accent);font-weight:700;min-width:18px;">${n}</span>
+              <span style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${ANIMALES[n]}</span>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    // ── CONTROL DE RIESGO ───────────────────────────────────────────────────
+    let crRiesgo = [];
+    let crEstadoAbierto = true;
+
+    function crActualizarRiesgo() {
+      const monto = parseFloat(document.getElementById('cr-monto')?.value) || 0;
+      const riesgoVal = (monto * 0.5).toFixed(2); // 50% exposure ratio example
+      const el = document.getElementById('cr-riesgo');
+      if (el) el.value = riesgoVal;
+    }
+
+    function crAgregar() {
+      const num    = document.getElementById('cr-numero')?.value.trim();
+      const monto  = parseFloat(document.getElementById('cr-monto')?.value) || 0;
+      const riesgo = parseFloat(document.getElementById('cr-riesgo')?.value) || 0;
+      const lista  = document.getElementById('cr-lista')?.value || 'Principal';
+      const sorteo = document.getElementById('cr-sorteo')?.value || '';
+      const modal  = document.getElementById('cr-modalidad')?.value || '';
+      if (!num || num.length < 1) { alert('Ingresa un número (1-3 dígitos).'); return; }
+      const numPad = String(num).padStart(3,'0');
+      // Check if already exists — sum if so
+      const existing = crRiesgo.find(r => r.num === numPad && r.lista === lista);
+      if (existing) {
+        existing.monto  = +(existing.monto  + monto).toFixed(2);
+        existing.riesgo = +(existing.riesgo + riesgo).toFixed(2);
+      } else {
+        crRiesgo.push({ num: numPad, monto, riesgo, lista, sorteo, modal });
+      }
+      crRenderTable();
+      crActualizarLimite();
+      document.getElementById('cr-numero').value = '';
+      document.getElementById('cr-monto').value  = '';
+      document.getElementById('cr-riesgo').value = '';
+    }
+
+    function crRenderTable() {
+      const tbody = document.getElementById('cr-tbody');
+      if (!tbody) return;
+      if (!crRiesgo.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted);font-size:0.82rem;">Sin registros — agrega un número para comenzar</td></tr>';
+        const cnt = document.getElementById('cr-count');
+        if (cnt) cnt.textContent = 'Mostrando 0 de 0 registros';
+        return;
+      }
+      tbody.innerHTML = crRiesgo.map((r,i) => `
+        <tr data-idx="${i}">
+          <td><input type="checkbox" class="cr-cb"></td>
+          <td style="font-family:monospace;font-weight:700;color:var(--accent);font-size:0.88rem;">${r.num}</td>
+          <td style="color:var(--text);">${r.monto.toFixed(2)}</td>
+          <td style="color:#a5b4fc;">${r.riesgo.toFixed(2)}</td>
+          <td>${r.riesgo > 0 && r.monto/r.riesgo > 0.8
+               ? '<span style="color:#f87171;font-size:0.7rem;background:rgba(248,113,113,0.1);padding:0.1rem 0.4rem;border-radius:4px;">⚠️ Alto</span>'
+               : '<span style="color:#4ade80;font-size:0.7rem;background:rgba(74,222,128,0.1);padding:0.1rem 0.4rem;border-radius:4px;">OK</span>'}</td>
+          <td style="display:flex;gap:0.4rem;align-items:center;">
+            <button onclick="crSumar(${i})" style="font-size:0.7rem;padding:0.15rem 0.55rem;background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);border-radius:4px;cursor:pointer;">Sumar</button>
+            <button onclick="crRiesgo.splice(${i},1);crRenderTable();crActualizarLimite();" style="font-size:0.7rem;padding:0.15rem 0.45rem;background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2);border-radius:4px;cursor:pointer;">&#x1F5D1;</button>
+          </td>
+        </tr>`).join('');
+      const cnt = document.getElementById('cr-count');
+      if (cnt) cnt.textContent = `Mostrando ${crRiesgo.length} de ${crRiesgo.length} registros`;
+      document.getElementById('cr-all').onchange = (e) => document.querySelectorAll('.cr-cb').forEach(c=>c.checked=e.target.checked);
+    }
+
+    function crSumar(i) {
+      const extra = prompt(`Sumar monto al número ${crRiesgo[i].num}:`);
+      if (extra === null) return;
+      const val = parseFloat(extra) || 0;
+      crRiesgo[i].monto  = +(crRiesgo[i].monto  + val).toFixed(2);
+      crRiesgo[i].riesgo = +(crRiesgo[i].riesgo + val*0.5).toFixed(2);
+      crRenderTable(); crActualizarLimite();
+    }
+
+    function crActualizarLimite() {
+      const limite = parseFloat(document.getElementById('cr-limite')?.value) || 10000;
+      const total  = crRiesgo.reduce((a,r)=>a+r.monto, 0);
+      const pct    = limite > 0 ? ((total/limite)*100).toFixed(1) : '0.0';
+      const el = document.getElementById('cr-limite-pct');
+      if (el) el.textContent = pct + '%';
+    }
+
+    function crToggleEstado() {
+      crEstadoAbierto = !crEstadoAbierto;
+      const badge = document.getElementById('cr-estado-badge');
+      if (badge) {
+        badge.textContent = crEstadoAbierto ? 'ABIERTO' : 'CERRADO';
+        badge.style.background = crEstadoAbierto ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.12)';
+        badge.style.color      = crEstadoAbierto ? '#4ade80' : '#f87171';
+      }
+    }
+
+    function crConsultar() {
+      const desde = document.getElementById('cr-desde')?.value;
+      const hasta = document.getElementById('cr-hasta')?.value;
+      if (!desde || !hasta) { alert('Selecciona rango de fechas'); return; }
+      // In production: fetch from API. For now just show current data.
+      crRenderTable();
+    }
+
+    function crLimpiar() {
+      ['cr-desde','cr-hasta'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+    }
+
+    function crEliminarSel() {
+      const sel = [...document.querySelectorAll('.cr-cb:checked')];
+      if (!sel.length) { alert('Selecciona al menos un registro'); return; }
+      const idxs = sel.map(cb => parseInt(cb.closest('tr').dataset.idx));
+      crRiesgo = crRiesgo.filter((_,i) => !idxs.includes(i));
+      crRenderTable(); crActualizarLimite();
+    }
+
+    function crLimpiarTabla() {
+      if (!crRiesgo.length || confirm('Limpiar todos los registros?')) {
+        crRiesgo = []; crRenderTable(); crActualizarLimite();
+      }
+    }
+
+    function imprimirRiesgo() { window.print(); }
+    function exportarRiesgoPDF() { alert('Generando PDF del control de riesgo — función disponible en versión producción.'); }
+
+
+    // ── BLOQUEO DE VENTAS ───────────────────────────────────────────────────
+    let bvBloqueos = [];
+
+    function bvAplicarBloqueo() {
+      const modal  = document.getElementById('bv-modalidad')?.value || '';
+      const sorteo = document.getElementById('bv-sorteo')?.value    || '';
+      const tipo   = document.getElementById('bv-tipo')?.value      || '';
+      const numero = document.getElementById('bv-numero')?.value.trim() || '';
+      const motivo = document.getElementById('bv-motivo')?.value.trim() || '—';
+      if (!numero) { alert('Ingresa el número a bloquear.'); return; }
+      const fecha = new Date().toLocaleDateString('es-VE', {day:'2-digit',month:'2-digit',year:'numeric'});
+      bvBloqueos.push({ modal, sorteo, tipo, numero, motivo, fecha, activo: true });
+      bvRenderTabla();
+      ['bv-numero','bv-motivo'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+    }
+
+    function bvRenderTabla() {
+      const tbody = document.getElementById('bv-tbody');
+      const badge = document.getElementById('bv-count-badge');
+      if (!tbody) return;
+      if (badge) badge.textContent = bvBloqueos.length + ' bloqueados';
+      if (!bvBloqueos.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted);font-size:0.82rem;">Sin bloqueos activos — aplica uno arriba</td></tr>';
+        return;
+      }
+      const sorteoColor = { '10:00 AM':'#fbbf24', '1:00 PM':'#60a5fa', '4:00 PM':'#f97316', '7:00 PM':'#a78bfa', '11:00 PM':'#4ade80' };
+      tbody.innerHTML = bvBloqueos.map((b, i) => `
+        <tr>
+          <td style="font-weight:600;color:var(--text);">${b.modal}</td>
+          <td><span style="background:rgba(59,130,246,0.12);color:#93c5fd;border:1px solid rgba(59,130,246,0.25);border-radius:9999px;padding:0.1rem 0.45rem;font-size:0.65rem;">${b.tipo}</span></td>
+          <td style="color:${sorteoColor[b.sorteo]||'var(--accent)'};font-weight:600;font-size:0.78rem;">${b.sorteo}</td>
+          <td style="font-family:monospace;font-weight:700;color:var(--accent);">${b.numero}</td>
+          <td style="color:var(--muted);font-size:0.73rem;">${b.motivo}</td>
+          <td style="color:var(--muted);font-size:0.73rem;">${b.fecha}</td>
+          <td>
+            <div style="display:flex;gap:0.3rem;align-items:center;">
+              <button onclick="bvVerBloqueo(${i})" style="font-size:0.65rem;padding:0.15rem 0.45rem;background:rgba(99,102,241,0.12);color:#a78bfa;border:1px solid rgba(99,102,241,0.25);border-radius:4px;cursor:pointer;">Ver</button>
+              <button onclick="bvEditarBloqueo(${i})" style="font-size:0.65rem;padding:0.15rem 0.45rem;background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border);border-radius:4px;cursor:pointer;">✏️ Editar</button>
+              <button onclick="bvBloqueos.splice(${i},1);bvRenderTabla();" style="font-size:0.65rem;padding:0.15rem 0.45rem;background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2);border-radius:4px;cursor:pointer;">Cancelar</button>
+            </div>
+          </td>
+        </tr>`).join('');
+    }
+
+    function bvVerBloqueo(i) {
+      const b = bvBloqueos[i];
+      if (!b) return;
+      alert(`📋 Bloqueo #${i+1}\n\nModalidad: ${b.modal}\nSorteo: ${b.sorteo}\nTipo: ${b.tipo}\nNúmero: ${b.numero}\nMotivo: ${b.motivo}\nFecha: ${b.fecha}`);
+    }
+
+    function bvEditarBloqueo(i) {
+      const b = bvBloqueos[i];
+      if (!b) return;
+      const nuevo = prompt(`Editar número del bloqueo (actual: ${b.numero}):`, b.numero);
+      if (nuevo !== null && nuevo.trim()) { b.numero = nuevo.trim(); bvRenderTabla(); }
+    }
+
+    function bvLimpiarTodo() {
+      if (!bvBloqueos.length || confirm('¿Eliminar todos los bloqueos activos?')) {
+        bvBloqueos = []; bvRenderTabla();
+      }
+    }
+
+    function bvConsultar() { bvRenderTabla(); }
+    function bvLimpiarFiltro() {
+      ['bv-desde','bv-hasta'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+    }
+
+    // Also keep old alias for backwards compat
+    function aplicarBloqueo() { bvAplicarBloqueo(); }
+    function renderBV()       { bvRenderTabla(); }
+
+
+    detectarIP();
+    document.querySelector('.tab').classList.add('active');
+  </script>
+
+</body>
+</html>
