@@ -28,8 +28,9 @@ django-guardian==3.3.1
 django-crequest==2018.5.11
 django-extensions==4.1
 
-# Firebase (notificaciones)
-firebase_admin==7.1.0
+# Firebase (notificaciones push)
+# firebase_admin se instala con --prefer-binary para evitar compilación de pycairo
+firebase-admin==6.5.0
 
 # Utilidades
 requests==2.32.5
@@ -38,15 +39,9 @@ python-dotenv==1.2.2
 PyJWT==2.11.0
 six==1.17.0
 jsonfield==3.2.0
-pillow==12.1.1
+pillow==11.1.0
 
-# Reportes PDF/Excel
-pdfkit==1.0.0
-xhtml2pdf==0.2.17
-reportlab==4.4.10
-lxml==6.0.2
-
-# Celery (opcional — comentado en fase inicial)
-# celery==5.6.3
-# kombu==5.6.2
-# redis==7.4.0
+# Reportes PDF
+reportlab==4.2.5
+xhtml2pdf==0.2.16
+lxml==5.3.0
