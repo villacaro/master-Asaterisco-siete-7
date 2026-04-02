@@ -18,7 +18,10 @@ from admin_lib.util_task import AsyncGestionOperationalError
 try:
     from celery.registry import tasks
 except ImportError:
-    tasks = {}
+    class _NoOpTaskRegistry:
+        def register(self, *args, **kwargs):
+            pass
+    tasks = _NoOpTaskRegistry()
 from django.core.cache import cache
 from django.db.models import Sum
 from django.utils.timezone import now

@@ -411,6 +411,21 @@
       </button>
 
       <div class="nav-sep"></div>
+      <div class="nav-section-label">Comercialización</div>
+      <button class="nav-item" onclick="showSection('ventas', this)">
+        <span class="nav-icon">🎟️</span> Ventas
+        <span class="nav-badge" id="badge-ventas" style="background:rgba(34,197,94,0.2);color:#86efac;border-color:rgba(34,197,94,0.3);">0</span>
+      </button>
+      <button class="nav-item" onclick="showSection('pagos-taquilleros', this)">
+        <span class="nav-icon">💳</span> Pagos Taquilleros
+        <span class="nav-badge" id="badge-pagos-pend" style="background:rgba(245,158,11,0.2);color:#fcd34d;border-color:rgba(245,158,11,0.3);">0</span>
+      </button>
+      <button class="nav-item" onclick="showSection('pago-premios', this)">
+        <span class="nav-icon">🏆</span> Pago de Premios
+        <span class="nav-badge" id="badge-premios-pend" style="background:rgba(239,68,68,0.2);color:#fca5a5;border-color:rgba(239,68,68,0.3);">0</span>
+      </button>
+
+      <div class="nav-sep"></div>
       <div class="nav-section-label">Contabilidad</div>
       <button class="nav-item" onclick="showSection('cuadre', this)">
         <span class="nav-icon">💰</span> Cuadre Nivel Superior
@@ -1359,7 +1374,345 @@
           </div>
         </div>
 
+        <!-- ── VENTAS ──────────────────────────────────── -->
+        <div id="section-ventas" class="section-panel">
+          <div class="page-header">
+            <div>
+              <div class="breadcrumb">El Arrejuntao › Comercialización</div>
+              <h2>🎟️ Ventas</h2>
+              <div style="font-size:0.7rem;color:var(--muted);margin-top:0.15rem;">Registro y seguimiento de apuestas por taquillero y sorteo</div>
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="btn-sm btn-primary" onclick="ventasCargar()">🔄 Actualizar</button>
+              <button class="btn-sm btn-purple2" onclick="window.print()">🖨️ Imprimir</button>
+            </div>
+          </div>
+
+          <!-- KPIs -->
+          <div class="stats-row" style="margin-bottom:0.85rem;">
+            <div class="stat-card"><div class="stat-label">Total Registros</div><div class="stat-value green" id="v-total-reg">0</div><div class="stat-sub">ventas del período</div></div>
+            <div class="stat-card"><div class="stat-label">Monto Total</div><div class="stat-value amber" id="v-total-bs">Bs. 0,00</div><div class="stat-sub">acumulado</div></div>
+            <div class="stat-card"><div class="stat-label">Estado Filtro</div><div class="stat-value blue" style="font-size:0.95rem;" id="v-estado-label">Todos</div></div>
+            <div class="stat-card"><div class="stat-label">Fecha Consulta</div><div class="stat-value muted" style="font-size:0.75rem;" id="v-fecha-label">—</div></div>
+          </div>
+
+          <!-- Filtros -->
+          <div class="card-box" style="padding:0.85rem 1rem;margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:flex-end;gap:0.65rem;flex-wrap:wrap;">
+              <div><div class="filter-label">Desde</div><input type="date" id="v-desde" class="input-filter" onchange="document.getElementById('v-fecha-label').textContent=this.value"></div>
+              <div><div class="filter-label">Hasta</div><input type="date" id="v-hasta" class="input-filter"></div>
+              <div><div class="filter-label">Taquillero</div><input type="text" id="v-taquillero" class="input-filter" placeholder="Filtrar por taquillero..."></div>
+              <div>
+                <div class="filter-label">Estado</div>
+                <select id="v-estado" class="select-input" onchange="document.getElementById('v-estado-label').textContent=this.options[this.selectedIndex].text">
+                  <option value="">Todos</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="ganador">Ganador</option>
+                  <option value="perdedor">Perdedor</option>
+                  <option value="anulado">Anulado</option>
+                </select>
+              </div>
+              <button class="btn-sm btn-primary" onclick="ventasCargar()">🔍 Consultar</button>
+            </div>
+          </div>
+
+          <!-- Formulario nueva venta -->
+          <div class="card-box" style="padding:0.85rem 1rem;margin-bottom:0.75rem;border:1px solid rgba(34,197,94,0.2);background:rgba(34,197,94,0.03);">
+            <div style="font-size:0.68rem;color:var(--accent);font-weight:700;letter-spacing:.08em;margin-bottom:0.65rem;">➕ REGISTRAR NUEVA VENTA</div>
+            <div style="display:grid;grid-template-columns:1.2fr 1.4fr 1fr 1.2fr 1.5fr 1fr auto;gap:0.55rem;align-items:flex-end;">
+              <div>
+                <div class="filter-label">Horario</div>
+                <select id="vnueva-horario" class="select-input" style="width:100%;">
+                  <option>10:00 AM</option><option>01:00 PM</option><option>04:00 PM</option><option>07:00 PM</option><option>11:00 PM</option>
+                </select>
+              </div>
+              <div>
+                <div class="filter-label">Modalidad</div>
+                <select id="vnueva-modalidad" class="select-input" style="width:100%;">
+                  <option value="triple_a">Triple A</option>
+                  <option value="triple_b">Triple B</option>
+                  <option value="triple_signo">Triple + Signo</option>
+                  <option value="el_arrimao">El Arrimao</option>
+                  <option value="el_pegadito">El Pegadito</option>
+                  <option value="animalito">Animalito</option>
+                  <option value="terminal_a">Terminal A</option>
+                  <option value="terminal_b">Terminal B</option>
+                </select>
+              </div>
+              <div>
+                <div class="filter-label">Número</div>
+                <input type="text" id="vnueva-numero" class="input-filter" placeholder="123" style="width:100%;">
+              </div>
+              <div>
+                <div class="filter-label">Monto Bs</div>
+                <input type="number" id="vnueva-monto" class="input-filter" placeholder="0.00" step="0.01" min="0" style="width:100%;">
+              </div>
+              <div>
+                <div class="filter-label">Taquillero</div>
+                <input type="text" id="vnueva-taquillero" class="input-filter" placeholder="Nombre taquillero" style="width:100%;">
+              </div>
+              <div>
+                <div class="filter-label">Ref. Ticket</div>
+                <input type="text" id="vnueva-ticket" class="input-filter" placeholder="Opcional" style="width:100%;">
+              </div>
+              <div>
+                <button class="btn-sm btn-primary" onclick="ventasCrear()" style="padding:0.42rem 1rem;white-space:nowrap;">💾 Guardar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla -->
+          <div class="card-box">
+            <div style="padding:0.65rem 1rem;border-bottom:1px solid var(--border);font-size:0.72rem;color:var(--muted);">Historial de Ventas — <span id="v-reg-count" style="color:var(--accent);">usa los filtros para consultar</span></div>
+            <div style="overflow-x:auto;">
+              <table class="data-table" style="min-width:800px;">
+                <thead>
+                  <tr>
+                    <th>ID</th><th>Fecha</th><th>Horario</th><th>Modalidad</th><th>Número</th><th>Monto Bs</th><th>Taquillero</th><th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="v-tbody">
+                  <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted);">Aplica filtros y presiona Consultar</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ── PAGOS TAQUILLEROS ──────────────────────── -->
+        <div id="section-pagos-taquilleros" class="section-panel">
+          <div class="page-header">
+            <div>
+              <div class="breadcrumb">El Arrejuntao › Comercialización</div>
+              <h2>💳 Pagos de Taquilleros</h2>
+              <div style="font-size:0.7rem;color:var(--muted);margin-top:0.15rem;">Cobros y depósitos recibidos de taquilleros — pendientes de confirmación</div>
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="btn-sm btn-primary" onclick="pagosCargar()">🔄 Actualizar</button>
+              <button class="btn-sm btn-purple2" onclick="window.print()">🖨️ Imprimir</button>
+            </div>
+          </div>
+
+          <!-- KPIs -->
+          <div class="stats-row" style="margin-bottom:0.85rem;">
+            <div class="stat-card"><div class="stat-label">Total Registros</div><div class="stat-value green" id="p-total-reg">0</div><div class="stat-sub">pagos del período</div></div>
+            <div class="stat-card"><div class="stat-label">Monto Total</div><div class="stat-value amber" id="p-total-bs">Bs. 0,00</div><div class="stat-sub">cobrado</div></div>
+            <div class="stat-card"><div class="stat-label">Pendientes</div><div class="stat-value" style="color:var(--amber);" id="p-pendientes-count">—</div><div class="stat-sub">por confirmar</div></div>
+            <div class="stat-card"><div class="stat-label">Fecha Consulta</div><div class="stat-value muted" style="font-size:0.75rem;" id="p-fecha-label">—</div></div>
+          </div>
+
+          <!-- Filtros -->
+          <div class="card-box" style="padding:0.85rem 1rem;margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:flex-end;gap:0.65rem;flex-wrap:wrap;">
+              <div><div class="filter-label">Desde</div><input type="date" id="p-desde" class="input-filter"></div>
+              <div><div class="filter-label">Hasta</div><input type="date" id="p-hasta" class="input-filter"></div>
+              <div><div class="filter-label">Taquillero</div><input type="text" id="p-taquillero" class="input-filter" placeholder="Filtrar..."></div>
+              <div>
+                <div class="filter-label">Estado</div>
+                <select id="p-estado" class="select-input">
+                  <option value="">Todos</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="confirmado">Confirmado</option>
+                  <option value="rechazado">Rechazado</option>
+                </select>
+              </div>
+              <button class="btn-sm btn-primary" onclick="pagosCargar()">🔍 Consultar</button>
+            </div>
+          </div>
+
+          <!-- Formulario nuevo pago -->
+          <div class="card-box" style="padding:0.85rem 1rem;margin-bottom:0.75rem;border:1px solid rgba(245,158,11,0.2);background:rgba(245,158,11,0.03);">
+            <div style="font-size:0.68rem;color:var(--amber);font-weight:700;letter-spacing:.08em;margin-bottom:0.65rem;">💳 REGISTRAR NUEVO PAGO</div>
+            <div style="display:grid;grid-template-columns:1.5fr 1fr 1.2fr 1.4fr 1fr 1fr auto;gap:0.55rem;align-items:flex-end;">
+              <div>
+                <div class="filter-label">Taquillero</div>
+                <input type="text" id="pnuevo-taquillero" class="input-filter" placeholder="Nombre taquillero" style="width:100%;">
+              </div>
+              <div>
+                <div class="filter-label">Monto Bs</div>
+                <input type="number" id="pnuevo-monto" class="input-filter" placeholder="0.00" step="0.01" min="0" style="width:100%;">
+              </div>
+              <div>
+                <div class="filter-label">Método</div>
+                <select id="pnuevo-metodo" class="select-input" style="width:100%;">
+                  <option value="efectivo">Efectivo</option>
+                  <option value="transferencia">Transferencia</option>
+                  <option value="mobile">Pago Móvil</option>
+                  <option value="zelle">Zelle</option>
+                  <option value="cripto">Cripto</option>
+                  <option value="otro">Otro</option>
+                </select>
+              </div>
+              <div>
+                <div class="filter-label">Referencia</div>
+                <input type="text" id="pnuevo-ref" class="input-filter" placeholder="Nro. comprobante" style="width:100%;">
+              </div>
+              <div>
+                <div class="filter-label">Período Desde</div>
+                <input type="date" id="pnuevo-desde" class="input-filter" style="width:100%;">
+              </div>
+              <div>
+                <div class="filter-label">Período Hasta</div>
+                <input type="date" id="pnuevo-hasta" class="input-filter" style="width:100%;">
+              </div>
+              <div>
+                <button class="btn-sm" style="background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.35);padding:0.42rem 1rem;white-space:nowrap;" onclick="pagosRegistrar()">💾 Registrar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla -->
+          <div class="card-box">
+            <div style="padding:0.65rem 1rem;border-bottom:1px solid var(--border);font-size:0.72rem;color:var(--muted);">Historial de Pagos — <span style="color:var(--amber);">haz clic en Confirmar o Rechazar para procesar</span></div>
+            <div style="overflow-x:auto;">
+              <table class="data-table" style="min-width:900px;">
+                <thead>
+                  <tr>
+                    <th>ID</th><th>Fecha</th><th>Taquillero</th><th>Monto Bs</th><th>Método</th><th>Referencia</th><th>Estado</th><th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="p-tbody">
+                  <tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted);">Aplica filtros y presiona Consultar</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ── PAGO DE PREMIOS ────────────────────────── -->
+        <div id="section-pago-premios" class="section-panel">
+          <div class="page-header">
+            <div>
+              <div class="breadcrumb">El Arrejuntao › Comercialización</div>
+              <h2>🏆 Pago de Premios</h2>
+              <div style="font-size:0.7rem;color:var(--muted);margin-top:0.15rem;">Registro y pago de premios a ganadores — control de liquidación</div>
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+              <button class="btn-sm btn-primary" onclick="premiosCargar()">🔄 Actualizar</button>
+              <button class="btn-sm btn-purple2" onclick="window.print()">🖨️ Imprimir</button>
+            </div>
+          </div>
+
+          <!-- KPIs -->
+          <div class="stats-row" style="margin-bottom:0.85rem;">
+            <div class="stat-card"><div class="stat-label">Total Premios</div><div class="stat-value green" id="pr-total-reg">0</div><div class="stat-sub">registrados</div></div>
+            <div class="stat-card"><div class="stat-label">Monto Total Premios</div><div class="stat-value" style="color:#4ade80;" id="pr-total-prem">Bs. 0,00</div><div class="stat-sub">acumulado</div></div>
+            <div class="stat-card"><div class="stat-label">Pendientes de Pago</div><div class="stat-value" style="color:var(--red);" id="pr-total-pend">Bs. 0,00</div><div class="stat-sub">por liquidar</div></div>
+            <div class="stat-card"><div class="stat-label">Multiplicador Base</div><div class="stat-value blue">x70</div><div class="stat-sub">Triple A / Triple B</div></div>
+          </div>
+
+          <!-- Filtros -->
+          <div class="card-box" style="padding:0.85rem 1rem;margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:flex-end;gap:0.65rem;flex-wrap:wrap;">
+              <div><div class="filter-label">Desde</div><input type="date" id="pr-desde" class="input-filter"></div>
+              <div><div class="filter-label">Hasta</div><input type="date" id="pr-hasta" class="input-filter"></div>
+              <div>
+                <div class="filter-label">Estado</div>
+                <select id="pr-estado" class="select-input">
+                  <option value="">Todos</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="en_proceso">En Proceso</option>
+                  <option value="pagado">Pagado</option>
+                  <option value="rechazado">Rechazado</option>
+                </select>
+              </div>
+              <div>
+                <div class="filter-label">Modalidad</div>
+                <select id="pr-modalidad" class="select-input">
+                  <option value="">Todas</option>
+                  <option value="triple_a">Triple A</option>
+                  <option value="triple_b">Triple B</option>
+                  <option value="triple_signo">Triple Signo</option>
+                  <option value="el_arrimao">El Arrimao</option>
+                  <option value="el_pegadito">El Pegadito</option>
+                  <option value="animalito">Animalito</option>
+                </select>
+              </div>
+              <button class="btn-sm btn-primary" onclick="premiosCargar()">🔍 Consultar</button>
+            </div>
+          </div>
+
+          <!-- Formulario nuevo ganador -->
+          <div class="card-box" style="padding:0.85rem 1rem;margin-bottom:0.75rem;border:1px solid rgba(245,208,32,0.25);background:rgba(245,208,32,0.03);">
+            <div style="font-size:0.68rem;color:var(--gold);font-weight:700;letter-spacing:.08em;margin-bottom:0.65rem;">🏆 REGISTRAR NUEVO GANADOR</div>
+            <div style="display:grid;grid-template-columns:1fr 1.3fr 0.9fr 0.9fr;gap:0.55rem;margin-bottom:0.55rem;">
+              <div>
+                <div class="filter-label">Horario Sorteo</div>
+                <select id="prnuevo-horario" class="select-input" style="width:100%;">
+                  <option>10:00 AM</option><option>01:00 PM</option><option>04:00 PM</option><option>07:00 PM</option><option>11:00 PM</option>
+                </select>
+              </div>
+              <div>
+                <div class="filter-label">Modalidad</div>
+                <select id="prnuevo-modalidad" class="select-input" style="width:100%;">
+                  <option value="triple_a">Triple A</option>
+                  <option value="triple_b">Triple B</option>
+                  <option value="triple_signo">Triple + Signo</option>
+                  <option value="el_arrimao">El Arrimao</option>
+                  <option value="el_pegadito">El Pegadito</option>
+                  <option value="animalito">Animalito</option>
+                </select>
+              </div>
+              <div>
+                <div class="filter-label">Número Ganador</div>
+                <input type="text" id="prnuevo-numero" class="input-filter" placeholder="🏆 Ej: 456" style="width:100%;font-weight:800;font-size:1rem;color:var(--gold);">
+              </div>
+              <div>
+                <div class="filter-label">Ref. Ticket</div>
+                <input type="text" id="prnuevo-ticket" class="input-filter" placeholder="Opcional" style="width:100%;">
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1.8fr 1fr 1.4fr 1fr 1fr auto;gap:0.55rem;align-items:flex-end;">
+              <div>
+                <div class="filter-label">Nombre del Ganador</div>
+                <input type="text" id="prnuevo-nombre" class="input-filter" placeholder="Nombre completo" style="width:100%;">
+              </div>
+              <div>
+                <div class="filter-label">Cédula / ID</div>
+                <input type="text" id="prnuevo-cedula" class="input-filter" placeholder="V-00000000" style="width:100%;">
+              </div>
+              <div>
+                <div class="filter-label">Taquillero</div>
+                <input type="text" id="prnuevo-taquillero" class="input-filter" placeholder="Taquillero" style="width:100%;">
+              </div>
+              <div>
+                <div class="filter-label">Monto Apostado Bs</div>
+                <input type="number" id="prnuevo-apuesta" class="input-filter" placeholder="0.00" step="0.01" style="width:100%;" oninput="this.closest('.card-box').querySelector('#prnuevo-preview').textContent='Premio estimado: Bs. '+(parseFloat(this.value)||0)*(parseFloat(document.getElementById('prnuevo-multi').value)||70)+'.00'">
+              </div>
+              <div>
+                <div class="filter-label">Multiplicador</div>
+                <input type="number" id="prnuevo-multi" class="input-filter" value="70" step="1" min="1" style="width:100%;">
+              </div>
+              <div>
+                <button class="btn-sm" style="background:rgba(245,208,32,0.15);color:var(--gold);border:1px solid rgba(245,208,32,0.4);padding:0.42rem 1.1rem;white-space:nowrap;font-weight:700;" onclick="premiosRegistrar()">🏆 Registrar Ganador</button>
+              </div>
+            </div>
+            <div id="prnuevo-preview" style="margin-top:0.5rem;font-size:0.72rem;color:var(--gold);font-weight:600;"></div>
+          </div>
+
+          <!-- Tabla -->
+          <div class="card-box">
+            <div style="padding:0.65rem 1rem;border-bottom:1px solid var(--border);font-size:0.72rem;color:var(--muted);">Lista de Ganadores — <span style="color:var(--gold);">gestiona el estado de pago de cada premio</span></div>
+            <div style="overflow-x:auto;">
+              <table class="data-table" style="min-width:1000px;">
+                <thead>
+                  <tr>
+                    <th>ID</th><th>Fecha</th><th>Horario</th><th>Modalidad</th><th>Número</th><th>Ganador</th><th>Apostado</th><th>Premio Bs</th><th>Estado / Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="pr-tbody">
+                  <tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--muted);">Aplica filtros y presiona Consultar</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+
       </div><!-- /page-content -->
+
     </main>
   </div><!-- /layout -->
 
@@ -2329,6 +2682,325 @@
     function aplicarBloqueo() { bvAplicarBloqueo(); }
     function renderBV()       { bvRenderTabla(); }
 
+
+    // ═══════════════════════════════════════════════════════════
+    // MÓDULO VENTAS — JavaScript
+    // ═══════════════════════════════════════════════════════════
+
+    let ventasData = [];
+
+    async function ventasCargar() {
+      const desde  = document.getElementById('v-desde')?.value  || '';
+      const hasta  = document.getElementById('v-hasta')?.value  || '';
+      const taq    = document.getElementById('v-taquillero')?.value.trim() || '';
+      const estado = document.getElementById('v-estado')?.value || '';
+      let url = '/api/ventas/?';
+      if (desde)  url += `fecha_desde=${desde}&`;
+      if (hasta)  url += `fecha_hasta=${hasta}&`;
+      if (taq)    url += `taquillero=${encodeURIComponent(taq)}&`;
+      if (estado) url += `estado=${estado}&`;
+      try {
+        const r    = await fetch(url);
+        const data = await r.json();
+        ventasData = data.ventas || [];
+        ventasRenderizar();
+        // Actualizar badge
+        const badge = document.getElementById('badge-ventas');
+        if (badge) badge.textContent = ventasData.length;
+        // Totales
+        const tv = document.getElementById('v-total-reg');   if (tv)  tv.textContent = ventasData.length;
+        const tb = document.getElementById('v-total-bs');    if (tb)  tb.textContent = 'Bs. ' + (data.total_bs||0).toFixed(2);
+      } catch(e) { console.warn('Ventas API error', e); }
+    }
+
+    function ventasRenderizar() {
+      const tbody = document.getElementById('v-tbody');
+      if (!tbody) return;
+      if (!ventasData.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted);font-size:0.82rem;">No hay ventas registradas para los filtros seleccionados</td></tr>';
+        return;
+      }
+      const colEstado = { pendiente:'#fbbf24', ganador:'#4ade80', perdedor:'#f87171', anulado:'#9ca3af' };
+      tbody.innerHTML = ventasData.map(v => `
+        <tr>
+          <td style="font-size:0.7rem;color:var(--muted);">${v.id}</td>
+          <td style="color:var(--text);font-weight:600;">${v.fecha}</td>
+          <td style="color:#60a5fa;font-size:0.78rem;">${v.horario}</td>
+          <td style="color:var(--text);">${v.modalidad_nombre}</td>
+          <td style="font-family:monospace;font-weight:700;color:var(--accent);">${v.numero}</td>
+          <td style="color:var(--amber);font-weight:700;">Bs. ${v.monto.toFixed(2)}</td>
+          <td style="color:var(--muted);font-size:0.78rem;">${v.taquillero||'—'}</td>
+          <td><span style="font-size:0.65rem;font-weight:700;background:rgba(0,0,0,0.25);color:${colEstado[v.estado]||'#9ca3af'};border-radius:9999px;padding:0.12rem 0.5rem;">${v.estado.toUpperCase()}</span></td>
+        </tr>`).join('');
+    }
+
+    async function ventasCrear() {
+      const horario  = document.getElementById('vnueva-horario').value;
+      const modalidad= document.getElementById('vnueva-modalidad').value;
+      const numero   = document.getElementById('vnueva-numero').value.trim();
+      const monto    = parseFloat(document.getElementById('vnueva-monto').value);
+      const taquillero = document.getElementById('vnueva-taquillero').value.trim();
+      const ticket   = document.getElementById('vnueva-ticket').value.trim();
+
+      if (!numero || isNaN(monto) || monto <= 0) {
+        alert('Completa todos los campos requeridos (número y monto válido)');
+        return;
+      }
+      try {
+        const r = await fetch('/api/ventas/crear/', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json','X-CSRFToken': getCookie('csrftoken')},
+          body: JSON.stringify({ horario, modalidad, numero, monto, taquillero, ticket_ref: ticket })
+        });
+        const d = await r.json();
+        if (d.ok) {
+          alert('✅ Venta registrada correctamente (ID: ' + d.id + ')');
+          ['vnueva-numero','vnueva-monto','vnueva-ticket','vnueva-taquillero'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.value = '';
+          });
+          ventasCargar();
+        } else {
+          alert('❌ Error: ' + d.error);
+        }
+      } catch(e) { alert('Error de conexión'); }
+    }
+
+
+    // ═══════════════════════════════════════════════════════════
+    // MÓDULO PAGOS — JavaScript
+    // ═══════════════════════════════════════════════════════════
+
+    let pagosData = [];
+
+    async function pagosCargar() {
+      const desde  = document.getElementById('p-desde')?.value  || '';
+      const hasta  = document.getElementById('p-hasta')?.value  || '';
+      const taq    = document.getElementById('p-taquillero')?.value.trim() || '';
+      const estado = document.getElementById('p-estado')?.value || '';
+      let url = '/api/pagos/?';
+      if (desde)  url += `fecha_desde=${desde}&`;
+      if (hasta)  url += `fecha_hasta=${hasta}&`;
+      if (taq)    url += `taquillero=${encodeURIComponent(taq)}&`;
+      if (estado) url += `estado=${estado}&`;
+      try {
+        const r    = await fetch(url);
+        const data = await r.json();
+        pagosData  = data.pagos || [];
+        pagosRenderizar();
+        const badge = document.getElementById('badge-pagos-pend');
+        if (badge) badge.textContent = pagosData.filter(p=>p.estado==='pendiente').length;
+        const tr = document.getElementById('p-total-reg'); if (tr) tr.textContent = pagosData.length;
+        const tb = document.getElementById('p-total-bs');  if (tb) tb.textContent = 'Bs. ' + (data.total_bs||0).toFixed(2);
+      } catch(e) { console.warn('Pagos API error', e); }
+    }
+
+    function pagosRenderizar() {
+      const tbody = document.getElementById('p-tbody');
+      if (!tbody) return;
+      if (!pagosData.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted);font-size:0.82rem;">No hay pagos registrados</td></tr>';
+        return;
+      }
+      const colEstado = { pendiente:'#fbbf24', confirmado:'#4ade80', rechazado:'#f87171' };
+      tbody.innerHTML = pagosData.map(p => `
+        <tr>
+          <td style="font-size:0.7rem;color:var(--muted);">${p.id}</td>
+          <td style="color:var(--text);font-weight:600;">${p.fecha}</td>
+          <td style="color:var(--text);">${p.taquillero}</td>
+          <td style="color:var(--amber);font-weight:700;">Bs. ${p.monto.toFixed(2)}</td>
+          <td style="color:var(--muted);font-size:0.78rem;">${p.metodo_nombre}</td>
+          <td style="color:var(--muted);font-size:0.75rem;">${p.referencia||'—'}</td>
+          <td><span style="font-size:0.65rem;font-weight:700;background:rgba(0,0,0,0.25);color:${colEstado[p.estado]||'#9ca3af'};border-radius:9999px;padding:0.12rem 0.5rem;">${p.estado_nombre.toUpperCase()}</span></td>
+          <td>
+            <div style="display:flex;gap:0.3rem;">
+              ${p.estado==='pendiente' ? `
+              <button onclick="pagoConfirmar(${p.id},'confirmado')" style="font-size:0.65rem;padding:0.15rem 0.45rem;background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);border-radius:4px;cursor:pointer;">✓ Confirmar</button>
+              <button onclick="pagoConfirmar(${p.id},'rechazado')" style="font-size:0.65rem;padding:0.15rem 0.45rem;background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2);border-radius:4px;cursor:pointer;">✗ Rechazar</button>
+              ` : `<span style="font-size:0.65rem;color:var(--muted);">${p.confirmado_por||'—'}</span>`}
+            </div>
+          </td>
+        </tr>`).join('');
+    }
+
+    async function pagosRegistrar() {
+      const taquillero = document.getElementById('pnuevo-taquillero').value.trim();
+      const monto      = parseFloat(document.getElementById('pnuevo-monto').value);
+      const metodo     = document.getElementById('pnuevo-metodo').value;
+      const referencia = document.getElementById('pnuevo-ref').value.trim();
+      const periodoD   = document.getElementById('pnuevo-desde').value;
+      const periodoH   = document.getElementById('pnuevo-hasta').value;
+
+      if (!taquillero || isNaN(monto) || monto <= 0) {
+        alert('Completa taquillero y monto válido');
+        return;
+      }
+      try {
+        const r = await fetch('/api/pagos/crear/', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json','X-CSRFToken': getCookie('csrftoken')},
+          body: JSON.stringify({ taquillero, monto, metodo, referencia, periodo_desde: periodoD||null, periodo_hasta: periodoH||null })
+        });
+        const d = await r.json();
+        if (d.ok) {
+          alert('✅ Pago registrado (ID: ' + d.id + ')');
+          ['pnuevo-taquillero','pnuevo-monto','pnuevo-ref','pnuevo-desde','pnuevo-hasta'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.value = '';
+          });
+          pagosCargar();
+        } else {
+          alert('❌ Error: ' + d.error);
+        }
+      } catch(e) { alert('Error de conexión'); }
+    }
+
+    async function pagoConfirmar(id, estado) {
+      const quien = prompt(`${estado==='confirmado'?'Confirmar':'Rechazar'} pago #${id}.\nConfirmado por (tu nombre):`);
+      if (quien === null) return;
+      try {
+        const r = await fetch(`/api/pagos/${id}/confirmar/`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json','X-CSRFToken': getCookie('csrftoken')},
+          body: JSON.stringify({ estado, confirmado_por: quien })
+        });
+        const d = await r.json();
+        if (d.ok) { pagosCargar(); }
+        else { alert('❌ Error: ' + d.error); }
+      } catch(e) { alert('Error de conexión'); }
+    }
+
+
+    // ═══════════════════════════════════════════════════════════
+    // MÓDULO PREMIOS — JavaScript
+    // ═══════════════════════════════════════════════════════════
+
+    let premiosData = [];
+
+    async function premiosCargar() {
+      const desde    = document.getElementById('pr-desde')?.value  || '';
+      const hasta    = document.getElementById('pr-hasta')?.value  || '';
+      const estado   = document.getElementById('pr-estado')?.value || '';
+      const modalidad= document.getElementById('pr-modalidad')?.value || '';
+      let url = '/api/premios/?';
+      if (desde)     url += `fecha_desde=${desde}&`;
+      if (hasta)     url += `fecha_hasta=${hasta}&`;
+      if (estado)    url += `estado=${estado}&`;
+      if (modalidad) url += `modalidad=${modalidad}&`;
+      try {
+        const r    = await fetch(url);
+        const data = await r.json();
+        premiosData = data.premios || [];
+        premiosRenderizar();
+        const badge = document.getElementById('badge-premios-pend');
+        if (badge) badge.textContent = premiosData.filter(p=>p.estado==='pendiente').length;
+        const tr = document.getElementById('pr-total-reg');  if (tr) tr.textContent = premiosData.length;
+        const tp = document.getElementById('pr-total-prem'); if (tp) tp.textContent = 'Bs. ' + (data.total_premios||0).toFixed(2);
+        const tpend = document.getElementById('pr-total-pend'); if (tpend) tpend.textContent = 'Bs. ' + (data.total_pendiente||0).toFixed(2);
+      } catch(e) { console.warn('Premios API error', e); }
+    }
+
+    function premiosRenderizar() {
+      const tbody = document.getElementById('pr-tbody');
+      if (!tbody) return;
+      if (!premiosData.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:2rem;color:var(--muted);font-size:0.82rem;">No hay premios registrados</td></tr>';
+        return;
+      }
+      const colEstado = { pendiente:'#fbbf24', pagado:'#4ade80', rechazado:'#f87171', en_proceso:'#60a5fa' };
+      tbody.innerHTML = premiosData.map(p => `
+        <tr>
+          <td style="font-size:0.7rem;color:var(--muted);">${p.id}</td>
+          <td style="color:var(--text);font-weight:600;">${p.fecha}</td>
+          <td style="color:#60a5fa;font-size:0.78rem;">${p.horario}</td>
+          <td style="color:var(--text);">${p.modalidad_nombre}</td>
+          <td style="font-family:monospace;font-weight:800;color:var(--gold);font-size:1rem;">🏆 ${p.numero_ganador}</td>
+          <td style="color:var(--text);">${p.ganador_nombre}<br><span style="font-size:0.65rem;color:var(--muted);">${p.ganador_id||''}</span></td>
+          <td style="color:var(--amber);font-weight:700;">Bs. ${p.monto_apuesta.toFixed(2)}</td>
+          <td style="color:#4ade80;font-weight:800;font-size:0.95rem;">Bs. ${p.monto_premio.toFixed(2)}</td>
+          <td>
+            <span style="font-size:0.65rem;font-weight:700;background:rgba(0,0,0,0.25);color:${colEstado[p.estado]||'#9ca3af'};border-radius:9999px;padding:0.12rem 0.5rem;display:block;margin-bottom:0.3rem;">${p.estado_nombre.toUpperCase()}</span>
+            ${p.estado==='pendiente'||p.estado==='en_proceso' ? `
+            <div style="display:flex;gap:0.25rem;margin-top:0.25rem;">
+              <button onclick="premiosPagar(${p.id},'pagado')" style="font-size:0.6rem;padding:0.12rem 0.4rem;background:rgba(74,222,128,0.12);color:#4ade80;border:1px solid rgba(74,222,128,0.25);border-radius:4px;cursor:pointer;">💸 Pagar</button>
+              <button onclick="premiosPagar(${p.id},'en_proceso')" style="font-size:0.6rem;padding:0.12rem 0.4rem;background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.2);border-radius:4px;cursor:pointer;">⏳ Proceso</button>
+              <button onclick="premiosPagar(${p.id},'rechazado')" style="font-size:0.6rem;padding:0.12rem 0.4rem;background:rgba(248,113,113,0.1);color:#f87171;border:1px solid rgba(248,113,113,0.2);border-radius:4px;cursor:pointer;">✗</button>
+            </div>` : `<span style="font-size:0.65rem;color:var(--muted);">${p.pagado_por||'—'}</span>`}
+          </td>
+        </tr>`).join('');
+    }
+
+    async function premiosRegistrar() {
+      const horario  = document.getElementById('prnuevo-horario').value;
+      const modalidad= document.getElementById('prnuevo-modalidad').value;
+      const numero   = document.getElementById('prnuevo-numero').value.trim();
+      const nombre   = document.getElementById('prnuevo-nombre').value.trim();
+      const cedula   = document.getElementById('prnuevo-cedula').value.trim();
+      const taq      = document.getElementById('prnuevo-taquillero').value.trim();
+      const apuesta  = parseFloat(document.getElementById('prnuevo-apuesta').value);
+      const multi    = parseFloat(document.getElementById('prnuevo-multi').value) || 70;
+      const ticket   = document.getElementById('prnuevo-ticket').value.trim();
+
+      if (!numero || !nombre || isNaN(apuesta) || apuesta <= 0) {
+        alert('Completa número ganador, nombre del ganador y monto de apuesta');
+        return;
+      }
+      const monto_premio = apuesta * multi;
+      if (!confirm(`¿Registrar premio?\n\nGanador: ${nombre}\nNúmero: ${numero}\nApuesta: Bs.${apuesta.toFixed(2)}\nMultiplicador: x${multi}\nPremio: Bs.${monto_premio.toFixed(2)}`)) return;
+
+      try {
+        const r = await fetch('/api/premios/crear/', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json','X-CSRFToken': getCookie('csrftoken')},
+          body: JSON.stringify({ horario, modalidad, numero_ganador: numero, ganador_nombre: nombre, ganador_id: cedula, taquillero: taq, monto_apuesta: apuesta, multiplicador: multi, ticket_ref: ticket })
+        });
+        const d = await r.json();
+        if (d.ok) {
+          alert(`✅ Premio registrado (ID: ${d.id})\nMonto Premio: Bs.${d.monto_premio.toFixed(2)}`);
+          ['prnuevo-numero','prnuevo-nombre','prnuevo-cedula','prnuevo-taquillero','prnuevo-apuesta','prnuevo-ticket'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.value = '';
+          });
+          premiosCargar();
+        } else {
+          alert('❌ Error: ' + d.error);
+        }
+      } catch(e) { alert('Error de conexión'); }
+    }
+
+    async function premiosPagar(id, estado) {
+      const labels = { pagado:'Pagar Premio', en_proceso:'Marcar En Proceso', rechazado:'Rechazar Premio' };
+      const quien  = prompt(`${labels[estado]||estado} #${id}\nNombre del administrador:`);
+      if (quien === null) return;
+      try {
+        const r = await fetch(`/api/premios/${id}/pagar/`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json','X-CSRFToken': getCookie('csrftoken')},
+          body: JSON.stringify({ estado, pagado_por: quien })
+        });
+        const d = await r.json();
+        if (d.ok) { premiosCargar(); }
+        else { alert('❌ Error: ' + d.error); }
+      } catch(e) { alert('Error de conexión'); }
+    }
+
+    // Helper cookie
+    function getCookie(name) {
+      let cv = null;
+      if (document.cookie && document.cookie !== '') {
+        for (const c of document.cookie.split(';')) {
+          const tc = c.trim();
+          if (tc.startsWith(name + '=')) { cv = decodeURIComponent(tc.slice(name.length+1)); break; }
+        }
+      }
+      return cv;
+    }
+
+    // Auto-cargar datos al entrar en cada sección
+    const _origShowSection = showSection;
+    showSection = function(sec, navEl, tabEl) {
+      _origShowSection(sec, navEl, tabEl);
+      if (sec === 'ventas')            ventasCargar();
+      else if (sec === 'pagos-taquilleros') pagosCargar();
+      else if (sec === 'pago-premios') premiosCargar();
+    };
 
     detectarIP();
     document.querySelector('.tab').classList.add('active');

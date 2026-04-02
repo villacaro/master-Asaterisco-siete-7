@@ -20,7 +20,10 @@ from admin_status.models import Status
 try:
     from celery.registry import tasks
 except ImportError:
-    tasks = {}
+    class _NoOpTaskRegistry:
+        def register(self, *args, **kwargs):
+            pass
+    tasks = _NoOpTaskRegistry()
 from django.core.mail import mail_admins
 from django.db.models import Sum
 from django.utils.timezone import now

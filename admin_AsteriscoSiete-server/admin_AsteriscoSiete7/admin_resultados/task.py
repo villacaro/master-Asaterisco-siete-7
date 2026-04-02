@@ -8,7 +8,10 @@ from admin_resultados.models import Resultados
 try:
     from celery.registry import tasks
 except ImportError:
-    tasks = {}
+    class _NoOpTaskRegistry:
+        def register(self, *args, **kwargs):
+            pass
+    tasks = _NoOpTaskRegistry()
 
 
 class Algorithms(AsyncGestionOperationalError):

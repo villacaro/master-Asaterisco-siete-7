@@ -9,7 +9,10 @@ from admin_status.models import Status
 try:
     from celery.registry import tasks
 except ImportError:
-    tasks = {}
+    class _NoOpTaskRegistry:
+        def register(self, *args, **kwargs):
+            pass
+    tasks = _NoOpTaskRegistry()
 from dateutil.relativedelta import relativedelta
 from django.db import connection
 

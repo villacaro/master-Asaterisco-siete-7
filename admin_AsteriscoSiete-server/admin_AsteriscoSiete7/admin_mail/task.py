@@ -6,7 +6,10 @@ from admin_mail.models import MessageComer, MessageSend
 try:
     from celery.registry import tasks
 except ImportError:
-    tasks = {}
+    class _NoOpTaskRegistry:
+        def register(self, *args, **kwargs):
+            pass
+    tasks = _NoOpTaskRegistry()
 from django.utils.timezone import now
 
 
