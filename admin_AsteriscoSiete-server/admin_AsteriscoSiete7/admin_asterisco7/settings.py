@@ -79,6 +79,7 @@ MENU_VALID = False
 TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = [
+    '*',
     '127.0.0.1',
     os.environ.get('PANEL_ALLOWED_HOSTS_IP'),
     os.environ.get('PANEL_ALLOWED_HOSTS_NAME_1'),
