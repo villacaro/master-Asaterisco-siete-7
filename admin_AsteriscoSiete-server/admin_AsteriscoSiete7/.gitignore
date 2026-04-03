@@ -54,3 +54,5 @@ Thumbs.db
 
 # ── Logs ──────────────────────────────────────────────────────────────────────
 *.log
+serviceAccountKey.json
+*firebase-adminsdk*.json

@@ -28,6 +28,7 @@ MENU_VALID = False
 SECRET_KEY = os.environ.get('SECRET_KEY', 'CAMBIA-ESTO-EN-PRODUCCION')
 
 ALLOWED_HOSTS = [
+    '*',
     '127.0.0.1',
     'localhost',
     '.railway.app',     # cubre *.railway.app automáticamente

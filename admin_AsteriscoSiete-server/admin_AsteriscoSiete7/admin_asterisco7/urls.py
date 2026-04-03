@@ -12,12 +12,14 @@ from admin_asterisco7.reportes_views import (
 )
 
 from django.http import HttpResponse
+from django.views.generic import RedirectView
 
 def health_check(request):
     return HttpResponse("OK", status=200)
 
 urlpatterns = [
     re_path(r'^health/?$', health_check, name='health_check'),
+    re_path(r'^$', RedirectView.as_view(url='/taquilla/', permanent=False), name='index'),
     # ── App Taquilla El Arrejuntao ─────────────────────────────────────────────
     # Accesible independiente en: http://127.0.0.1:8000/taquilla/
     re_path(r'^taquilla/$', taquilla_view, name='taquilla'),
