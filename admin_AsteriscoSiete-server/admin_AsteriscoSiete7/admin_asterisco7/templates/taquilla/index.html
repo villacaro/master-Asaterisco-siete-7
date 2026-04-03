@@ -411,7 +411,6 @@
             }
         }
     </style>
-
     <script type="module" src="/static/arrejuntao/firebase-auth.js"></script>
 </head>
 
@@ -6175,9 +6174,7 @@
         <style>body{font-family:'Courier New',monospace;font-size:11px;padding:15px;color:#000}
         .center{text-align:center}.bold{font-weight:bold}.divider{border-bottom:1px dashed #000;margin:6px 0}
         .anulado{color:red;font-size:18px;font-weight:900;text-align:center;margin:10px 0}
-        </style>
-    <script type="module" src="/static/arrejuntao/firebase-auth.js"></script>
-</head><body>
+        </style></head><body>
         <div class="center bold" style="font-size:13px">SERVICIOS INTEGRADOS</div>
         <div class="center bold">TRIPLE7 C.A</div>
         <div class="center" style="color:#2563eb;font-size:10px">Asterisco Siete (*7)</div>
@@ -6262,9 +6259,7 @@
         win.document.write(`<html><head><title>Ticket #${t.id}</title>
         <style>body{font-family:'Courier New',monospace;font-size:11px;padding:15px;color:#000}
         .center{text-align:center}.bold{font-weight:bold}.divider{border-bottom:1px dashed #000;margin:6px 0}
-        </style>
-    <script type="module" src="/static/arrejuntao/firebase-auth.js"></script>
-</head><body>
+        </style></head><body>
         <div class="center bold" style="font-size:13px">SERVICIOS INTEGRADOS</div>
         <div class="center bold">TRIPLE7 C.A</div>
         <div class="center" style="color:#2563eb;font-size:10px">Asterisco Siete (*7)</div>
@@ -6728,9 +6723,7 @@
     win.document.write(`<html><head><title>Reporte</title>
       <style>body{font-family:'Courier New',monospace;font-size:11px;padding:15px}
       table{border-collapse:collapse;width:100%}td,th{padding:3px 6px;border-bottom:1px solid #ddd}
-      </style>
-    <script type="module" src="/static/arrejuntao/firebase-auth.js"></script>
-</head><body>`);
+      </style></head><body>`);
     if(bodyEl) win.document.write(bodyEl.innerHTML);
     if(tableEl) win.document.write(tableEl.outerHTML);
     win.document.write('</body></html>'); win.document.close(); win.print();
@@ -6908,9 +6901,7 @@
     const win = window.open('','_blank','width=480,height=640');
     win.document.write(`<html><head><title>Resultados Sorteos</title>
       <style>body{font-family:'Courier New',monospace;font-size:11px;padding:20px}pre{white-space:pre-wrap}</style>
-      
-    <script type="module" src="/static/arrejuntao/firebase-auth.js"></script>
-</head><body><pre>${contenido}</pre></body></html>`);
+      </head><body><pre>${contenido}</pre></body></html>`);
     win.document.close();
     win.print();
   };

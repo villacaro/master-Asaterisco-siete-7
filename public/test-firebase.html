@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZLV057XQHX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZLV057XQHX');
+</script>
+  <title>Asterisco Siete – Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #2c3e50, #4ca1af);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: rgba(255,255,255,0.1);
+      padding: 2rem 3rem;
+      border-radius: 12px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.37);
+      margin-top: 2rem;
+    }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    p { margin-bottom: 2rem; }
+    button, input[type="submit"] {
+      background: #ff6b6b;
+      border: none;
+      color: #fff;
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover, input[type="submit"]:hover { background: #ff4757; }
+    .section {
+      width: 90%;
+      max-width: 800px;
+      background: rgba(255,255,255,0.08);
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      backdrop-filter: blur(6px);
+    }
+    .section h2 { margin-top: 0; }
+    .list { list-style: none; padding: 0; }
+    .list li { margin: 0.5rem 0; }
+    input, textarea {
+      width: 100%;
+      padding: 0.6rem;
+      border-radius: 6px;
+      border: none;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🚀 Asterisco Siete</h1>
+    <p>Tu aplicación está lista. Haz click para iniciar Analytics.</p>
+    <button id="logBtn">Log Event</button>
+  </div>
+
+  <!-- Autenticación -->
+  <div class="section" id="authSection">
+    <h2>🔐 Autenticación</h2>
+    <div id="userInfo">No hay usuario conectado.</div>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Correo electrónico" required />
+      <input type="password" id="password" placeholder="Contraseña" required />
+      <input type="submit" value="Iniciar sesión" />
+    </form>
+    <form id="registerForm" style="margin-top: 10px;">
+      <input type="email" id="regEmail" placeholder="Nuevo correo electrónico" required />
+      <input type="password" id="regPassword" placeholder="Nueva contraseña (mínimo 6 caracteres)" required />
+      <input type="submit" value="Registrarse" style="background:#4ca1af;" />
+    </form>
+    <button id="logoutBtn" style="display:none; margin-top:0.5rem;">Cerrar sesión</button>
+  </div>
+
+  <!-- Lista de usuarios (Firestore) -->
+  <div class="section" id="usersSection">
+    <h2>👥 Usuarios (Firestore)</h2>
+    <ul class="list" id="usersList"><li>Cargando usuarios...</li></ul>
+  </div>
+
+  <!-- Lista de tickets (Firestore) -->
+  <div class="section" id="ticketsSection">
+    <h2>📋 Tickets (Firestore)</h2>
+    <form id="ticketForm" style="margin-bottom: 1rem;">
+      <input type="text" id="ticketTitle" placeholder="Título del nuevo ticket" required />
+      <input type="submit" value="Crear Ticket" style="background:#4ca1af;" />
+    </form>
+    <ul class="list" id="ticketsList"><li>Cargando tickets...</li></ul>
+  </div>
+
+  <!-- Subida de archivos (Storage) -->
+  <div class="section" id="storageSection">
+    <h2>📁 Subir archivo (Storage)</h2>
+    <input type="file" id="fileInput" />
+    <button id="uploadBtn">Subir</button>
+    <div id="uploadResult"></div>
+  </div>
+
+  <!-- Notificaciones push (Messaging) -->
+  <div class="section" id="messagingSection">
+    <h2>🔔 Notificaciones Push (Messaging)</h2>
+    <button id="requestPermissionBtn">Solicitar permiso</button>
+    <div id="tokenDisplay"></div>
+  </div>
+
+  <script type="module" src="/firebase-config.js"></script>
+  <script type="module">
+    import { app, analytics, auth, db, storage, messaging } from "./firebase-config.js";
+    import { logEvent } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+    import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { collection, getDocs, addDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    import { getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
+
+    // Analytics
+    document.getElementById('logBtn').addEventListener('click', () => {
+      logEvent(analytics, 'button_click', { label: 'logBtn' });
+      console.log('Analytics event logged');
+    });
+
+    // Auth
+    const userInfo = document.getElementById('userInfo');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert('Usuario autenticado con éxito');
+      } catch (err) {
+        alert('Error al iniciar sesión: ' + err.message);
+      }
+    });
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        alert('Usuario registrado y autenticado');
+      } catch (err) {
+        alert('Error al registrar: ' + err.message);
+      }
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      await signOut(auth);
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userInfo.textContent = `Conectado como: ${user.email}`;
+        logoutBtn.style.display = 'inline-block';
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'none';
+      } else {
+        userInfo.textContent = 'No hay usuario conectado.';
+        logoutBtn.style.display = 'inline-block';
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'block';
+        logoutBtn.style.display = 'none';
+      }
+    });
+
+    // Firestore – usuarios
+    const usersList = document.getElementById('usersList');
+    async function loadUsers() {
+      const q = query(collection(db, 'users'));
+      const snapshot = await getDocs(q);
+      usersList.innerHTML = '';
+      snapshot.forEach(doc => {
+        const li = document.createElement('li');
+        li.textContent = `${doc.id}: ${JSON.stringify(doc.data())}`;
+        usersList.appendChild(li);
+      });
+    }
+    loadUsers();
+
+    // Firestore – tickets
+    const ticketsList = document.getElementById('ticketsList');
+    const ticketForm = document.getElementById('ticketForm');
+
+    async function loadTickets() {
+      const q = query(collection(db, 'tickets'), orderBy('createdAt', 'desc'));
+      const snapshot = await getDocs(q);
+      ticketsList.innerHTML = '';
+      if (snapshot.empty) {
+        ticketsList.innerHTML = '<li>No hay tickets todavía. ¡Crea el primero!</li>';
+      }
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const li = document.createElement('li');
+        li.textContent = `#${doc.id} - ${data.title || 'Sin título'} - ${data.status || 'Sin estado'}`;
+        ticketsList.appendChild(li);
+      });
+    }
+
+    ticketForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('ticketTitle').value;
+      try {
+        await addDoc(collection(db, 'tickets'), {
+          title: title,
+          status: 'abierto',
+          createdAt: serverTimestamp()
+        });
+        document.getElementById('ticketTitle').value = '';
+        alert('Ticket creado con éxito');
+        loadTickets(); // Recargar la lista
+      } catch (err) {
+        alert('Error al crear ticket: ' + err.message);
+      }
+    });
+
+    loadTickets();
+
+    // Storage – subir archivo
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadResult = document.getElementById('uploadResult');
+    uploadBtn.addEventListener('click', async () => {
+      const file = fileInput.files[0];
+      if (!file) { alert('Selecciona un archivo primero'); return; }
+      const storageRef = ref(storage, `uploads/${file.name}`);
+      try {
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        uploadResult.innerHTML = `Archivo subido. <a href="${url}" target="_blank">Ver archivo</a>`;
+      } catch (err) {
+        uploadResult.textContent = 'Error al subir: ' + err.message;
+      }
+    });
+
+    // Messaging – notificaciones push
+    const requestPermissionBtn = document.getElementById('requestPermissionBtn');
+    const tokenDisplay = document.getElementById('tokenDisplay');
+    requestPermissionBtn.addEventListener('click', async () => {
+      try {
+        const token = await getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY' });
+        tokenDisplay.textContent = token ? `Token: ${token}` : 'No se obtuvo token';
+        console.log('FCM token:', token);
+      } catch (err) {
+        tokenDisplay.textContent = 'Error al obtener permiso: ' + err;
+      }
+    });
+    onMessage(messaging, (payload) => {
+      console.log('Mensaje recibido en primer plano:', payload);
+      alert(`Notificación: ${payload.notification?.title || ''}\n${payload.notification?.body || ''}`);
+    });
+  </script>
+</body>
+</html>

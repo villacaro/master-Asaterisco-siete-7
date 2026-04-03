@@ -1,0 +1,13 @@
+{
+  "hosting": {
+    "public": "public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "redirects": [
+      {
+        "source": "/:path*",
+        "destination": "https://master-asaterisco-siete-7-production.up.railway.app/:path",
+        "type": 302
+      }
+    ]
+  }
+}
