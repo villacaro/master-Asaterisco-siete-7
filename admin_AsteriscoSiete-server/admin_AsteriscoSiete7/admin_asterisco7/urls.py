@@ -11,7 +11,13 @@ from admin_asterisco7.reportes_views import (
     api_cuadre, api_liquidaciones, api_resumen_admin, api_dias_trabajo,
 )
 
+from django.http import HttpResponse
+
+def health_check(request):
+    return HttpResponse("OK", status=200)
+
 urlpatterns = [
+    re_path(r'^health/?$', health_check, name='health_check'),
     # ── App Taquilla El Arrejuntao ─────────────────────────────────────────────
     # Accesible independiente en: http://127.0.0.1:8000/taquilla/
     re_path(r'^taquilla/$', taquilla_view, name='taquilla'),
