@@ -16,6 +16,7 @@ Variables de entorno requeridas en Railway:
 """
 import os
 import dj_database_url
+from .settings import *
 
 # ── Seguridad ──────────────────────────────────────────────────────────────────
 DEBUG = False
