@@ -44,7 +44,7 @@ PROJECT_PATH = os.path.dirname(os.path.realpath(__file__))
 BASE_DIR     = os.path.dirname(os.path.dirname(__file__))
 
 # ── Base de datos: Supabase PostgreSQL ────────────────────────────────────────
-DATABASE_URL = os.environ.get('DATABASE_URL', '')
+DATABASE_URL = os.environ.get('SUPABASE_POOLER_URL') or os.environ.get('DATABASE_URL', '')
 DATABASES = {
     'default': dj_database_url.parse(
         DATABASE_URL,
