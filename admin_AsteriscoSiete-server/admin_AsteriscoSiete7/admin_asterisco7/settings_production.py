@@ -176,9 +176,9 @@ USE_I18N      = True
 USE_L10N      = True
 USE_TZ        = False
 
-# Quitamos DEFAULT_TABLESPACE — Supabase Free no soporta tablespaces personalizados
-# DEFAULT_TABLESPACE       = 'ts_parley'
-# DEFAULT_INDEX_TABLESPACE = 'ts_parley'
+# Supabase no soporta tablespaces personalizados — sobreescribimos el valor de settings.py
+DEFAULT_TABLESPACE       = ''
+DEFAULT_INDEX_TABLESPACE = ''
 
 X_FRAME_OPTIONS        = 'SAMEORIGIN'
 USE_THOUSAND_SEPARATOR = False
