@@ -755,16 +755,7 @@ def candidatos_riesgo_api(request):
     }, json_dumps_params={'ensure_ascii': False})
 
 
-def arrejuntao_view(request):
 
-    """Sirve la home page de El Arrejuntao directamente desde Django.
-    Accesible en: http://127.0.0.1:8000/arrejuntao/
-    Lee el archivo HTML directamente (sin template engine).
-    """
-    html_path = os.path.join(settings.BASE_DIR, 'admin_asterisco7', 'templates', 'arrejuntao', 'index.html')
-    with open(html_path, 'r', encoding='utf-8') as f:
-        content = f.read()
-    return HttpResponse(content, content_type='text/html; charset=utf-8')
 
 
 @staff_member_required(login_url='/admin/login/')
