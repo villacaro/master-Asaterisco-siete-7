@@ -410,6 +410,25 @@
                 display: none !important;
             }
         }
+
+        /* ── iOS Safe Area (notch/home bar) ─────────────────── */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        nav.pb-safe {
+            padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+        }
+
+        /* ── Mejores metas de toque para botones de lotería ─── */
+        .lottery-btn {
+            min-height: 32px;
+            touch-action: manipulation;
+        }
+
+        /* ── Evitar zoom en inputs iOS ───────────────────────── */
+        input[type='text'], input[type='number'] {
+            font-size: max(16px, 1em);
+        }
     </style>
     <script type="module" src="/static/arrejuntao/firebase-auth.js"></script>
 </head>
@@ -431,23 +450,20 @@
 
             <div
                 class="flex flex-row md:flex-col gap-1 md:gap-3 w-full md:w-auto px-2 justify-around md:justify-center flex-1">
-                <!-- MENÚ VENTA TAQUILLA -->
+                <!-- ✦ ASTERISCO — TAQUILLA PRINCIPAL -->
                 <button onclick="changeView('pos')"
-                    class="nav-btn p-2 md:p-3 rounded-xl bg-slate-100 text-indigo-600 dark:bg-slate-800 dark:text-white shadow-inner-strong group relative transition-colors"
-                    title="Inicio / Venta Taquilla">
-                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                        </path>
-                    </svg>
+                    class="nav-btn p-2 md:p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 shadow-inner group relative transition-colors hover:bg-indigo-100 dark:hover:bg-indigo-800/40 border border-indigo-200/60 dark:border-indigo-700/30"
+                    title="Taquilla Principal (*7)">
+                    <span class="font-black select-none flex items-center justify-center" style="font-size:26px;line-height:1;">✳</span>
                 </button>
-                <button onclick="toggleAnimalitos()"
-                    class="nav-btn p-2 md:p-3 rounded-xl text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:text-white dark:hover:bg-emerald-900/30 transition-colors"
-                    title="Animalitos">
-                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
-                        </path>
+                <!-- ✦ RECOGER TAQUILLA -->
+                <button onclick="openRecogerTaquillaModal()"
+                    class="nav-btn p-2 md:p-3 rounded-xl text-teal-600 hover:bg-teal-50 dark:text-teal-400 dark:hover:text-white dark:hover:bg-teal-900/30 transition-colors"
+                    title="Recoger Taquilla">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="1.5"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9h18"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 13v4m-2-2l2 2 2-2"/>
                     </svg>
                 </button>
                 <!-- MENÚ GESTIÓN (Operaciones) -->
@@ -638,6 +654,11 @@
                     </div>
                     <!-- Botón Calculadora + Reportes + Cambiar Clave en header superior -->
                     <div class="flex items-center gap-1">
+                        <!-- IP de la taquilla -->
+                        <div class="hidden sm:flex flex-col items-center justify-center px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 mr-1" title="Dirección IP de esta taquilla">
+                            <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest leading-none">IP</span>
+                            <span id="taquilla-ip-display" class="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 leading-none mt-0.5">···</span>
+                        </div>
                         <button onclick="toggleCalculator()"
                             class="p-2 rounded-xl text-yellow-600 hover:bg-yellow-50 dark:text-yellow-400 dark:hover:bg-yellow-900/30 transition-colors"
                             title="Calculadora">
@@ -680,11 +701,11 @@
                     <!-- BARRA DE APUESTAS (STICKY HEADER) -->
                     <div
                         class="sticky top-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 py-3 px-3 md:px-4 shadow-sm dark:shadow-lg transition-colors">
-                        <div class="flex flex-col xl:flex-row items-center justify-between gap-3 max-w-6xl mx-auto">
+                        <div class="flex flex-col lg:flex-row items-center justify-between gap-3 max-w-6xl mx-auto">
 
                             <!-- SECCIÓN IZQUIERDA: OPCIONES / PANEL DE CONTROL -->
                             <div
-                                class="flex items-center gap-2 md:gap-3 w-full xl:w-auto bg-slate-100 dark:bg-slate-800/40 p-1 md:p-1.5 rounded-lg border border-slate-200 dark:border-slate-700/50 transition-colors">
+                                class="flex items-center gap-2 md:gap-3 w-full lg:w-auto bg-slate-100 dark:bg-slate-800/40 p-1 md:p-1.5 rounded-lg border border-slate-200 dark:border-slate-700/50 transition-colors">
                                 <button onclick="toggleAnimalitos()"
                                     class="h-12 px-2 md:px-3 bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700/30 hover:bg-emerald-200 dark:hover:bg-emerald-700 hover:text-emerald-900 dark:hover:text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex flex-col items-center justify-center gap-0.5 shrink-0"
                                     title="Modo Animalitos">
@@ -758,8 +779,8 @@
 
                             <!-- SECCIÓN DERECHA: CAMPOS DE INGRESO (INPUTS) -->
                             <div
-                                class="flex flex-wrap sm:flex-nowrap items-end gap-2 w-full xl:w-auto xl:flex-1 justify-end">
-                                <div class="w-[48%] sm:w-32 xl:w-40">
+                                class="flex flex-wrap sm:flex-nowrap items-end gap-2 w-full lg:w-auto lg:flex-1 justify-end">
+                                <div class="w-[48%] sm:w-32 lg:w-36">
                                     <label
                                         class="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1 ml-1 tracking-wider truncate"
                                         id="label-bet-number">Número</label>
@@ -767,7 +788,7 @@
                                         class="block w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-lg md:text-xl font-mono font-bold text-center h-11 md:h-11 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 transition-all placeholder-slate-400 shadow-inner-strong"
                                         placeholder="---" autocomplete="off">
                                 </div>
-                                <div class="w-[48%] sm:w-36 xl:w-48">
+                                <div class="w-[48%] sm:w-36 lg:w-40">
                                     <div class="flex justify-between items-end mb-1 px-1">
                                         <label
                                             class="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">Monto</label>
@@ -785,13 +806,13 @@
                                     <!-- ✅ ATAJOS DE MONTO (NUEVO) -->
                                     <div class="flex gap-1 mt-1 justify-between">
                                         <button onclick="document.getElementById('betAmount').value=50"
-                                            class="flex-1 text-[9px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-200 dark:border-slate-700 rounded-md py-0.5 transition-all">50</button>
+                                            class="flex-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-200 dark:border-slate-700 rounded-md py-1.5 transition-all touch-manipulation">50</button>
                                         <button onclick="document.getElementById('betAmount').value=100"
-                                            class="flex-1 text-[9px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-200 dark:border-slate-700 rounded-md py-0.5 transition-all">100</button>
+                                            class="flex-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-200 dark:border-slate-700 rounded-md py-1.5 transition-all touch-manipulation">100</button>
                                         <button onclick="document.getElementById('betAmount').value=200"
-                                            class="flex-1 text-[9px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-200 dark:border-slate-700 rounded-md py-0.5 transition-all">200</button>
+                                            class="flex-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-200 dark:border-slate-700 rounded-md py-1.5 transition-all touch-manipulation">200</button>
                                         <button onclick="document.getElementById('betAmount').value=500"
-                                            class="flex-1 text-[9px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-200 dark:border-slate-700 rounded-md py-0.5 transition-all">500</button>
+                                            class="flex-1 text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 border border-slate-200 dark:border-slate-700 rounded-md py-1.5 transition-all touch-manipulation">500</button>
                                     </div>
                                 </div>
                                 <!-- JUGADA MÚLTIPLE removida: se apuesta directamente en la barra -->
@@ -893,7 +914,7 @@
                                 </div>
                             </div>
                             <!-- Horarios individuales -->
-                            <div class="grid grid-cols-6 gap-1.5">
+                            <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
                                 <button onclick="openMultiProductModal(['10AM'])" class="flex flex-col items-center gap-1 py-2 px-1 rounded-lg bg-white dark:bg-slate-700 border border-orange-200 dark:border-orange-700/40 hover:bg-orange-50 dark:hover:bg-orange-900/30 hover:border-orange-400 transition-all group">
                                     <span class="text-[8px] font-bold text-yellow-600 dark:text-yellow-400 uppercase">Mañana</span>
                                     <span class="font-bold text-slate-800 dark:text-white text-[11px] font-mono group-hover:text-orange-600 transition-colors">10AM</span>
@@ -2882,15 +2903,32 @@
 
 
         const lotteryConfig = [
-            { name: "Táchira" }, { name: "Zulia" }, { name: "Chance" },
-            { name: "Caracas" }, { name: "Caliente" }, { name: "Zamorano" },
-            { name: "SUPERGANA" }, { name: "TRIPLE GANA" }, { name: "NAPA GANA" }
+            // ── Fila 1 ──────────────────────────────────────────
+            { name: "Táchira" }, { name: "TRIPLE GANA" }, { name: "NAPA GANA" },
+            // ── Fila 2: Triple Chance (ancho completo) ──────────
+            { name: "TRIPLE CHANCE", fullWidth: true },
+            // ── Fila 3: Triple Fácil (ancho completo) ───────────
+            { name: "TRIPLE FÁCIL", fullWidth: true },
+            // ── Clásicas ─────────────────────────────────────────
+            { name: "Zulia" }, { name: "Caliente" }, { name: "Zamorano" },
+            // ── Super / Triples ──────────────────────────────────
+            { name: "SUPERGANA" }, { name: "TRIPLE CARACAS" }, { name: "TRIPLE GATO" },
+            // ── Triples adicionales ──────────────────────────────
+            { name: "TRIPLE LAGO" }
         ];
+
 
         const lotteryDrawTimes = {
             'morning': '1:00 PM',
             'afternoon': '4:30 PM',
-            'night': '7:00 PM'
+            'night': '7:00 PM',
+            'zam_1': '10:00 AM', 'zam_2': '12:00 PM', 'zam_3': '2:00 PM', 'zam_4': '4:00 PM', 'zam_5': '7:00 PM',
+            'tc_1':  '9:00 AM',  'tc_2':  '10:00 AM', 'tc_3':  '11:00 AM', 'tc_4':  '12:00 PM',
+            'tc_5':  '1:00 PM',  'tc_6':  '2:00 PM',  'tc_7':  '3:00 PM',  'tc_8':  '4:00 PM',
+            'tc_9':  '5:00 PM',  'tc_10': '6:00 PM',  'tc_11': '7:00 PM',  'tc_12': '10:00 PM',
+            'tf_1':  '8:00 AM',  'tf_2':  '9:00 AM',  'tf_3':  '10:00 AM', 'tf_4':  '11:00 AM',
+            'tf_5':  '12:00 PM', 'tf_6':  '1:00 PM',  'tf_7':  '2:00 PM',  'tf_8':  '3:00 PM',
+            'tf_9':  '4:00 PM',  'tf_10': '5:00 PM',  'tf_11': '6:00 PM',  'tf_12': '7:00 PM'
         };
 
         function isBetAllowed(timeStr) {
@@ -3816,28 +3854,94 @@
             }
         });
 
-        function renderLotteryGrid() {
+         function renderLotteryGrid() {
             const container = document.getElementById('lottery-grid-container');
-            container.innerHTML = lotteryConfig.map(l => `
+            container.innerHTML = lotteryConfig.map(l => {
+                const isZamorano    = l.name === 'Zamorano';
+                const isTripleChance = l.name === 'TRIPLE CHANCE';
+                const sep = '<div class="w-px bg-slate-200 dark:bg-slate-700 flex-shrink-0"></div>';
+
+                // ── TRIPLE CHANCE: 12 columnas en scroll horizontal ──
+                if (isTripleChance) {
+                    const tcSlots = [
+                        { key: 'tc_1',  label: '9AM'  }, { key: 'tc_2',  label: '10AM' },
+                        { key: 'tc_3',  label: '11AM' }, { key: 'tc_4',  label: '12PM' },
+                        { key: 'tc_5',  label: '1PM'  }, { key: 'tc_6',  label: '2PM'  },
+                        { key: 'tc_7',  label: '3PM'  }, { key: 'tc_8',  label: '4PM'  },
+                        { key: 'tc_9',  label: '5PM'  }, { key: 'tc_10', label: '6PM'  },
+                        { key: 'tc_11', label: '7PM'  }, { key: 'tc_12', label: '10PM' }
+                    ];
+                    const colors = ['text-yellow-600','text-yellow-500','text-yellow-400','text-green-500',
+                                    'text-green-600','text-blue-400','text-blue-500','text-blue-600',
+                                    'text-indigo-500','text-indigo-600','text-red-500','text-red-600'];
+                    const tcCols = tcSlots.map((s,i) =>
+                        renderTimeColumn(l.name, s.label, s.label, s.key, colors[i] + ' dark:' + colors[i].replace('text-','text-'))
+                    ).join(sep);
+                    return `
+                    <div class="col-span-1 sm:col-span-2 lg:col-span-3 bg-white dark:bg-slate-800 rounded-lg p-2 border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-slate-900 dark:text-white text-base">${l.name}</span>
+                            <button onclick="toggleTimeGroup('${l.name}','ALL')" class="mod-btn text-indigo-500 dark:text-indigo-300 border-indigo-400 dark:border-indigo-500 h-6 px-2 text-[9px]">Todos</button>
+                        </div>
+                        <div class="flex gap-1 text-[10px] overflow-x-auto pb-1">${tcCols}</div>
+                    </div>`;
+                }
+
+                // ── TRIPLE FÁCIL: 12 columnas en scroll horizontal ──
+                if (l.name === 'TRIPLE FÁCIL') {
+                    const tfSlots = [
+                        { key: 'tf_1',  label: '8AM'  }, { key: 'tf_2',  label: '9AM'  },
+                        { key: 'tf_3',  label: '10AM' }, { key: 'tf_4',  label: '11AM' },
+                        { key: 'tf_5',  label: '12PM' }, { key: 'tf_6',  label: '1PM'  },
+                        { key: 'tf_7',  label: '2PM'  }, { key: 'tf_8',  label: '3PM'  },
+                        { key: 'tf_9',  label: '4PM'  }, { key: 'tf_10', label: '5PM'  },
+                        { key: 'tf_11', label: '6PM'  }, { key: 'tf_12', label: '7PM'  }
+                    ];
+                    const tfColors = ['text-yellow-600','text-yellow-500','text-yellow-400','text-green-500',
+                                      'text-green-600','text-blue-400','text-blue-500','text-blue-600',
+                                      'text-indigo-500','text-indigo-600','text-red-500','text-red-600'];
+                    const tfCols = tfSlots.map((s,i) =>
+                        renderTimeColumn(l.name, s.label, s.label, s.key, tfColors[i])
+                    ).join(sep);
+                    return `
+                    <div class="col-span-1 sm:col-span-2 lg:col-span-3 bg-white dark:bg-slate-800 rounded-lg p-2 border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-slate-900 dark:text-white text-base">${l.name}</span>
+                            <button onclick="toggleTimeGroup('${l.name}','ALL')" class="mod-btn text-indigo-500 dark:text-indigo-300 border-indigo-400 dark:border-indigo-500 h-6 px-2 text-[9px]">Todos</button>
+                        </div>
+                        <div class="flex gap-1 text-[10px] overflow-x-auto pb-1">${tfCols}</div>
+                    </div>`;
+                }
+
+
+                // ── ZAMORANO: 5 columnas ──
+                const columns = isZamorano ? `
+                    ${renderTimeColumn(l.name, '10AM', 'M1', 'zam_1', 'text-yellow-600 dark:text-yellow-500')}${sep}
+                    ${renderTimeColumn(l.name, '12PM', 'M2', 'zam_2', 'text-yellow-500 dark:text-yellow-400')}${sep}
+                    ${renderTimeColumn(l.name, '2PM',  'T1', 'zam_3', 'text-blue-500  dark:text-blue-400')}${sep}
+                    ${renderTimeColumn(l.name, '4PM',  'T2', 'zam_4', 'text-blue-600  dark:text-blue-500')}${sep}
+                    ${renderTimeColumn(l.name, '7PM',  'N',  'zam_5', 'text-red-600   dark:text-red-500')}
+                ` : `
+                    ${renderTimeColumn(l.name, 'Mañana', 'M', 'morning',   'text-yellow-600 dark:text-yellow-500')}${sep}
+                    ${renderTimeColumn(l.name, 'Tarde',   'T', 'afternoon', 'text-blue-600  dark:text-blue-500')}${sep}
+                    ${renderTimeColumn(l.name, 'Noche',   'N', 'night',     'text-red-600   dark:text-red-500')}
+                `;
+                const todosBtn = isZamorano
+                    ? `<button onclick="toggleTimeGroup('${l.name}','ALL')" class="mod-btn text-indigo-500 dark:text-indigo-300 border-indigo-400 dark:border-indigo-500 h-6 px-2 text-[9px]">Todos</button>`
+                    : `<button onclick="toggleTimeGroup('${l.name}','morning')" class="mod-btn w-6 h-6" title="Seleccionar Mañana"><svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></button>
+                       <button onclick="toggleTimeGroup('${l.name}','afternoon')" class="mod-btn w-6 h-6" title="Seleccionar Tarde"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg></button>
+                       <button onclick="toggleTimeGroup('${l.name}','night')" class="mod-btn w-6 h-6" title="Seleccionar Noche"><svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></button>
+                       <button onclick="toggleTimeGroup('${l.name}','ALL')" class="mod-btn text-indigo-500 dark:text-indigo-300 border-indigo-400 dark:border-indigo-500 h-6 px-2 text-[9px]">Todos</button>`;
+
+                return `
                 <div class="bg-white dark:bg-slate-800 rounded-lg p-2 border border-slate-200 dark:border-slate-700 shadow-sm hover:border-slate-400 dark:hover:border-slate-600 transition-colors lottery-card group">
                     <div class="flex justify-between items-start mb-2">
                         <span class="font-bold text-slate-900 dark:text-white text-base">${l.name}</span>
-                        <div class="flex gap-1 flex-wrap justify-end max-w-[60%]">
-                             <button onclick="toggleTimeGroup('${l.name}', 'morning')" class="mod-btn w-6 h-6" title="Seleccionar Mañana"><svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></button>
-                             <button onclick="toggleTimeGroup('${l.name}', 'afternoon')" class="mod-btn w-6 h-6" title="Seleccionar Tarde"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg></button>
-                             <button onclick="toggleTimeGroup('${l.name}', 'night')" class="mod-btn w-6 h-6" title="Seleccionar Noche"><svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></button>
-                             <button onclick="toggleTimeGroup('${l.name}', 'ALL')" class="mod-btn text-indigo-500 dark:text-indigo-300 border-indigo-400 dark:border-indigo-500 h-6 px-2 text-[9px]" title="Seleccionar Todos">Todos</button>
-                        </div>
+                        <div class="flex gap-1 flex-wrap justify-end max-w-[60%]">${todosBtn}</div>
                     </div>
-                    <div class="flex gap-1 text-[10px]">
-                        ${renderTimeColumn(l.name, 'Mañana', 'M', 'morning', 'text-yellow-600 dark:text-yellow-500')}
-                        <div class="w-px bg-slate-200 dark:bg-slate-700"></div>
-                        ${renderTimeColumn(l.name, 'Tarde', 'T', 'afternoon', 'text-blue-600 dark:text-blue-500')}
-                        <div class="w-px bg-slate-200 dark:bg-slate-700"></div>
-                        ${renderTimeColumn(l.name, 'Noche', 'N', 'night', 'text-red-600 dark:text-red-500')}
-                    </div>
-                </div>
-            `).join('');
+                    <div class="flex gap-1 text-[10px]">${columns}</div>
+                </div>`;
+            }).join('');
         }
 
         function renderTimeColumn(lottery, label, shortLabel, type, colorClass) {
@@ -3856,16 +3960,17 @@
             function makeBtn(sub) {
                 const extra = (lottery === 'Zamorano' || lottery === 'SUPERGANA' || lottery === 'TRIPLE GANA' || lottery === 'NAPA GANA') && sub === 'S' ? 'border-purple-400 dark:border-purple-500/50 text-purple-500 dark:text-purple-400' : 'border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400';
                 if (!allowed) {
-                    return `<button disabled class="lottery-btn w-full h-7 rounded bg-slate-100 dark:bg-slate-900 border ${extra} ${opacityClass} font-bold text-[10px]" title="Sorteo Cerrado">${sub}</button>`;
+                    return `<button disabled class="lottery-btn w-full h-8 rounded bg-slate-100 dark:bg-slate-900 border ${extra} ${opacityClass} font-bold text-[11px]" title="Sorteo Cerrado">${sub}</button>`;
                 } else {
-                    return `<button onclick="toggleLottery(this, '${lottery}', '${type}', '${sub}', '${label}')" class="lottery-btn btn-${type} w-full h-7 rounded bg-slate-100 dark:bg-slate-900 border ${extra} font-bold hover:bg-slate-200 dark:hover:bg-slate-700 text-[10px]" data-lottery="${lottery}" data-time="${type}" data-sub="${sub}">${sub}</button>`;
+                    return `<button onclick="toggleLottery(this, '${lottery}', '${type}', '${sub}', '${label}')" class="lottery-btn btn-${type} w-full h-8 rounded bg-slate-100 dark:bg-slate-900 border ${extra} font-bold hover:bg-slate-200 dark:hover:bg-slate-700 text-[11px]" data-lottery="${lottery}" data-time="${type}" data-sub="${sub}">${sub}</button>`;
                 }
             }
 
             let buttonsHtml = '';
             if (lottery === 'Zamorano') {
-                buttonsHtml = makeBtn('A') + makeBtn('C') + makeBtn('S');
-            } else if (lottery === 'SUPERGANA' || lottery === 'TRIPLE GANA' || lottery === 'NAPA GANA') {
+                buttonsHtml = makeBtn('A') + makeBtn('S');
+            } else if (lottery === 'SUPERGANA' || lottery === 'TRIPLE GANA' || lottery === 'NAPA GANA' ||
+                       lottery === 'TRIPLE GATO' || lottery === 'TRIPLE LAGO' || lottery === 'TRIPLE FÁCIL') {
                 buttonsHtml = makeBtn('A') + makeBtn('S');
             } else {
                 buttonsHtml = makeBtn('A') + makeBtn('B') + makeBtn('C');
@@ -7173,9 +7278,162 @@
   if(document.readyState !== 'loading') poblar();
 })();
 </script>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DETECTAR IP LOCAL DE LA TAQUILLA (WebRTC)
+// ═══════════════════════════════════════════════════════════
+async function detectarIPLocal() {
+    try {
+        const ips = [];
+        const pc = new RTCPeerConnection({ iceServers: [] });
+        pc.createDataChannel('');
+        await pc.createOffer().then(sdp => pc.setLocalDescription(sdp));
+        await new Promise((resolve) => {
+            pc.onicecandidate = (ice) => {
+                if (!ice || !ice.candidate) { resolve(); return; }
+                const m = ice.candidate.candidate.match(/(\d{1,3}(?:\.\d{1,3}){3})/);
+                if (m && !ips.includes(m[1])) ips.push(m[1]);
+            };
+            setTimeout(resolve, 700);
+        });
+        pc.close();
+        return ips.find(ip =>
+            ip.startsWith('10.') || ip.startsWith('192.168.') ||
+            /^172\.(1[6-9]|2[0-9]|3[01])\./.test(ip)
+        ) || ips[0] || window.location.hostname;
+    } catch { return window.location.hostname; }
+}
+
+// Mostrar IP al arrancar
+detectarIPLocal().then(ip => {
+    document.querySelectorAll('[id^="taquilla-ip"]').forEach(el => el.textContent = ip);
+});
+
+// ═══════════════════════════════════════════════════════════
+// RECOGER TAQUILLA
+// ═══════════════════════════════════════════════════════════
+function openRecogerTaquillaModal() {
+    const modal = document.getElementById('recoger-taquilla-modal');
+    if (!modal) return;
+    const today = new Date().toLocaleDateString('es-VE');
+    const txs   = (typeof allTransactions !== 'undefined' ? allTransactions : [])
+                    .filter(t => t.dateOnly === today && t.status !== 'Anulado');
+    const totalVentas  = txs.reduce((s, t) => s + (t.total || 0), 0);
+    const totalTickets = txs.length;
+    const fmtBs = n => 'Bs ' + n.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    set('rt-fecha',        new Date().toLocaleDateString('es-VE', {weekday:'long',year:'numeric',month:'long',day:'numeric'}));
+    set('rt-hora',         new Date().toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'}));
+    set('rt-total-ventas', fmtBs(totalVentas));
+    set('rt-total-tickets',totalTickets + (totalTickets !== 1 ? ' tickets' : ' ticket'));
+    set('rt-taquilla-name',sessionStorage.getItem('ast7_taquilla') || '—');
+    set('rt-operador',     sessionStorage.getItem('ast7_nombre')   || '—');
+    set('rt-ip',           document.getElementById('taquilla-ip-display')?.textContent || window.location.hostname);
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeRecogerModal() {
+    const modal = document.getElementById('recoger-taquilla-modal');
+    if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+}
+</script>
 <!-- FIN CARD PERFIL SCRIPT -->
 
 
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- MODAL: RECOGER TAQUILLA                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="recoger-taquilla-modal"
+    class="hidden fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm items-center justify-center p-4"
+    onclick="if(event.target===this) closeRecogerModal()">
+
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md border border-slate-200 dark:border-slate-700 overflow-hidden">
+
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-teal-600 to-emerald-600 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="18" height="18" rx="2" stroke-width="1.5"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9h18M12 13v4m-2-2l2 2 2-2"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-white font-bold text-lg leading-none">Recoger Taquilla</h2>
+                    <p class="text-white/70 text-xs mt-0.5">Resumen de cierre del turno</p>
+                </div>
+            </div>
+            <button onclick="closeRecogerModal()" class="text-white/60 hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-4">
+
+            <!-- Info de sesión -->
+            <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 space-y-2.5">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-500 dark:text-slate-400 font-medium">Taquilla</span>
+                    <span class="font-bold text-slate-800 dark:text-white uppercase" id="rt-taquilla-name">—</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-500 dark:text-slate-400 font-medium">Operador</span>
+                    <span class="font-semibold text-slate-700 dark:text-slate-200" id="rt-operador">—</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-500 dark:text-slate-400 font-medium">Dirección IP</span>
+                    <span class="font-mono font-bold text-indigo-600 dark:text-indigo-400 text-xs" id="rt-ip">—</span>
+                </div>
+                <div class="border-t border-slate-200 dark:border-slate-700 pt-2 flex justify-between items-center text-sm">
+                    <span class="text-slate-500 dark:text-slate-400 font-medium">Fecha / Hora</span>
+                    <span class="font-semibold text-slate-700 dark:text-slate-200 text-xs">
+                        <span id="rt-fecha">—</span> &nbsp;·&nbsp; <span id="rt-hora">—</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Totales -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700/40 rounded-xl p-4 text-center">
+                    <p class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">Total Vendido</p>
+                    <p class="font-black text-emerald-700 dark:text-emerald-300 text-lg leading-none" id="rt-total-ventas">Bs 0,00</p>
+                </div>
+                <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700/40 rounded-xl p-4 text-center">
+                    <p class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1">Tickets Emitidos</p>
+                    <p class="font-black text-indigo-700 dark:text-indigo-300 text-lg leading-none" id="rt-total-tickets">0</p>
+                </div>
+            </div>
+
+            <!-- Advertencia -->
+            <div class="flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl p-3">
+                <svg class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <p class="text-xs text-amber-700 dark:text-amber-300">
+                    Verifica el efectivo antes de confirmar el cierre. Esta acción registra el resumen del turno.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 pb-6 flex gap-3">
+            <button onclick="closeRecogerModal()" class="flex-1 h-11 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-sm">
+                Cancelar
+            </button>
+            <button onclick="window.print(); closeRecogerModal()" class="flex-1 h-11 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold shadow-lg shadow-teal-600/20 active:scale-95 transition-all text-sm flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                </svg>
+                Imprimir Cierre
+            </button>
+        </div>
+    </div>
+</div>
 </body>
 
 </html>
