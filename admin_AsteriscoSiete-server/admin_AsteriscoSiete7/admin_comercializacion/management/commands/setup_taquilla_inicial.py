@@ -325,13 +325,14 @@ class Command(BaseCommand):
 
         status_instalacion = Status.objects.get(codename='status_instalacion')
 
+        from django.contrib.auth.hashers import make_password
         usuario = UsuariosTaquilla(
             user=USER_NAME,
             nombre='Operador Principal',
             taquilla=taquilla,
             status=status_instalacion,
         )
-        usuario.set_password(USER_PASS)
+        usuario.password = make_password(USER_PASS)
         usuario.save()
         self.stdout.write(f'  ✅ UsuarioTaquilla creado: {USER_NAME}')
 
