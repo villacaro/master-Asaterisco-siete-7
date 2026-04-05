@@ -13,6 +13,9 @@ python manage.py ensure_superuser
 echo "=== Setup taquilla inicial (idempotente) ==="
 python manage.py setup_taquilla_inicial
 
+echo "=== Reset usuario taquilla (garantiza password hasheado) ==="
+python manage.py reset_taquilla_user
+
 echo "=== Iniciando Gunicorn en 0.0.0.0:${PORT:-8080} ==="
 exec gunicorn admin_AsteriscoSiete7.wsgi:application \
     --bind 0.0.0.0:${PORT:-8080} \
