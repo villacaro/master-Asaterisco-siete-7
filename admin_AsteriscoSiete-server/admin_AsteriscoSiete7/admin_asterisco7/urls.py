@@ -5,7 +5,7 @@ from django.urls import include, re_path
 from django.views.static import serve
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from admin_asterisco7.dashboard_views import dashboard, dashboard_stats, dashboard_api, dashboard_crud, taquilla_view, reportes_page, candidatos_page, monitor_api, liquidacion_page, taquilla_login_api, taquilla_venta_api, taquilla_ventas_lista_api, liquidaciones_sorteo_api, candidatos_riesgo_api, cuadre_nivel_superior_api, taquilla_resultados_hoy, taquilla_mi_ip
+from admin_asterisco7.dashboard_views import dashboard, dashboard_stats, dashboard_api, dashboard_crud, taquilla_view, reportes_page, candidatos_page, monitor_api, liquidacion_page, taquilla_login_api, taquilla_venta_api, taquilla_ventas_lista_api, liquidaciones_sorteo_api, candidatos_riesgo_api, cuadre_nivel_superior_api, taquilla_resultados_hoy, taquilla_mi_ip, taquilla_cambiar_clave_api
 from admin_asterisco7.reportes_views import (
     api_lista_linea, api_por_producto, api_riesgo_venta, api_sorteos_disponibles,
     api_cuadre, api_liquidaciones, api_resumen_admin, api_dias_trabajo,
@@ -30,6 +30,7 @@ urlpatterns = [
     re_path(r'^api/taquilla/$', taquilla_ventas_lista_api, name='taquilla_ventas_alias'),
     re_path(r'^api/taquilla/resultados-hoy/$', taquilla_resultados_hoy, name='taquilla_resultados_hoy'),
     re_path(r'^api/taquilla/mi-ip/$', taquilla_mi_ip, name='taquilla_mi_ip'),
+    re_path(r'^taquilla/cambiar-clave/$', taquilla_cambiar_clave_api, name='taquilla_cambiar_clave'),
 
     # Dashboard de gestión
     re_path(r'^dashboard/$',               dashboard,       name='dashboard'),

@@ -636,7 +636,7 @@
                                 0,00</span>
                         </div>
                     </div>
-                    <!-- Botón Calculadora + Reportes en header superior -->
+                    <!-- Botón Calculadora + Reportes + Cambiar Clave en header superior -->
                     <div class="flex items-center gap-1">
                         <button onclick="toggleCalculator()"
                             class="p-2 rounded-xl text-yellow-600 hover:bg-yellow-50 dark:text-yellow-400 dark:hover:bg-yellow-900/30 transition-colors"
@@ -653,6 +653,15 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </button>
+                        <!-- CAMBIAR CLAVE — acceso directo en barra superior -->
+                        <button onclick="openUtilidadesModal()"
+                            class="p-2 rounded-xl text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors"
+                            title="Cambiar Contraseña">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                             </svg>
                         </button>
                         <button onclick="openResultadosModal()"
@@ -2385,6 +2394,94 @@
         </div>
     </div>
 
+    <!-- MODAL CAMBIAR CONTRASEÑA -->
+    <div id="cambiar-clave-modal"
+        class="fixed inset-0 z-[400] bg-black/70 backdrop-blur-sm flex items-center justify-center hidden p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-rose-600 to-pink-600 p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold text-sm uppercase tracking-wider">Cambiar Contraseña</h3>
+                        <p class="text-rose-100 text-[10px]">Seguridad de la cuenta</p>
+                    </div>
+                </div>
+                <button onclick="closeCambiarClaveModal()" class="text-white/70 hover:text-white transition-colors p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Contraseña Actual</label>
+                    <div class="relative">
+                        <input type="password" id="clave-actual" placeholder="Ingrese su contraseña actual" autocomplete="current-password"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 pr-11 text-sm font-mono text-slate-900 dark:text-white focus:outline-none focus:border-rose-500 transition-colors">
+                        <button type="button" onclick="toggleClaveVis('clave-actual','eye-actual')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition-colors">
+                            <svg id="eye-actual" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Nueva Contraseña</label>
+                    <div class="relative">
+                        <input type="password" id="clave-nueva" placeholder="Mínimo 8 caracteres" autocomplete="new-password"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 pr-11 text-sm font-mono text-slate-900 dark:text-white focus:outline-none focus:border-rose-500 transition-colors">
+                        <button type="button" onclick="toggleClaveVis('clave-nueva','eye-nueva')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition-colors">
+                            <svg id="eye-nueva" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Confirmar Nueva Contraseña</label>
+                    <div class="relative">
+                        <input type="password" id="clave-confirm" placeholder="Repita la nueva contraseña" autocomplete="new-password"
+                            class="w-full bg-slate-50 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 pr-11 text-sm font-mono text-slate-900 dark:text-white focus:outline-none focus:border-rose-500 transition-colors">
+                        <button type="button" onclick="toggleClaveVis('clave-confirm','eye-confirm')"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition-colors">
+                            <svg id="eye-confirm" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <!-- Error msg -->
+                <p id="clave-error-msg" class="text-xs text-red-500 font-semibold hidden"></p>
+            </div>
+            <!-- Footer -->
+            <div class="px-6 pb-6 flex gap-3">
+                <button onclick="closeCambiarClaveModal()"
+                    class="flex-1 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wider hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
+                    Cancelar
+                </button>
+                <button onclick="submitCambiarClave()"
+                    class="flex-1 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold text-sm uppercase tracking-wider shadow-lg shadow-rose-600/30 transition-all flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL LOGIN (AUTENTICACIÓN) -->
     <div id="login-modal"
         class="fixed inset-0 z-[999] bg-slate-900/95 backdrop-blur-sm flex items-center justify-center transition-opacity duration-300 hidden">
@@ -2467,6 +2564,85 @@
     </div>
 
     <script>
+        // --- CAMBIAR CONTRASEÑA ---
+        function openCambiarClaveModal() {
+            document.getElementById('clave-actual').value = '';
+            document.getElementById('clave-nueva').value = '';
+            document.getElementById('clave-confirm').value = '';
+            document.getElementById('clave-error-msg').classList.add('hidden');
+            document.getElementById('cambiar-clave-modal').classList.remove('hidden');
+        }
+        function closeCambiarClaveModal() {
+            document.getElementById('cambiar-clave-modal').classList.add('hidden');
+        }
+        function toggleClaveVis(inputId, iconId) {
+            const inp = document.getElementById(inputId);
+            const icn = document.getElementById(iconId);
+            if (!inp || !icn) return;
+            const isPass = inp.type === 'password';
+            inp.type = isPass ? 'text' : 'password';
+            // Toggle entre ojo-cerrado y ojo-abierto
+            if (isPass) {
+                icn.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>`;
+            } else {
+                icn.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>`;
+            }
+        }
+        async function submitCambiarClave() {
+            const actual  = document.getElementById('clave-actual').value.trim();
+            const nueva   = document.getElementById('clave-nueva').value.trim();
+            const confirm = document.getElementById('clave-confirm').value.trim();
+            const errEl   = document.getElementById('clave-error-msg');
+            errEl.classList.add('hidden');
+
+            if (!actual || !nueva || !confirm) {
+                errEl.textContent = 'Todos los campos son obligatorios.';
+                errEl.classList.remove('hidden'); return;
+            }
+            if (nueva.length < 8) {
+                errEl.textContent = 'La nueva contraseña debe tener al menos 8 caracteres.';
+                errEl.classList.remove('hidden'); return;
+            }
+            if (nueva !== confirm) {
+                errEl.textContent = 'Las contraseñas no coinciden.';
+                errEl.classList.remove('hidden'); return;
+            }
+
+            // Obtener el usuario de la sesión activa
+            const username = window._currentUser?.username || sessionStorage.getItem('taquilla_username') || '';
+            if (!username) {
+                errEl.textContent = 'No se pudo identificar al usuario. Recarga la página.';
+                errEl.classList.remove('hidden'); return;
+            }
+
+            try {
+                const resp = await fetch('/taquilla/cambiar-clave/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                    body: JSON.stringify({ username, old_password: actual, new_password: nueva })
+                });
+                const data = await resp.json();
+                if (resp.ok && data.success) {
+                    closeCambiarClaveModal();
+                    showToast('Contraseña actualizada exitosamente', 'success');
+                } else {
+                    errEl.textContent = data.message || 'Error al cambiar la contraseña.';
+                    errEl.classList.remove('hidden');
+                }
+            } catch (e) {
+                errEl.textContent = 'Error de conexión con el servidor.';
+                errEl.classList.remove('hidden');
+            }
+        }
+        function getCookie(name) {
+            let v = null;
+            document.cookie.split(';').forEach(c => {
+                const [k, ...val] = c.trim().split('=');
+                if (k === name) v = decodeURIComponent(val.join('='));
+            });
+            return v;
+        }
+
         // --- NOTIFICATIONS & MODALS ---
         function showToast(msg, type = 'error') {
             const container = document.getElementById('toast-container');

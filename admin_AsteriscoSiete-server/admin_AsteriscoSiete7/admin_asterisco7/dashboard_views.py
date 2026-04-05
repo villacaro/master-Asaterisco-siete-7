@@ -436,6 +436,60 @@ def taquilla_mi_ip(request):
 
 
 @csrf_exempt
+def taquilla_cambiar_clave_api(request):
+    """
+    POST /taquilla/cambiar-clave/
+    Permite al operador de taquilla cambiar su propia contraseña.
+    Body JSON: { username, old_password, new_password }
+    """
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
+
+    try:
+        body = json.loads(request.body)
+    except Exception:
+        return JsonResponse({'success': False, 'message': 'JSON inválido'}, status=400)
+
+    username     = (body.get('username') or '').strip()
+    old_password = (body.get('old_password') or '').strip()
+    new_password = (body.get('new_password') or '').strip()
+
+    if not username or not old_password or not new_password:
+        return JsonResponse({'success': False, 'message': 'Todos los campos son requeridos'}, status=400)
+
+    if len(new_password) < 8:
+        return JsonResponse({'success': False, 'message': 'La nueva contraseña debe tener al menos 8 caracteres'}, status=400)
+
+    try:
+        from django.apps import apps
+        from django.contrib.auth.hashers import check_password, make_password
+
+        UsuariosTaquilla = apps.get_model('admin_comercializacion', 'UsuariosTaquilla')
+
+        usuario = UsuariosTaquilla.objects.filter(user=username).first()
+        if not usuario:
+            return JsonResponse({'success': False, 'message': 'Usuario no encontrado'}, status=404)
+
+        if not check_password(old_password, usuario.password):
+            return JsonResponse({'success': False, 'message': 'La contraseña actual es incorrecta'}, status=401)
+
+        # Actualizar con el nuevo hash
+        UsuariosTaquilla.objects.filter(user=username).update(
+            password=make_password(new_password)
+        )
+
+        return JsonResponse({'success': True, 'message': 'Contraseña actualizada correctamente'})
+
+    except Exception as e:
+        import traceback
+        return JsonResponse({
+            'success': False,
+            'message': f'Error interno: {e}',
+            'trace': traceback.format_exc()
+        }, status=500)
+
+
+@csrf_exempt
 def taquilla_resultados_hoy(request):
     """
     GET /api/taquilla/resultados-hoy/
