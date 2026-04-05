@@ -508,15 +508,7 @@
                             d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                 </button>
-                <!-- BOTÓN UTILIDADES -->
-                <button onclick="openUtilidadesModal()"
-                    class="nav-btn p-2 md:p-3 rounded-xl text-amber-500 hover:bg-amber-50 dark:text-amber-400 dark:hover:text-white dark:hover:bg-amber-900/30 transition-colors hidden sm:block"
-                    title="Utilidades del Sistema">
-                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
-                    </svg>
-                </button>
+
                 <!-- BOTÓN AYUDA -->
                 <button onclick="openHelpModal()"
                     class="nav-btn p-2 md:p-3 rounded-xl text-indigo-500 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:text-white dark:hover:bg-indigo-900/30 transition-colors hidden sm:block"
@@ -542,77 +534,15 @@
                     </svg>
                 </button>
 
-                <!-- ── AVATAR / PERFIL DE USUARIO ───────────────────── -->
-                <div class="relative" id="profile-wrap">
-                    <button onclick="toggleProfileMenu()" id="profile-avatar-btn"
-                        class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-glow hover:scale-105 transition-transform cursor-pointer border-2 border-transparent hover:border-indigo-400"
-                        title="Mi perfil" id="profile-btn">
-                        <span id="profile-initials">??</span>
-                    </button>
-
-                    <!-- DROPDOWN PANEL -->
-                    <div id="profile-menu"
-                        class="hidden absolute z-[200] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl w-64 p-0 overflow-hidden"
-                        style="bottom:0; left:52px;">
-
-                        <!-- Header del perfil -->
-                        <div class="flex items-center gap-3 p-4 border-b border-slate-100 dark:border-slate-800">
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg flex-shrink-0">
-                                <span id="profile-initials-lg">??</span>
-                            </div>
-                            <div class="min-w-0">
-                                <div class="font-bold text-slate-800 dark:text-white text-sm truncate" id="profile-name">—</div>
-                                <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate" id="profile-taquilla">—</div>
-                                <span class="inline-flex items-center gap-1 mt-0.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300">
-                                    Operador
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Info estado -->
-                        <div class="px-4 py-3 space-y-2 border-b border-slate-100 dark:border-slate-800">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                                    <span class="text-base">🟢</span> Estado
-                                </div>
-                                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400">ACTIVO</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                                    <span class="text-base">🕐</span> Turno inicio
-                                </div>
-                                <span class="text-[11px] font-mono font-bold text-slate-700 dark:text-slate-300" id="profile-turno">—</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                                    <span class="text-base">📅</span> Sesión
-                                </div>
-                                <span class="text-[11px] font-mono font-bold text-slate-700 dark:text-slate-300" id="profile-session-time">—</span>
-                            </div>
-                        </div>
-
-                        <!-- Acciones -->
-                        <div class="p-2">
-                            <button onclick="changeView('reports'); toggleProfileMenu()"
-                                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left group">
-                                <div class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-base">📊</div>
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Mis reportes</span>
-                            </button>
-                            <button onclick="changeView('config'); toggleProfileMenu()"
-                                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left">
-                                <div class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-base">⚙️</div>
-                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Configuración</span>
-                            </button>
-                            <div class="border-t border-slate-100 dark:border-slate-800 mt-1 pt-1">
-                                <button onclick="doLogout()"
-                                    class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-left">
-                                    <div class="w-7 h-7 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-base">🚪</div>
-                                    <span class="text-sm font-medium text-red-600 dark:text-red-400">Cerrar sesión</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- ── CERRAR SESIÓN ─────────────────────────────── -->
+                <button onclick="doLogout()"
+                    class="p-2 md:p-3 rounded-xl text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                    title="Cerrar Sesión">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                </button>
                 <!-- ── FIN PERFIL ─────────────────────────────────────── -->
             </div>
         </div>
