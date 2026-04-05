@@ -3874,6 +3874,39 @@
             }).join('');
         }
 
+        // ── ÍCONO DE FRANJA HORARIA (sol / luna) por horario ──
+        function getTimePhaseIcon(label) {
+            const m = label.match(/^(\d{1,2})(AM|PM)$/i);
+            if (!m) return '';
+            let h = parseInt(m[1]);
+            const per = m[2].toUpperCase();
+            if (per === 'PM' && h !== 12) h += 12;
+            if (per === 'AM' && h === 12) h = 0;
+
+            // SVG de sol con rayos
+            const sun = (c) => `<svg viewBox="0 0 24 24" width="11" height="11" fill="${c}" xmlns="http://www.w3.org/2000/svg" style="display:inline-block"><circle cx="12" cy="12" r="4"/><g stroke="${c}" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="7.05" y2="7.05"/><line x1="16.95" y1="16.95" x2="19.07" y2="19.07"/><line x1="4.93" y1="19.07" x2="7.05" y2="16.95"/><line x1="16.95" y1="7.05" x2="19.07" y2="4.93"/></g></svg>`;
+
+            // SVG de luna creciente
+            const moon = (c) => `<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" style="display:inline-block"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>`;
+
+            // SVG de atardecer (sol sobre línea de horizonte)
+            const sunset = (c) => `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" style="display:inline-block"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="9" x2="12" y2="2"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/><line x1="1" y1="22" x2="23" y2="22"/></svg>`;
+
+            if (h <= 8)  return sun('#FDE68A');   // 8AM  - amanecer amarillo pálido
+            if (h <= 9)  return sun('#FCD34D');   // 9AM  - mañana dorada clara
+            if (h <= 10) return sun('#FBBF24');   // 10AM - mañana brillante
+            if (h <= 11) return sun('#F59E0B');   // 11AM - ámbar profundo
+            if (h === 12) return sun('#D97706');  // 12PM - mediodía naranja-ámbar
+            if (h <= 13) return sun('#F97316');   // 1PM  - tarde naranja
+            if (h <= 14) return sun('#EA580C');   // 2PM  - naranja intenso
+            if (h <= 15) return sun('#DC2626');   // 3PM  - rojo-naranja
+            if (h <= 16) return sun('#B91C1C');   // 4PM  - rojo
+            if (h <= 17) return sunset('#C2410C');// 5PM  - atardecer naranja oscuro
+            if (h <= 18) return sunset('#7C3AED');// 6PM  - atardecer violeta
+            if (h <= 19) return moon('#818CF8'); // 7PM  - noche índigo claro
+            return moon('#4F46E5');              // 10PM+ - noche profunda
+        }
+
         function renderTimeColumn(lottery, label, shortLabel, type, colorClass) {
             let drawTimeStr = lotteryDrawTimes[type];
 
@@ -3906,9 +3939,11 @@
                 buttonsHtml = makeBtn('A') + makeBtn('B') + makeBtn('C');
             }
 
+            const icon = getTimePhaseIcon(label);
             return `
             <div class="flex-1 flex flex-col gap-1.5">
-                <div class="flex items-center justify-center gap-1 mb-0.5">
+                <div class="flex flex-col items-center justify-center mb-0.5 gap-0.5">
+                    ${icon ? `<span style="line-height:1;display:block;text-align:center">${icon}</span>` : ''}
                     <span class="font-bold ${colorClass} ${opacityClass} uppercase text-[9px]" title="Sorteo: ${drawTimeStr}">${label}</span>
                 </div>
                 <div class="flex gap-1 justify-center">
