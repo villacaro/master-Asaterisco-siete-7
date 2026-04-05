@@ -30,5 +30,7 @@ EXPOSE 8080
 # Set environment variable for production settings
 ENV DJANGO_SETTINGS_MODULE=admin_asterisco7.settings_production
 
-# Command to run the app with Gunicorn
-CMD ["gunicorn", "admin_AsteriscoSiete7.wsgi:application", "--bind", "0.0.0.0:8080"]
+# Entrypoint: runs migrations + setup + gunicorn
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+CMD ["/entrypoint.sh"]
