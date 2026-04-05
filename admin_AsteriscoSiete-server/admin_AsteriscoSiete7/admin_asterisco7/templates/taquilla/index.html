@@ -3811,7 +3811,12 @@
                     <div class="col-span-1 sm:col-span-2 lg:col-span-3 bg-white dark:bg-slate-800 rounded-lg p-2 border border-slate-200 dark:border-slate-700 shadow-sm">
                         <div class="flex justify-between items-center mb-2">
                             <span class="font-bold text-slate-900 dark:text-white text-base">${l.name}</span>
-                            <button onclick="toggleTimeGroup('${l.name}','ALL')" class="mod-btn text-indigo-500 dark:text-indigo-300 border-indigo-400 dark:border-indigo-500 h-6 px-2 text-[9px]">Todos</button>
+                            <div class="flex gap-1 flex-wrap justify-end">
+                                <button onclick="selectLotteryPhase('${l.name}','morning')" class="mod-btn w-6 h-6" title="Seleccionar Mañana"><svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></button>
+                                <button onclick="selectLotteryPhase('${l.name}','afternoon')" class="mod-btn w-6 h-6" title="Seleccionar Tarde"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg></button>
+                                <button onclick="selectLotteryPhase('${l.name}','night')" class="mod-btn w-6 h-6" title="Seleccionar Noche"><svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></button>
+                                <button onclick="toggleTimeGroup('${l.name}','ALL')" class="mod-btn text-indigo-500 dark:text-indigo-300 border-indigo-400 dark:border-indigo-500 h-6 px-2 text-[9px]">Todos</button>
+                             </div>
                         </div>
                         <div class="flex gap-1 text-[10px] overflow-x-auto pb-1">${tcCols}</div>
                     </div>`;
@@ -3837,7 +3842,12 @@
                     <div class="col-span-1 sm:col-span-2 lg:col-span-3 bg-white dark:bg-slate-800 rounded-lg p-2 border border-slate-200 dark:border-slate-700 shadow-sm">
                         <div class="flex justify-between items-center mb-2">
                             <span class="font-bold text-slate-900 dark:text-white text-base">${l.name}</span>
-                            <button onclick="toggleTimeGroup('${l.name}','ALL')" class="mod-btn text-indigo-500 dark:text-indigo-300 border-indigo-400 dark:border-indigo-500 h-6 px-2 text-[9px]">Todos</button>
+                            <div class="flex gap-1 flex-wrap justify-end">
+                                <button onclick="selectLotteryPhase('${l.name}','morning')" class="mod-btn w-6 h-6" title="Seleccionar Mañana"><svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></button>
+                                <button onclick="selectLotteryPhase('${l.name}','afternoon')" class="mod-btn w-6 h-6" title="Seleccionar Tarde"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg></button>
+                                <button onclick="selectLotteryPhase('${l.name}','night')" class="mod-btn w-6 h-6" title="Seleccionar Noche"><svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></button>
+                                <button onclick="toggleTimeGroup('${l.name}','ALL')" class="mod-btn text-indigo-500 dark:text-indigo-300 border-indigo-400 dark:border-indigo-500 h-6 px-2 text-[9px]">Todos</button>
+                             </div>
                         </div>
                         <div class="flex gap-1 text-[10px] overflow-x-auto pb-1">${tfCols}</div>
                     </div>`;
@@ -3857,7 +3867,7 @@
                     ${renderTimeColumn(l.name, 'Noche',   'N', 'night',     'text-red-600   dark:text-red-500')}
                 `;
                 const todosBtn = isZamorano
-                    ? `<button onclick="toggleTimeGroup('${l.name}','ALL')" class="mod-btn text-indigo-500 dark:text-indigo-300 border-indigo-400 dark:border-indigo-500 h-6 px-2 text-[9px]">Todos</button>`
+                    ? `<button onclick="selectLotteryPhase('${l.name}','morning')" class="mod-btn w-6 h-6" title="Seleccionar Mañana"><svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></button><button onclick="selectLotteryPhase('${l.name}','afternoon')" class="mod-btn w-6 h-6" title="Seleccionar Tarde"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg></button><button onclick="selectLotteryPhase('${l.name}','night')" class="mod-btn w-6 h-6" title="Seleccionar Noche"><svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></button><button onclick="toggleTimeGroup('${l.name}','ALL')" class="mod-btn text-indigo-500 dark:text-indigo-300 border-indigo-400 dark:border-indigo-500 h-6 px-2 text-[9px]">Todos</button>`
                     : `<button onclick="toggleTimeGroup('${l.name}','morning')" class="mod-btn w-6 h-6" title="Seleccionar Mañana"><svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></button>
                        <button onclick="toggleTimeGroup('${l.name}','afternoon')" class="mod-btn w-6 h-6" title="Seleccionar Tarde"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg></button>
                        <button onclick="toggleTimeGroup('${l.name}','night')" class="mod-btn w-6 h-6" title="Seleccionar Noche"><svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></button>
@@ -3907,6 +3917,25 @@
             return moon('#4F46E5');              // 10PM+ - noche profunda
         }
 
+        // ── Devuelve 'morning' | 'afternoon' | 'night' según hora ──
+        function getTimePhase(label) {
+            const m = label.match(/^(\d{1,2})(AM|PM)$/i);
+            if (!m) return null;
+            let h = parseInt(m[1]);
+            if (m[2].toUpperCase() === 'PM' && h !== 12) h += 12;
+            if (m[2].toUpperCase() === 'AM' && h === 12) h = 0;
+            if (h <= 12) return 'morning';
+            if (h <= 18) return 'afternoon';
+            return 'night';
+        }
+
+        // ── Selecciona todos los botones de una franja horaria ──
+        function selectLotteryPhase(lottery, phase) {
+            document.querySelectorAll(
+                `[data-lottery="${lottery}"][data-phase="${phase}"]`
+            ).forEach(btn => { if (!btn.disabled) btn.click(); });
+        }
+
         function renderTimeColumn(lottery, label, shortLabel, type, colorClass) {
             let drawTimeStr = lotteryDrawTimes[type];
 
@@ -3919,13 +3948,14 @@
 
             const allowed = isBetAllowed(drawTimeStr);
             const opacityClass = allowed ? '' : 'opacity-30 cursor-not-allowed';
+            const phase = getTimePhase(label) || 'other';
 
             function makeBtn(sub) {
                 const extra = (lottery === 'Zamorano' || lottery === 'SUPERGANA' || lottery === 'TRIPLE GANA' || lottery === 'NAPA GANA') && sub === 'S' ? 'border-purple-400 dark:border-purple-500/50 text-purple-500 dark:text-purple-400' : 'border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400';
                 if (!allowed) {
-                    return `<button disabled class="lottery-btn w-full h-8 rounded bg-slate-100 dark:bg-slate-900 border ${extra} ${opacityClass} font-bold text-[11px]" title="Sorteo Cerrado">${sub}</button>`;
+                    return `<button disabled class="lottery-btn w-full h-8 rounded bg-slate-100 dark:bg-slate-900 border ${extra} ${opacityClass} font-bold text-[11px]" data-lottery="${lottery}" data-phase="${phase}" title="Sorteo Cerrado">${sub}</button>`;
                 } else {
-                    return `<button onclick="toggleLottery(this, '${lottery}', '${type}', '${sub}', '${label}')" class="lottery-btn btn-${type} w-full h-8 rounded bg-slate-100 dark:bg-slate-900 border ${extra} font-bold hover:bg-slate-200 dark:hover:bg-slate-700 text-[11px]" data-lottery="${lottery}" data-time="${type}" data-sub="${sub}">${sub}</button>`;
+                    return `<button onclick="toggleLottery(this, '${lottery}', '${type}', '${sub}', '${label}')" class="lottery-btn btn-${type} w-full h-8 rounded bg-slate-100 dark:bg-slate-900 border ${extra} font-bold hover:bg-slate-200 dark:hover:bg-slate-700 text-[11px]" data-lottery="${lottery}" data-time="${type}" data-sub="${sub}" data-phase="${phase}">${sub}</button>`;
                 }
             }
 
