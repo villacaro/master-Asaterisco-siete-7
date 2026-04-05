@@ -244,6 +244,29 @@
             font-weight: 800;
         }
 
+        /* TC, TF, Zamorano: seleccionado por franja horaria (data-phase) */
+        .lottery-btn[data-phase="morning"][class*="selected-"] {
+            background-color: #facc15;
+            color: #422006;
+            border-color: #eab308;
+            box-shadow: 0 0 8px rgba(250, 204, 21, 0.4);
+            font-weight: 800;
+        }
+        .lottery-btn[data-phase="afternoon"][class*="selected-"] {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #2563eb;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+            font-weight: 800;
+        }
+        .lottery-btn[data-phase="night"][class*="selected-"] {
+            background-color: #ef4444;
+            color: white;
+            border-color: #dc2626;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+            font-weight: 800;
+        }
+
         /* Botones de Grupo y Modalidades */
         .mod-btn {
             font-size: 0.65rem;
