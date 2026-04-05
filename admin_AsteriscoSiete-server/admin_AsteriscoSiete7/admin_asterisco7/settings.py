@@ -603,11 +603,13 @@ except Exception:
     pass
 
 # FIREBASE ADMIN SETUP
-import os
+import logging as _firebase_log
 import firebase_admin
 from firebase_admin import credentials
 import base64
 import json
+
+_fb_logger = _firebase_log.getLogger('firebase_admin.setup')
 
 firebase_key_path = os.path.join(BASE_DIR, 'serviceAccountKey.json')
 
@@ -618,18 +620,18 @@ if not firebase_admin._apps:
             decoded_cert = base64.b64decode(os.environ.get('FIREBASE_SERVICE_ACCOUNT_BASE64')).decode('utf-8')
             cred_dict = json.loads(decoded_cert)
             cred = credentials.Certificate(cred_dict)
-            print("✅ Firebase Admin SDK Initialized via ENV var (Base64)!")
+            _fb_logger.info('[OK] Firebase Admin SDK Initialized via ENV var (Base64)!')
         except Exception as e:
-            print(f"⚠️ Failed to init Firebase via ENV var: {e}")
+            _fb_logger.warning('[WARN] Failed to init Firebase via ENV var: %s', e)
     elif os.path.exists(firebase_key_path):
         try:
             cred = credentials.Certificate(firebase_key_path)
-            print("✅ Firebase Admin SDK Initialized via serviceAccountKey.json!")
+            _fb_logger.info('[OK] Firebase Admin SDK Initialized via serviceAccountKey.json!')
         except Exception as e:
-            print(f"⚠️ Failed to init Firebase Admin via disk: {e}")
-            
+            _fb_logger.warning('[WARN] Failed to init Firebase Admin via disk: %s', e)
+
     if cred:
         try:
             firebase_admin.initialize_app(cred)
         except Exception as e:
-            print(f"⚠️ Firebase App initialization failed: {e}")
+            _fb_logger.warning('[WARN] Firebase App initialization failed: %s', e)
