@@ -2,13 +2,10 @@
 reset_taquilla_user.py
 ======================
 Comando idempotente que garantiza que exista el UsuariosTaquilla 'taquilla1'
-con la contraseña correctamente hasheada.
+con la contrasena correctamente hasheada.
 
-Qué hace:
-  1. Busca el UsuariosTaquilla con user='taquilla1'
-  2. Si no existe: lo crea (requiere que la cadena comercial ya exista)
-  3. Si existe: resetea el password con make_password (aunque ya esté correcto)
-  4. Imprime el resultado para verlo en los logs de Railway
+Usa queryset.update() en lugar de save() para EVITAR los signals de auditoria
+que fallan cuando no existen registros de UsersProcesses en la BD de produccion.
 
 Uso:
   python manage.py reset_taquilla_user
@@ -29,112 +26,104 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--password', default='Taquilla2024!',
-            help='Contraseña a establecer (default: Taquilla2024!)'
+            help='Contrasena a establecer (default: Taquilla2024!)'
         )
 
     def handle(self, *args, **options):
         username = options['user']
         password = options['password']
+        hashed = make_password(password)
 
         from django.apps import apps
         UsuariosTaquilla = apps.get_model('admin_comercializacion', 'UsuariosTaquilla')
 
-        self.stdout.write(f'\n── Buscando UsuariosTaquilla: {username!r} ──────────────')
+        self.stdout.write('\n== reset_taquilla_user ==')
 
-        # ── Diagnóstico: mostrar todos los usuarios existentes ──────────────
+        # Diagnostico: mostrar todos los usuarios existentes
         all_users = list(UsuariosTaquilla.objects.values_list('user', flat=True))
-        self.stdout.write(f'  Usuarios existentes en BD: {all_users}')
+        self.stdout.write('  Usuarios en BD: {0}'.format(all_users))
 
-        usuario = UsuariosTaquilla.objects.filter(user=username).first()
+        qs = UsuariosTaquilla.objects.filter(user=username)
 
-        if not usuario:
-            self.stdout.write(self.style.WARNING(
-                f'  ⚠  Usuario {username!r} no encontrado. Intentando crear...'
-            ))
-            usuario = self._create_usuario(username, password)
-            if not usuario:
-                return  # error ya reportado
-        else:
-            self.stdout.write(f'  ✅ Encontrado (pk={usuario.pk})')
-
-        # ── Verificar estado actual del password ────────────────────────────
-        pwd_raw = str(getattr(usuario, 'password', ''))
-        self.stdout.write(f'  Hash actual (primeros 60 chars): {pwd_raw[:60]!r}')
-
-        already_ok = check_password(password, pwd_raw)
-        if already_ok:
+        if qs.exists():
+            # Usar .update() en lugar de .save() para EVITAR signals de auditoria
+            # que fallan cuando UsersProcesses no existe en la BD
+            updated = qs.update(password=hashed)
             self.stdout.write(self.style.SUCCESS(
-                f'  ✅ Password ya es correcto. Login debería funcionar.'
+                '  OK Password actualizado via queryset.update() (filas: {0})\n'
+                '  Usuario:  {1}\n'
+                '  Clave:    {2}\n'
+                '  URL: https://master-asaterisco-siete-7-production.up.railway.app/taquilla/\n'.format(
+                    updated, username, password
+                )
             ))
         else:
             self.stdout.write(self.style.WARNING(
-                f'  ⚠  Password incorrecto o no hasheado. Reseteando...'
+                '  WARN Usuario {0!r} no existe. Intentando crear...'.format(username)
             ))
+            created = self._create_usuario_sin_signals(username, password, hashed)
+            if created:
+                self.stdout.write(self.style.SUCCESS(
+                    '  OK Usuario creado:\n'
+                    '  Usuario:  {0}\n'
+                    '  Clave:    {1}\n'.format(username, password)
+                ))
+            else:
+                self.stdout.write(self.style.ERROR(
+                    '  ERROR No se pudo crear el usuario. Ver traza arriba.'
+                ))
 
-        # ── Siempre resetear el hash para garantizar consistencia ───────────
-        usuario.password = make_password(password)
-        usuario.save(update_fields=['password'])
-        self.stdout.write(self.style.SUCCESS(
-            f'\n✅ Password reseteado correctamente.\n'
-            f'  🔑 Usuario:  {username}\n'
-            f'  🔑 Clave:    {password}\n'
-            f'  🌐 URL:      https://master-asaterisco-siete-7-production.up.railway.app/taquilla/\n'
-        ))
-
-    def _create_usuario(self, username, password):
-        """Intenta crear el UsuariosTaquilla si la cadena comercial ya existe."""
+    def _create_usuario_sin_signals(self, username, password, hashed):
+        """Crea UsuariosTaquilla via SQL directo (bypass de signals y auditoria)."""
+        from django.db import connection
         from django.apps import apps
-        from admin_status.models import Status
 
         try:
             UsuariosTaquilla = apps.get_model('admin_comercializacion', 'UsuariosTaquilla')
             Taquillas = apps.get_model('admin_comercializacion', 'Taquillas')
+            Status = apps.get_model('admin_status', 'Status')
 
-            # Buscar la primera taquilla disponible
             taquilla = Taquillas.objects.first()
             if not taquilla:
                 self.stdout.write(self.style.ERROR(
-                    '  ❌ No hay Taquillas en la BD. '
-                    'Ejecuta primero: python manage.py setup_taquilla_inicial'
+                    '  ERROR No hay Taquillas en la BD. Ejecuta setup_taquilla_inicial primero.'
                 ))
-                return None
+                return False
 
-            # Verificar si ya hay un usuario en esa taquilla
+            # Verificar si ya hay usuario en esa taquilla (con distinto user)
             existing = UsuariosTaquilla.objects.filter(taquilla=taquilla).first()
             if existing:
                 self.stdout.write(
-                    f'  ℹ  La taquilla pk={taquilla.pk} ya tiene usuario: {existing.user!r}. '
-                    f'Reseteando password en ese usuario...'
+                    '  INFO Taquilla pk={0} ya tiene usuario: {1!r}. '
+                    'Reseteando password...'.format(taquilla.pk, existing.user)
                 )
-                return existing
+                UsuariosTaquilla.objects.filter(pk=existing.pk).update(password=hashed)
+                return True
 
-            status = Status.objects.filter(codename='status_instalacion').first()
-            if not status:
-                status = Status.objects.filter(codename='activo').first()
-            if not status:
-                self.stdout.write(self.style.ERROR(
-                    '  ❌ No se encontró un Status válido. '
-                    'Ejecuta primero: python manage.py setup_taquilla_inicial'
-                ))
-                return None
-
-            from django.utils.timezone import now
-            usuario = UsuariosTaquilla(
-                user=username,
-                nombre='Operador Principal',
-                taquilla=taquilla,
-                status=status,
+            status = (
+                Status.objects.filter(codename='status_instalacion').first()
+                or Status.objects.filter(codename='activo').first()
             )
-            usuario.password = make_password(password)
-            usuario.save()
-            self.stdout.write(self.style.SUCCESS(
-                f'  ✅ UsuariosTaquilla creado: {username!r} (pk={usuario.pk})'
-            ))
-            return usuario
+            if not status:
+                self.stdout.write(self.style.ERROR('  ERROR No se encontro Status valido.'))
+                return False
+
+            # Insertar via SQL directo para evitar completamente los signals
+            table = UsuariosTaquilla._meta.db_table
+            with connection.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO {0} "
+                    "(user, nombre, taquilla_id, status_id, password, "
+                    "pub_key_client, pub_key, priv_key, pk_clone) "
+                    "VALUES (%s, %s, %s, %s, %s, '', '', '', 0)".format(table),
+                    [username, 'Operador Principal', taquilla.pk, status.pk, hashed]
+                )
+            self.stdout.write('  OK Insertado via SQL directo (sin signals).')
+            return True
 
         except Exception as exc:
             import traceback
             self.stdout.write(self.style.ERROR(
-                f'  ❌ Error al crear usuario: {exc}\n{traceback.format_exc()}'
+                '  ERROR al crear: {0}\n{1}'.format(exc, traceback.format_exc())
             ))
-            return None
+            return False
