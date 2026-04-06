@@ -30,13 +30,23 @@ ALLOWED_HOSTS = ['*']
 PROJECT_PATH = os.path.dirname(os.path.realpath(__file__))
 BASE_DIR     = os.path.dirname(os.path.dirname(__file__))
 
-# ── Base de datos local (SQLite para desarrollo sin PostgreSQL) ───────────────
+# ── Base de datos: Supabase PostgreSQL (mismo que producción) ─────────────────
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db_local_asterisco7.sqlite3'),
+        'ENGINE':   'django.db.backends.postgresql',
+        'NAME':     'postgres',
+        'USER':     'postgres.apqqbljjvdcpgkijpjcc',
+        'PASSWORD': 'Ivanna.213694./',
+        'HOST':     'aws-1-us-west-2.pooler.supabase.com',
+        'PORT':     '6543',
+        'OPTIONS':  {'sslmode': 'require'},
+        'DISABLE_SERVER_SIDE_CURSORS': True,
     }
 }
+
+# Supabase no usa tablespaces personalizados
+DEFAULT_TABLESPACE       = ''
+DEFAULT_INDEX_TABLESPACE = ''
 
 # ── Apps instaladas — MÍNIMO ABSOLUTO para migrar admin_juego ────────────────
 # Todas las demás apps del proyecto usan APIs de Django <2.0 y fallan en Django 6
@@ -151,8 +161,8 @@ REST_FRAMEWORK = {
 }
 
 # ── Opciones adicionales del proyecto ─────────────────────────────────────────
-DEFAULT_TABLESPACE       = 'ts_parley'
-DEFAULT_INDEX_TABLESPACE = 'ts_parley'
+DEFAULT_TABLESPACE       = ''
+DEFAULT_INDEX_TABLESPACE = ''
 X_FRAME_OPTIONS          = 'DENY'
 USE_THOUSAND_SEPARATOR   = False
 DECIMAL_SEPARATOR        = ','
