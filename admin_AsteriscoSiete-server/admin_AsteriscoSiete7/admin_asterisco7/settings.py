@@ -105,19 +105,30 @@ import dj_database_url
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('PANEL_DB_NAME'),
-        'USER': os.environ.get('PANEL_DB_USER'),
-        'PASSWORD': os.environ.get('PANEL_DB_PASSWORD'),
-        'HOST': os.environ.get('PANEL_DB_HOST'),
-        'PORT': os.environ.get('PANEL_DB_PORT'),
+        'NAME': os.environ.get('PANEL_DB_NAME', 'postgres'),
+        'USER': os.environ.get('PANEL_DB_USER', 'postgres.apqqbljjvdcpgkijpjcc'),
+        'PASSWORD': os.environ.get('PANEL_DB_PASSWORD', 'Ivanna.213694./'),
+        'HOST': os.environ.get('PANEL_DB_HOST', 'aws-1-us-west-2.pooler.supabase.com'),
+        'PORT': os.environ.get('PANEL_DB_PORT', '6543'),
+        'OPTIONS': {'sslmode': 'require'},
+        'DISABLE_SERVER_SIDE_CURSORS': True,
     },
 }
 
-if os.environ.get('DATABASE_URL'):
+# Railway puede proveer la URL de Supabase en cualquiera de estas variables
+_db_url = (
+    os.environ.get('DATABASE_URL') or
+    os.environ.get('SUPABASE_POOLER_URL') or
+    os.environ.get('SUPABASE_URL')
+)
+if _db_url:
     DATABASES['default'] = dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=500
+        default=_db_url,
+        conn_max_age=500,
+        ssl_require=True,
     )
+    DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
+
 
 CELERY_RESULT_BACKEND = 'redis://{0}:6379/1'.format(os.environ.get('REDIS_PORT_6379_TCP_ADDR'))
 BROKER_URL = 'amqp://{0}:{1}@{2}:5672//'.format(
@@ -153,8 +164,9 @@ SECRET_KEY = 'jd7@9#1ls=e8oa&amp;^68p90q!mdju($=r8x68j6q#yfa73$5jpf0'
 PROJECT_PATH = os.path.dirname(os.path.realpath(__file__))
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
-DEFAULT_TABLESPACE = 'ts_comer'
-DEFAULT_INDEX_TABLESPACE = 'ts_comer'
+DEFAULT_TABLESPACE = ''
+DEFAULT_INDEX_TABLESPACE = ''
+
 
 OPBEAT = {
     'ORGANIZATION_ID': '2608c50a398d4953b38682507fbeac4c',
