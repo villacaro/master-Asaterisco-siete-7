@@ -296,29 +296,13 @@ def liquidaciones_sorteo_api(request):
 @csrf_exempt
 def taquilla_venta_api(request):
     """
-    Recibe un ticket confirmado desde la taquilla y lo guarda en BD.
+    Recibe un ticket confirmado desde la taquilla y lo guarda en BD (Supabase).
     POST { id, items:[{lottery,number,amount,bet_type}], total, usuario, taquillaNombre }
+    La autenticación es manejada por el sistema de sesión propio de la taquilla
+    (sessionStorage). No requiere Firebase Bearer token.
     """
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
-        
-    # === FIREBASE AUTHENTICATION CHECK ===
-    auth_header = request.META.get('HTTP_AUTHORIZATION', '')
-    if not auth_header.startswith('Bearer '):
-        return JsonResponse({'error': 'No autorizado. Se requiere token de Firebase (Bearer).'}, status=401)
-        
-    id_token = auth_header.split('Bearer ')[1]
-    decoded_token = None
-    try:
-        from firebase_admin import auth as firebase_auth
-        decoded_token = firebase_auth.verify_id_token(id_token)
-    except Exception as e:
-        return JsonResponse({'error': 'Token inválido o expirado.', 'details': str(e)}, status=401)
-        
-    # Validated
-    firebase_uid = decoded_token.get('uid')
-    firebase_email = decoded_token.get('email', 'desconocido')
-    # ======================================
 
     try:
         body = json.loads(request.body)
