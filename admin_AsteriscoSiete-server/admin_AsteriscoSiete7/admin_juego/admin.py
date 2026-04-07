@@ -16,7 +16,10 @@ Módulos registrados:
 from django.contrib import admin
 from django.utils.html import format_html, mark_safe
 
-from admin_juego.models import SistemaJuego, TipoProducto, Fechas, RestriccionesSorteo
+from admin_juego.models import (
+    SistemaJuego, TipoProducto, Fechas, RestriccionesSorteo,
+    ModalidadJuego, ModalidadProducto, ModalidadPeriodo,
+)
 from admin_juego.models_arrejuntao import (
     # Modelos de Plantilla Arrejuntao
     AnimalFigura,
@@ -600,3 +603,35 @@ class FechasAdmin(admin.ModelAdmin):
     @admin.display(description='Quiniela', boolean=True)
     def permite_quiniela(self, obj):
         return obj.quiniela
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ModalidadJuego (Equipos / Selecciones)
+# ─────────────────────────────────────────────────────────────────────────────
+
+@admin.register(ModalidadJuego)
+class ModalidadJuegoAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'deporte', 'logo_img', 'created_at', 'updated_at')
+    list_filter = ('deporte',)
+    search_fields = ('nombre', 'deporte__nombre')
+    ordering = ('deporte', 'nombre')
+
+    @admin.display(description='Logo')
+    def logo_img(self, obj):
+        return logo_preview(obj, 'logo', 32)
+
+
+@admin.register(ModalidadProducto)
+class ModalidadProductoAdmin(admin.ModelAdmin):
+    list_display = ('equipo', 'liga', 'created_at')
+    list_filter = ('liga',)
+    search_fields = ('equipo__nombre', 'liga__nombre')
+    ordering = ('liga', 'equipo')
+
+
+@admin.register(ModalidadPeriodo)
+class ModalidadPeriodoAdmin(admin.ModelAdmin):
+    list_display = ('equipo', 'temporada', 'created_at')
+    list_filter = ('temporada',)
+    search_fields = ('equipo__nombre', 'temporada__nombre')
+    ordering = ('temporada', 'equipo')

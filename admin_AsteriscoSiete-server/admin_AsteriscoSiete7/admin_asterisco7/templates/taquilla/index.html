@@ -7414,30 +7414,106 @@ detectarIPLocal().then(ip => {
 // ═══════════════════════════════════════════════════════════
 // RECOGER TAQUILLA
 // ═══════════════════════════════════════════════════════════
-function openRecogerTaquillaModal() {
+async function openRecogerTaquillaModal() {
     const modal = document.getElementById('recoger-taquilla-modal');
     if (!modal) return;
-    const today = new Date().toLocaleDateString('es-VE');
-    const txs   = (typeof allTransactions !== 'undefined' ? allTransactions : [])
-                    .filter(t => t.dateOnly === today && t.status !== 'Anulado');
-    const totalVentas  = txs.reduce((s, t) => s + (t.total || 0), 0);
-    const totalTickets = txs.length;
-    const fmtBs = n => 'Bs ' + n.toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2});
+
     const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-    set('rt-fecha',        new Date().toLocaleDateString('es-VE', {weekday:'long',year:'numeric',month:'long',day:'numeric'}));
-    set('rt-hora',         new Date().toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'}));
-    set('rt-total-ventas', fmtBs(totalVentas));
-    set('rt-total-tickets',totalTickets + (totalTickets !== 1 ? ' tickets' : ' ticket'));
-    set('rt-taquilla-name',sessionStorage.getItem('ast7_taquilla') || '—');
-    set('rt-operador',     sessionStorage.getItem('ast7_nombre')   || '—');
-    set('rt-ip',           document.getElementById('taquilla-ip-display')?.textContent || window.location.hostname);
+    const fmtBs = n => 'Bs ' + Number(n).toLocaleString('es-VE', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+    set('rt-fecha', new Date().toLocaleDateString('es-VE', {weekday:'long',year:'numeric',month:'long',day:'numeric'}));
+    set('rt-hora',  new Date().toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'}));
+    set('rt-taquilla-name', sessionStorage.getItem('ast7_taquilla') || '—');
+    set('rt-operador',      sessionStorage.getItem('ast7_nombre')   || '—');
+    set('rt-ip',            document.getElementById('taquilla-ip-display')?.textContent || window.location.hostname);
+    set('rt-total-ventas',  'Cargando…');
+    set('rt-total-tickets', 'Cargando…');
+
     modal.classList.remove('hidden');
     modal.classList.add('flex');
+
+    // Consulta totales del día al API
+    try {
+        const hoy = new Date().toISOString().slice(0,10);
+        const resp = await fetch(`/api/dashboard/cuadre-caja/?fecha_inicio=${hoy}&fecha_fin=${hoy}`);
+        if (resp.ok) {
+            const data = await resp.json();
+            set('rt-total-ventas',  fmtBs(data.total_ventas  || data.venta_total   || 0));
+            set('rt-total-tickets', (data.total_tickets || data.cantidad_tickets || 0) + ' tickets');
+        } else {
+            set('rt-total-ventas',  fmtBs(0));
+            set('rt-total-tickets', '0 tickets');
+        }
+    } catch(e) {
+        set('rt-total-ventas',  fmtBs(0));
+        set('rt-total-tickets', '0 tickets');
+    }
 }
 
 function closeRecogerModal() {
     const modal = document.getElementById('recoger-taquilla-modal');
     if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+}
+
+function imprimirCierre() {
+    const g = id => document.getElementById(id)?.textContent?.trim() || '—';
+    const fecha    = g('rt-fecha');
+    const hora     = g('rt-hora');
+    const taquilla = g('rt-taquilla-name');
+    const operador = g('rt-operador');
+    const ip       = g('rt-ip');
+    const ventas   = g('rt-total-ventas');
+    const tickets  = g('rt-total-tickets');
+
+    const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cierre de Turno — Asterisco *7</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Courier New', monospace; font-size: 12px; color: #000; background: #fff; width: 80mm; margin: 0 auto; padding: 8px; }
+    .center { text-align: center; }
+    .bold { font-weight: bold; }
+    .sep { border-top: 1px dashed #000; margin: 6px 0; }
+    .sep2 { border-top: 2px solid #000; margin: 8px 0; }
+    .row { display: flex; justify-content: space-between; margin: 3px 0; }
+    .label { color: #444; }
+    .big { font-size: 15px; font-weight: bold; }
+    .logo { font-size: 22px; font-weight: 900; letter-spacing: -1px; margin-bottom: 4px; }
+    @media print { @page { margin: 0; size: 80mm auto; } body { width: 80mm; } }
+  </style>
+</head>
+<body>
+  <div class="center">
+    <div class="logo">★ 7</div>
+    <div class="bold">ASTERISCO SIETE</div>
+    <div style="font-size:10px;color:#555">Sistema de Taquilla</div>
+  </div>
+  <div class="sep2"></div>
+  <div class="center bold" style="font-size:14px;margin-bottom:4px">CIERRE DE TURNO</div>
+  <div class="sep"></div>
+  <div class="row"><span class="label">Fecha:</span><span>${fecha}</span></div>
+  <div class="row"><span class="label">Hora:</span><span>${hora}</span></div>
+  <div class="row"><span class="label">Taquilla:</span><span class="bold">${taquilla}</span></div>
+  <div class="row"><span class="label">Operador:</span><span>${operador}</span></div>
+  <div class="row"><span class="label">IP:</span><span style="font-size:10px">${ip}</span></div>
+  <div class="sep2"></div>
+  <div class="center bold" style="font-size:11px;margin-bottom:6px">RESUMEN DEL TURNO</div>
+  <div class="row"><span class="label">Total Vendido:</span><span class="big">${ventas}</span></div>
+  <div class="row"><span class="label">Tickets Emitidos:</span><span class="bold">${tickets}</span></div>
+  <div class="sep2"></div>
+  <div class="center" style="font-size:10px;color:#555;margin-top:6px">Documento generado automáticamente</div>
+  <div class="center" style="font-size:10px;color:#555">${new Date().toLocaleString('es-VE')}</div>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'width=340,height=520,toolbar=no,menubar=no,scrollbars=no');
+    if (!win) { alert('Activa las ventanas emergentes para imprimir.'); return; }
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => { win.print(); }, 500);
 }
 </script>
 <!-- FIN CARD PERFIL SCRIPT -->
@@ -7526,11 +7602,11 @@ function closeRecogerModal() {
             <button onclick="closeRecogerModal()" class="flex-1 h-11 rounded-xl border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-sm">
                 Cancelar
             </button>
-            <button onclick="window.print(); closeRecogerModal()" class="flex-1 h-11 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold shadow-lg shadow-teal-600/20 active:scale-95 transition-all text-sm flex items-center justify-center gap-2">
+            <button onclick="imprimirCierre()" class="flex-1 h-11 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold shadow-lg shadow-teal-600/20 active:scale-95 transition-all text-sm flex items-center justify-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                 </svg>
-                Imprimir Cierre
+                🖨️ Imprimir Cierre
             </button>
         </div>
     </div>

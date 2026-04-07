@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    /* ── TEMA OSCURO (default) ── */
     :root {
       --bg:        #0b0d18;
       --surface:   #13162a;
@@ -29,6 +30,27 @@
       --muted:     #94a3b8;
       --radius:    12px;
       --radius-sm: 8px;
+    }
+    /* ── TEMA CLARO ── */
+    body.light {
+      --bg:        #f1f5f9;
+      --surface:   #ffffff;
+      --surface2:  #f8fafc;
+      --surface3:  #e2e8f0;
+      --border:    #cbd5e1;
+      --accent:    #7c3aed;
+      --accent2:   #6d28d9;
+      --accent3:   #5b21b6;
+      --green:     #16a34a;
+      --green-dim: rgba(22,163,74,.1);
+      --red:       #dc2626;
+      --red-dim:   rgba(220,38,38,.08);
+      --yellow:    #d97706;
+      --orange:    #ea580c;
+      --blue:      #2563eb;
+      --cyan:      #0891b2;
+      --text:      #0f172a;
+      --muted:     #64748b;
     }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     body {
@@ -62,6 +84,15 @@
     }
     .nav-link:hover { color: var(--accent2); border-color: var(--accent); }
     .nav-link.active { color: var(--accent2); background: rgba(124,58,237,.1); border-color: var(--accent); }
+    /* ── Toggle tema ── */
+    .btn-theme {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 20px;
+      padding: 5px 12px; font-size: 12px; cursor: pointer;
+      transition: .2s; display: flex; align-items: center; gap: 5px;
+      font-family: inherit;
+    }
+    .btn-theme:hover { border-color: var(--accent); color: var(--accent2); }
 
     /* ── Main Layout ─── */
     .main { padding: 24px 28px; max-width: 1700px; margin: 0 auto; }
@@ -275,6 +306,7 @@
       <a href="/dashboard/reportes/" class="nav-link">📊 Reportes</a>
       <a href="/dashboard/candidatos/" class="nav-link">🎯 Candidatos</a>
       <a href="#" class="nav-link active">📋 Liquidaciones</a>
+      <button class="btn-theme" id="btn-theme" onclick="toggleTheme()">🌙 Oscuro</button>
     </div>
   </div>
 
@@ -653,7 +685,31 @@
     const d7 = new Date(); d7.setDate(d7.getDate() - 7);
     document.getElementById('fi-fecha-ini').value = d7.toISOString().slice(0,10);
     document.getElementById('fi-fecha-fin').value = t;
+
+    // Restaurar preferencia de tema guardada
+    const savedTheme = localStorage.getItem('ast7_theme') || 'dark';
+    applyTheme(savedTheme);
   });
+
+  // ─────────────────────────────────────────────────────
+  // Theme toggle
+  // ─────────────────────────────────────────────────────
+  function applyTheme(theme) {
+    const btn = document.getElementById('btn-theme');
+    if (theme === 'light') {
+      document.body.classList.add('light');
+      if (btn) { btn.textContent = '🌙 Oscuro'; }
+    } else {
+      document.body.classList.remove('light');
+      if (btn) { btn.textContent = '☀️ Claro'; }
+    }
+    localStorage.setItem('ast7_theme', theme);
+  }
+
+  function toggleTheme() {
+    const isLight = document.body.classList.contains('light');
+    applyTheme(isLight ? 'dark' : 'light');
+  }
   </script>
 </body>
 </html>
