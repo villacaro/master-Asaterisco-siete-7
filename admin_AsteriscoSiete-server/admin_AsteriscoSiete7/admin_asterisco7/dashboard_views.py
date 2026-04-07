@@ -406,6 +406,290 @@ def taquilla_ventas_lista_api(request):
 
 
 
+# ── APIS DE REPORTES TAQUILLA (leen de Supabase) ────────────────────────────
+
+def _parse_fecha_boleto(fecha):
+    """Convierte fecha de Postgres/SQLite a dict con fecha_display, date_only, time_only."""
+    if hasattr(fecha, 'strftime'):
+        return {
+            'fecha_display': fecha.strftime('%d/%m/%Y %H:%M'),
+            'date_only': fecha.strftime('%Y-%m-%d'),
+            'time_only': fecha.strftime('%H:%M'),
+        }
+    elif fecha:
+        import datetime as _dt
+        try:
+            dt = _dt.datetime.fromisoformat(str(fecha)[:19])
+            return {
+                'fecha_display': dt.strftime('%d/%m/%Y %H:%M'),
+                'date_only': dt.strftime('%Y-%m-%d'),
+                'time_only': dt.strftime('%H:%M'),
+            }
+        except Exception:
+            pass
+    return {'fecha_display': str(fecha)[:16], 'date_only': str(fecha)[:10], 'time_only': str(fecha)[11:16]}
+
+
+def _boleto_rows_to_list(rows):
+    """Convierte rows de taquilla_boleto a lista de dicts."""
+    result = []
+    for row in rows:
+        pk, tid, usr, taq, fecha, items_json, total, status = row
+        parsed = _parse_fecha_boleto(fecha)
+        try:
+            items = json.loads(items_json) if items_json else []
+        except Exception:
+            items = []
+        result.append({
+            'pk': pk, 'ticket_id': tid, 'usuario': usr, 'taquilla': taq,
+            'fecha': parsed['fecha_display'],
+            'date_only': parsed['date_only'],
+            'time_only': parsed['time_only'],
+            'items': items,
+            'total': float(total) if total else 0,
+            'status': status or 'activo',
+            'prizeValue': 0,
+        })
+    return result
+
+
+@csrf_exempt
+def taquilla_reporte_diario(request):
+    """
+    GET /taquilla/reportes/analisis-diario/?fecha=YYYY-MM-DD&taquilla=T1
+    Análisis diario: ventas, comisiones, premios del día desde Supabase.
+    """
+    from django.db import connection
+    fecha = request.GET.get('fecha', '') or __import__('datetime').date.today().isoformat()
+    taquilla_filtro = request.GET.get('taquilla', '')
+
+    try:
+        _ensure_taquilla_table()
+        with connection.cursor() as cursor:
+            if taquilla_filtro:
+                cursor.execute(
+                    "SELECT id,ticket_id,usuario,taquilla,fecha,items_json,total,status "
+                    "FROM taquilla_boleto WHERE DATE(fecha)=%s AND taquilla=%s ORDER BY fecha DESC",
+                    [fecha, taquilla_filtro]
+                )
+            else:
+                cursor.execute(
+                    "SELECT id,ticket_id,usuario,taquilla,fecha,items_json,total,status "
+                    "FROM taquilla_boleto WHERE DATE(fecha)=%s ORDER BY fecha DESC",
+                    [fecha]
+                )
+            rows = cursor.fetchall()
+
+        boletos = _boleto_rows_to_list(rows)
+        venta = sum(b['total'] for b in boletos)
+        comision = venta * 0.15
+        premios = sum(b['prizeValue'] for b in boletos)
+        saldo = venta - comision - premios
+
+        return JsonResponse({
+            'ok': True, 'fecha': fecha,
+            'total_tickets': len(boletos),
+            'venta': round(venta, 2),
+            'comision': round(comision, 2),
+            'premios': round(premios, 2),
+            'saldo': round(saldo, 2),
+            'boletos': boletos,
+        }, json_dumps_params={'ensure_ascii': False})
+    except Exception as e:
+        import traceback
+        return JsonResponse({'ok': False, 'error': str(e), 'trace': traceback.format_exc()}, status=500)
+
+
+@csrf_exempt
+def taquilla_reporte_periodo(request):
+    """
+    GET /taquilla/reportes/analisis-periodo/?desde=YYYY-MM-DD&hasta=YYYY-MM-DD&taquilla=T1
+    Análisis por rango de fechas desde Supabase.
+    """
+    from django.db import connection
+    import datetime as _dt
+    hoy = _dt.date.today().isoformat()
+    desde = request.GET.get('desde', hoy)
+    hasta = request.GET.get('hasta', hoy)
+    taquilla_filtro = request.GET.get('taquilla', '')
+
+    try:
+        _ensure_taquilla_table()
+        with connection.cursor() as cursor:
+            if taquilla_filtro:
+                cursor.execute(
+                    "SELECT id,ticket_id,usuario,taquilla,fecha,items_json,total,status "
+                    "FROM taquilla_boleto WHERE DATE(fecha) BETWEEN %s AND %s AND taquilla=%s ORDER BY fecha DESC",
+                    [desde, hasta, taquilla_filtro]
+                )
+            else:
+                cursor.execute(
+                    "SELECT id,ticket_id,usuario,taquilla,fecha,items_json,total,status "
+                    "FROM taquilla_boleto WHERE DATE(fecha) BETWEEN %s AND %s ORDER BY fecha DESC",
+                    [desde, hasta]
+                )
+            rows = cursor.fetchall()
+
+        boletos = _boleto_rows_to_list(rows)
+        venta = sum(b['total'] for b in boletos)
+        comision = venta * 0.15
+        premios = sum(b['prizeValue'] for b in boletos)
+        saldo = venta - comision - premios
+
+        return JsonResponse({
+            'ok': True, 'desde': desde, 'hasta': hasta,
+            'total_tickets': len(boletos),
+            'venta': round(venta, 2),
+            'comision': round(comision, 2),
+            'premios': round(premios, 2),
+            'saldo': round(saldo, 2),
+            'boletos': boletos,
+        }, json_dumps_params={'ensure_ascii': False})
+    except Exception as e:
+        import traceback
+        return JsonResponse({'ok': False, 'error': str(e), 'trace': traceback.format_exc()}, status=500)
+
+
+@csrf_exempt
+def taquilla_reporte_caja(request):
+    """
+    GET /taquilla/reportes/cuadre-caja/?fecha=YYYY-MM-DD&taquilla=T1
+    Cuadre de caja del día desde Supabase.
+    """
+    from django.db import connection
+    fecha = request.GET.get('fecha', '') or __import__('datetime').date.today().isoformat()
+    taquilla_filtro = request.GET.get('taquilla', '')
+
+    try:
+        _ensure_taquilla_table()
+        with connection.cursor() as cursor:
+            if taquilla_filtro:
+                cursor.execute(
+                    "SELECT id,ticket_id,usuario,taquilla,fecha,items_json,total,status "
+                    "FROM taquilla_boleto WHERE DATE(fecha)=%s AND taquilla=%s ORDER BY fecha DESC",
+                    [fecha, taquilla_filtro]
+                )
+            else:
+                cursor.execute(
+                    "SELECT id,ticket_id,usuario,taquilla,fecha,items_json,total,status "
+                    "FROM taquilla_boleto WHERE DATE(fecha)=%s ORDER BY fecha DESC",
+                    [fecha]
+                )
+            rows = cursor.fetchall()
+
+        boletos = _boleto_rows_to_list(rows)
+        venta = sum(b['total'] for b in boletos)
+        comision = venta * 0.15
+        premios = sum(b['prizeValue'] for b in boletos)
+        saldo = venta - comision - premios
+
+        # Resumen por taquilla
+        por_taquilla = {}
+        for b in boletos:
+            t = b['taquilla'] or 'Sin nombre'
+            if t not in por_taquilla:
+                por_taquilla[t] = {'tickets': 0, 'venta': 0}
+            por_taquilla[t]['tickets'] += 1
+            por_taquilla[t]['venta'] += b['total']
+
+        return JsonResponse({
+            'ok': True, 'fecha': fecha,
+            'total_tickets': len(boletos),
+            'venta': round(venta, 2),
+            'comision': round(comision, 2),
+            'premios': round(premios, 2),
+            'saldo': round(saldo, 2),
+            'por_taquilla': {k: {'tickets': v['tickets'], 'venta': round(v['venta'], 2)} for k, v in por_taquilla.items()},
+        }, json_dumps_params={'ensure_ascii': False})
+    except Exception as e:
+        import traceback
+        return JsonResponse({'ok': False, 'error': str(e), 'trace': traceback.format_exc()}, status=500)
+
+
+@csrf_exempt
+def taquilla_reporte_tickets(request):
+    """
+    GET /taquilla/reportes/tickets/?fecha=YYYY-MM-DD&status=activo&taquilla=T1
+    Lista de tickets desde Supabase.
+    """
+    from django.db import connection
+    fecha = request.GET.get('fecha', '') or __import__('datetime').date.today().isoformat()
+    status_filtro = request.GET.get('status', '')
+    taquilla_filtro = request.GET.get('taquilla', '')
+
+    try:
+        _ensure_taquilla_table()
+        conditions = ['DATE(fecha)=%s']
+        params = [fecha]
+        if status_filtro:
+            conditions.append('status=%s')
+            params.append(status_filtro)
+        if taquilla_filtro:
+            conditions.append('taquilla=%s')
+            params.append(taquilla_filtro)
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT id,ticket_id,usuario,taquilla,fecha,items_json,total,status "
+                "FROM taquilla_boleto WHERE " + ' AND '.join(conditions) + " ORDER BY fecha DESC LIMIT 500",
+                params
+            )
+            rows = cursor.fetchall()
+
+        boletos = _boleto_rows_to_list(rows)
+        total_venta = sum(b['total'] for b in boletos)
+
+        return JsonResponse({
+            'ok': True, 'fecha': fecha,
+            'count': len(boletos),
+            'total_venta': round(total_venta, 2),
+            'boletos': boletos,
+        }, json_dumps_params={'ensure_ascii': False})
+    except Exception as e:
+        import traceback
+        return JsonResponse({'ok': False, 'error': str(e), 'trace': traceback.format_exc()}, status=500)
+
+
+@csrf_exempt
+def taquilla_reporte_ganadores(request):
+    """
+    GET /taquilla/reportes/ganadores/?fecha=YYYY-MM-DD&taquilla=T1
+    Tickets ganadores/pagados desde Supabase.
+    """
+    from django.db import connection
+    fecha = request.GET.get('fecha', '') or __import__('datetime').date.today().isoformat()
+    taquilla_filtro = request.GET.get('taquilla', '')
+
+    try:
+        _ensure_taquilla_table()
+        with connection.cursor() as cursor:
+            if taquilla_filtro:
+                cursor.execute(
+                    "SELECT id,ticket_id,usuario,taquilla,fecha,items_json,total,status "
+                    "FROM taquilla_boleto WHERE DATE(fecha)=%s AND status IN ('Ganador','Pagado','ganador','pagado') AND taquilla=%s ORDER BY fecha DESC",
+                    [fecha, taquilla_filtro]
+                )
+            else:
+                cursor.execute(
+                    "SELECT id,ticket_id,usuario,taquilla,fecha,items_json,total,status "
+                    "FROM taquilla_boleto WHERE DATE(fecha)=%s AND status IN ('Ganador','Pagado','ganador','pagado') ORDER BY fecha DESC",
+                    [fecha]
+                )
+            rows = cursor.fetchall()
+
+        boletos = _boleto_rows_to_list(rows)
+
+        return JsonResponse({
+            'ok': True, 'fecha': fecha,
+            'count': len(boletos),
+            'boletos': boletos,
+        }, json_dumps_params={'ensure_ascii': False})
+    except Exception as e:
+        import traceback
+        return JsonResponse({'ok': False, 'error': str(e), 'trace': traceback.format_exc()}, status=500)
+
+
+
 @csrf_exempt
 def taquilla_mi_ip(request):
     """
@@ -416,6 +700,7 @@ def taquilla_mi_ip(request):
         request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip()
         or request.META.get('REMOTE_ADDR', '127.0.0.1')
     )
+
     return JsonResponse({'ip': ip})
 
 

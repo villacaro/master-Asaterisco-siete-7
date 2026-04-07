@@ -6759,7 +6759,7 @@
       <button onclick="generarAnalisisDiario()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs uppercase">🔄 Recargar</button>
       <div class="flex gap-2">
         <button onclick="imprimirRpt('d')" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold text-xs uppercase">🖨 Imprimir</button>
-        <button onclick="closeRpt('diario')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
+        <button onclick="volver_al_hub('diario')" class="px-4 py-2 bg-slate-500 hover:bg-slate-400 text-white rounded-xl font-bold text-xs uppercase">🏠 Hub</button><button onclick="closeRpt('diario')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
       </div>
     </div>
   </div>
@@ -6789,7 +6789,7 @@
       <button onclick="generarAnalisisPeriodo()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs uppercase">🔄 Recargar</button>
       <div class="flex gap-2">
         <button onclick="imprimirRpt('p')" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold text-xs uppercase">🖨 Imprimir</button>
-        <button onclick="closeRpt('periodo')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
+        <button onclick="volver_al_hub('periodo')" class="px-4 py-2 bg-slate-500 hover:bg-slate-400 text-white rounded-xl font-bold text-xs uppercase">🏠 Hub</button><button onclick="closeRpt('periodo')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
       </div>
     </div>
   </div>
@@ -6815,7 +6815,7 @@
       <button onclick="generarCuadreCaja()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-bold text-xs uppercase">🔄 Recargar</button>
       <div class="flex gap-2">
         <button onclick="imprimirRpt('c')" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold text-xs uppercase">🖨 Imprimir</button>
-        <button onclick="closeRpt('caja')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
+        <button onclick="volver_al_hub('caja')" class="px-4 py-2 bg-slate-500 hover:bg-slate-400 text-white rounded-xl font-bold text-xs uppercase">🏠 Hub</button><button onclick="closeRpt('caja')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
       </div>
     </div>
   </div>
@@ -6854,7 +6854,7 @@
     </div>
     <div class="flex justify-between px-5 py-3 border-t border-slate-100 dark:border-slate-800">
       <button onclick="generarRptTickets()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs uppercase">🔄 Recargar</button>
-      <button onclick="closeRpt('tickets')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
+      <button onclick="volver_al_hub('tickets')" class="px-4 py-2 bg-slate-500 hover:bg-slate-400 text-white rounded-xl font-bold text-xs uppercase">🏠 Hub</button><button onclick="closeRpt('tickets')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
     </div>
   </div>
 </div>
@@ -6897,7 +6897,7 @@
       <button onclick="generarRptGanadores()" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-bold text-xs uppercase">🔄 Recargar</button>
       <div class="flex gap-2">
         <button onclick="imprimirRpt('g')" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold text-xs uppercase">🖨 Imprimir</button>
-        <button onclick="closeRpt('ganadores')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
+        <button onclick="volver_al_hub('ganadores')" class="px-4 py-2 bg-slate-500 hover:bg-slate-400 text-white rounded-xl font-bold text-xs uppercase">🏠 Hub</button><button onclick="closeRpt('ganadores')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
       </div>
     </div>
   </div>
@@ -6960,95 +6960,144 @@
   window.closeReportesModal = function(){ document.getElementById('modal-reportes-hub').classList.add('hidden'); };
   window.openRpt  = function(n){ const el=document.getElementById('modal-rpt-'+n); if(!el)return; el.querySelectorAll('input[type=date]').forEach(i=>{ if(!i.value)i.value=_today(); }); el.classList.remove('hidden'); };
   window.closeRpt = function(n){ const el=document.getElementById('modal-rpt-'+n); if(el)el.classList.add('hidden'); };
+  window.volver_al_hub = function(rpt){ closeRpt(rpt); openReportesModal(); };
   window.openUtilidadesModal  = function(){ ['util-clave-actual','util-clave-nueva','util-clave-confirm'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';}); const m=document.getElementById('util-clave-msg');if(m)m.classList.add('hidden'); document.getElementById('modal-utilidades').classList.remove('hidden'); };
   window.closeUtilidadesModal = function(){ document.getElementById('modal-utilidades').classList.add('hidden'); };
 
-  function calcTotales(list){ let v=0,pr=0; list.forEach(t=>{ v+=(t.total||0); if(t.status==='Pagado'||t.status==='Ganador') pr+=(t.prizeValue||0); }); const c=v*0.15; return {venta:v,comision:c,premio:pr,saldo:v-c-pr}; }
+  function _loading(el){ el.innerHTML='<p class="text-slate-400 italic text-center pt-8 animate-pulse">⏳ Cargando desde Supabase...</p>'; }
+  function _error(el, msg){ el.innerHTML=`<p class="text-red-500 italic text-center pt-8">❌ Error: ${msg}</p>`; }
 
-  function renderAnalisisHTML(list, titulo){
-    const {venta,comision,premio,saldo}=calcTotales(list);
-    return `<div style="text-align:center;font-weight:bold;margin-bottom:4px">${titulo}</div>
+  // ── ANÁLISIS DIARIO (desde Supabase) ──────────────────────────────────────
+  window.generarAnalisisDiario = async function(){
+    const fecha = document.getElementById('rpt-d-fecha').value || _today();
+    const el = document.getElementById('rpt-d-body');
+    _loading(el);
+    try {
+      const r = await fetch(`/taquilla/reportes/analisis-diario/?fecha=${fecha}`);
+      const data = await r.json();
+      if(!data.ok) throw new Error(data.error||'Error desconocido');
+      if(!data.total_tickets){
+        el.innerHTML='<p class="text-slate-400 italic text-center pt-8">No hay datos para esta fecha</p>';
+        return;
+      }
+      el.innerHTML=`<div style="text-align:center;font-weight:bold;margin-bottom:4px">Análisis Diario — ${fecha}</div>
 <hr style="border:none;border-top:1px dashed #999;margin:4px 0">
-<div style="display:flex;justify-content:space-between"><span>VENTA  = Ref</span><span style="color:#166534;font-weight:bold">${venta.toFixed(2)}</span></div>
-<div style="display:flex;justify-content:space-between"><span>COMIS  = Ref</span><span>${comision.toFixed(2)}</span></div>
-<div style="display:flex;justify-content:space-between"><span>PREMIO = Ref</span><span>${premio.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>VENTA  = Bs</span><span style="color:#166534;font-weight:bold">${data.venta.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>COMIS  = Bs</span><span>${data.comision.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>PREMIO = Bs</span><span>${data.premios.toFixed(2)}</span></div>
 <hr style="border:none;border-top:1px dashed #999;margin:4px 0">
-<div style="display:flex;justify-content:space-between;font-weight:bold"><span>SALDO = Ref</span><span>${saldo.toFixed(2)}</span></div>`;
-  }
-
-  window.generarAnalisisDiario = function(){
-    const fecha=document.getElementById('rpt-d-fecha').value;
-    const el=document.getElementById('rpt-d-body');
-    if(typeof allTransactions==='undefined'){el.innerHTML='<p class="text-red-500 italic text-center pt-8">Sin datos</p>';return;}
-    const list=allTransactions.filter(t=>!fecha||t.dateOnly===fecha);
-    el.innerHTML=list.length===0?'<p class="text-slate-400 italic text-center pt-8">No hay datos para esta fecha</p>':renderAnalisisHTML(list,`Análisis Diario — ${fecha||_today()}`);
+<div style="display:flex;justify-content:space-between;font-weight:bold"><span>SALDO = Bs</span><span>${data.saldo.toFixed(2)}</span></div>
+<div style="margin-top:8px;color:#6b7280;font-size:0.75em">Tickets del día: ${data.total_tickets} · Datos en tiempo real desde Supabase ✓</div>`;
+    } catch(e){ _error(el, e.message); }
   };
 
-  window.generarAnalisisPeriodo = function(){
-    const desde=document.getElementById('rpt-p-desde').value;
-    const hasta=document.getElementById('rpt-p-hasta').value;
-    const el=document.getElementById('rpt-p-body');
-    if(typeof allTransactions==='undefined'){el.innerHTML='<p class="text-red-500 italic text-center pt-8">Sin datos</p>';return;}
-    const list=allTransactions.filter(t=>{ const d=t.dateOnly||''; return(!desde||d>=desde)&&(!hasta||d<=hasta); });
-    el.innerHTML=list.length===0?'<p class="text-slate-400 italic text-center pt-8">No hay datos en ese rango</p>':renderAnalisisHTML(list,`Período ${desde||'inicio'} → ${hasta||_today()}`);
+  // ── ANÁLISIS PERÍODO (desde Supabase) ─────────────────────────────────────
+  window.generarAnalisisPeriodo = async function(){
+    const desde = document.getElementById('rpt-p-desde').value || _today();
+    const hasta = document.getElementById('rpt-p-hasta').value || _today();
+    const el = document.getElementById('rpt-p-body');
+    _loading(el);
+    try {
+      const r = await fetch(`/taquilla/reportes/analisis-periodo/?desde=${desde}&hasta=${hasta}`);
+      const data = await r.json();
+      if(!data.ok) throw new Error(data.error||'Error desconocido');
+      if(!data.total_tickets){
+        el.innerHTML='<p class="text-slate-400 italic text-center pt-8">No hay datos en ese rango</p>';
+        return;
+      }
+      el.innerHTML=`<div style="text-align:center;font-weight:bold;margin-bottom:4px">Período ${desde} → ${hasta}</div>
+<hr style="border:none;border-top:1px dashed #999;margin:4px 0">
+<div style="display:flex;justify-content:space-between"><span>VENTA  = Bs</span><span style="color:#166534;font-weight:bold">${data.venta.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>COMIS  = Bs</span><span>${data.comision.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>PREMIO = Bs</span><span>${data.premios.toFixed(2)}</span></div>
+<hr style="border:none;border-top:1px dashed #999;margin:4px 0">
+<div style="display:flex;justify-content:space-between;font-weight:bold"><span>SALDO = Bs</span><span>${data.saldo.toFixed(2)}</span></div>
+<div style="margin-top:8px;color:#6b7280;font-size:0.75em">Tickets: ${data.total_tickets} · Datos en tiempo real desde Supabase ✓</div>`;
+    } catch(e){ _error(el, e.message); }
   };
 
-  window.generarCuadreCaja = function(){
-    const fecha=document.getElementById('rpt-c-fecha').value;
-    const el=document.getElementById('rpt-c-body');
-    if(typeof allTransactions==='undefined'){el.innerHTML='<p class="text-slate-400 italic text-center pt-8">No hay nada que imprimir</p>';return;}
-    const list=allTransactions.filter(t=>!fecha||t.dateOnly===fecha);
-    if(!list.length){el.innerHTML='<p class="text-slate-400 italic text-center pt-8">No hay nada que imprimir</p>';return;}
-    const {venta,comision,premio,saldo}=calcTotales(list);
-    el.innerHTML=`<div style="font-weight:bold;text-align:center;margin-bottom:4px">CUADRE DE CAJA — ${fecha||_today()}</div>
+  // ── CUADRE DE CAJA (desde Supabase) ───────────────────────────────────────
+  window.generarCuadreCaja = async function(){
+    const fecha = document.getElementById('rpt-c-fecha').value || _today();
+    const el = document.getElementById('rpt-c-body');
+    _loading(el);
+    try {
+      const r = await fetch(`/taquilla/reportes/cuadre-caja/?fecha=${fecha}`);
+      const data = await r.json();
+      if(!data.ok) throw new Error(data.error||'Error desconocido');
+      if(!data.total_tickets){
+        el.innerHTML='<p class="text-slate-400 italic text-center pt-8">No hay nada que imprimir</p>';
+        return;
+      }
+      let resumenTaq = '';
+      const pTaq = data.por_taquilla || {};
+      Object.entries(pTaq).forEach(([t,v])=>{
+        resumenTaq += `<div style="display:flex;justify-content:space-between"><span>${t}:</span><span>Bs ${v.venta.toFixed(2)} (${v.tickets} tkt)</span></div>`;
+      });
+      el.innerHTML=`<div style="font-weight:bold;text-align:center;margin-bottom:4px">CUADRE DE CAJA — ${fecha}</div>
 <hr style="border:none;border-top:1px dashed #999;margin:4px 0">
-<div style="display:flex;justify-content:space-between"><span>Total Ventas:</span><span style="font-weight:bold;color:#166534">Bs ${venta.toFixed(2)}</span></div>
-<div style="display:flex;justify-content:space-between"><span>Comisiones (15%):</span><span>Bs ${comision.toFixed(2)}</span></div>
-<div style="display:flex;justify-content:space-between"><span>Premios Pagados:</span><span>Bs ${premio.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>Total Ventas:</span><span style="font-weight:bold;color:#166534">Bs ${data.venta.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>Comisiones (15%):</span><span>Bs ${data.comision.toFixed(2)}</span></div>
+<div style="display:flex;justify-content:space-between"><span>Premios Pagados:</span><span>Bs ${data.premios.toFixed(2)}</span></div>
 <hr style="border:none;border-top:1px dashed #999;margin:4px 0">
-<div style="display:flex;justify-content:space-between;font-weight:bold"><span>SALDO CAJA:</span><span style="color:${saldo>=0?'#166534':'#dc2626'}">Bs ${saldo.toFixed(2)}</span></div>
-<div style="margin-top:8px">Tickets del día: ${list.length}</div>`;
+<div style="display:flex;justify-content:space-between;font-weight:bold"><span>SALDO CAJA:</span><span style="color:${data.saldo>=0?'#166534':'#dc2626'}">Bs ${data.saldo.toFixed(2)}</span></div>
+<div style="margin-top:8px">Tickets del día: ${data.total_tickets}</div>
+${resumenTaq?'<hr style="border:none;border-top:1px dashed #999;margin:8px 0"><div style="font-size:0.75em;color:#6b7280">Por Taquilla:</div>'+resumenTaq:''}
+<div style="margin-top:8px;color:#6b7280;font-size:0.75em">Datos en tiempo real desde Supabase ✓</div>`;
+    } catch(e){ _error(el, e.message); }
   };
 
-  window.generarRptTickets = function(){
-    const fecha=document.getElementById('rpt-t-fecha').value;
-    const tipo=document.getElementById('rpt-t-tipo').value;
-    const tbody=document.getElementById('rpt-t-tbody');
-    if(typeof allTransactions==='undefined'){tbody.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400">Sin datos</td></tr>';return;}
-    let list=allTransactions.filter(t=>(!fecha||t.dateOnly===fecha)&&(!tipo||t.status===tipo));
-    if(!list.length){tbody.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400 italic">No hay registros</td></tr>';return;}
-    const tv=list.reduce((s,t)=>s+(t.total||0),0);
-    const tp=list.reduce((s,t)=>s+(t.prizeValue||0),0);
-    const sc=s=>s==='Anulado'?'color:#dc2626':s==='Pagado'||s==='Ganador'?'color:#166534':'color:#4f46e5';
-    tbody.innerHTML=list.map((t,i)=>`<tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+  // ── REPORTE TICKETS (desde Supabase) ──────────────────────────────────────
+  window.generarRptTickets = async function(){
+    const fecha = document.getElementById('rpt-t-fecha').value || _today();
+    const tipo  = document.getElementById('rpt-t-tipo').value;
+    const tbody = document.getElementById('rpt-t-tbody');
+    tbody.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400 italic animate-pulse">⏳ Cargando...</td></tr>';
+    try {
+      const params = new URLSearchParams({fecha});
+      if(tipo) params.set('status', tipo);
+      const r = await fetch(`/taquilla/reportes/tickets/?${params}`);
+      const data = await r.json();
+      if(!data.ok) throw new Error(data.error||'Error desconocido');
+      const list = data.boletos || [];
+      if(!list.length){ tbody.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400 italic">No hay registros</td></tr>'; return; }
+      const tv = list.reduce((s,t)=>s+(t.total||0),0);
+      const sc=s=>s==='Anulado'?'color:#dc2626':s==='Pagado'||s==='Ganador'?'color:#166534':'color:#4f46e5';
+      tbody.innerHTML=list.map((t,i)=>`<tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
       <td class="px-3 py-1.5">${i+1}</td>
-      <td class="px-3 py-1.5 font-mono font-bold">#${t.id}</td>
-      <td class="px-3 py-1.5 text-slate-500">${t.dateOnly||'—'}</td>
+      <td class="px-3 py-1.5 font-mono font-bold">#${t.ticket_id}</td>
+      <td class="px-3 py-1.5 text-slate-500">${t.date_only||'—'}</td>
       <td class="px-3 py-1.5 font-bold" style="${sc(t.status)}">${t.status}</td>
       <td class="px-3 py-1.5 text-right">Bs ${(t.total||0).toFixed(2)}</td>
       <td class="px-3 py-1.5 text-right">${t.prizeValue?'Bs '+t.prizeValue.toFixed(2):'—'}</td>
     </tr>`).join('')+
-    `<tr class="bg-slate-100 dark:bg-slate-800 font-bold"><td colspan="3" class="px-3 py-1.5 text-right">TOTAL</td><td></td>
-    <td class="px-3 py-1.5 text-right">Bs ${tv.toFixed(2)}</td><td class="px-3 py-1.5 text-right">Bs ${tp.toFixed(2)}</td></tr>`;
+      `<tr class="bg-slate-100 dark:bg-slate-800 font-bold"><td colspan="3" class="px-3 py-1.5 text-right">TOTAL</td><td></td>
+      <td class="px-3 py-1.5 text-right">Bs ${tv.toFixed(2)}</td><td class="px-3 py-1.5 text-right text-slate-400 text-[10px]">Supabase ✓</td></tr>`;
+    } catch(e){ tbody.innerHTML=`<tr><td colspan="6" class="text-center py-4 text-red-500">❌ ${e.message}</td></tr>`; }
   };
 
-  window.generarRptGanadores = function(){
-    const fecha=document.getElementById('rpt-g-fecha').value;
-    const tbody=document.getElementById('rpt-g-tbody');
-    if(typeof allTransactions==='undefined'){tbody.innerHTML='<tr><td colspan="8" class="text-center py-6 text-slate-400">Sin datos</td></tr>';return;}
-    const list=allTransactions.filter(t=>(!fecha||t.dateOnly===fecha)&&(t.status==='Ganador'||t.status==='Pagado'));
-    if(!list.length){tbody.innerHTML='<tr><td colspan="8" class="text-center py-6 text-slate-400 italic">No hay ganadores</td></tr>';return;}
-    const taq=typeof sessionStorage!=='undefined'?sessionStorage.getItem('ast7_taquilla')||'T-1':'T-1';
-    const usr=typeof sessionStorage!=='undefined'?sessionStorage.getItem('ast7_user')||'—':'—';
-    let rows='',n=0;
-    list.forEach(t=>{ (t.items||[]).forEach(item=>{ n++;
-      rows+=`<tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-        <td class="px-3 py-1.5">${n}</td><td class="px-3 py-1.5 font-mono font-bold">#${t.id}</td>
-        <td class="px-3 py-1.5 text-slate-500">${t.timeOnly||'—'}</td><td class="px-3 py-1.5">${item.lottery||'—'}</td>
-        <td class="px-3 py-1.5">${taq}</td><td class="px-3 py-1.5">${usr}</td>
-        <td class="px-3 py-1.5 text-right font-mono font-bold">${item.number||'—'}</td>
-        <td class="px-3 py-1.5 text-right">Bs ${(item.amount||0).toFixed(2)}</td></tr>`; }); });
-    tbody.innerHTML=rows;
+  // ── REPORTE GANADORES (desde Supabase) ────────────────────────────────────
+  window.generarRptGanadores = async function(){
+    const fecha  = document.getElementById('rpt-g-fecha').value || _today();
+    const tbody  = document.getElementById('rpt-g-tbody');
+    tbody.innerHTML='<tr><td colspan="8" class="text-center py-6 text-slate-400 italic animate-pulse">⏳ Cargando...</td></tr>';
+    try {
+      const r = await fetch(`/taquilla/reportes/ganadores/?fecha=${fecha}`);
+      const data = await r.json();
+      if(!data.ok) throw new Error(data.error||'Error desconocido');
+      const list = data.boletos || [];
+      if(!list.length){ tbody.innerHTML='<tr><td colspan="8" class="text-center py-6 text-slate-400 italic">No hay ganadores</td></tr>'; return; }
+      let rows='', n=0;
+      list.forEach(t=>{
+        (t.items||[{lottery:'—',number:'—',amount:t.total}]).forEach(item=>{ n++;
+          rows+=`<tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+          <td class="px-3 py-1.5">${n}</td><td class="px-3 py-1.5 font-mono font-bold">#${t.ticket_id}</td>
+          <td class="px-3 py-1.5 text-slate-500">${t.time_only||'—'}</td><td class="px-3 py-1.5">${item.lottery||'—'}</td>
+          <td class="px-3 py-1.5">${t.taquilla||'—'}</td><td class="px-3 py-1.5">${t.usuario||'—'}</td>
+          <td class="px-3 py-1.5 text-right font-mono font-bold">${item.number||'—'}</td>
+          <td class="px-3 py-1.5 text-right">Bs ${(item.amount||t.total||0).toFixed(2)}</td></tr>`; }); });
+      tbody.innerHTML=rows;
+    } catch(e){ tbody.innerHTML=`<tr><td colspan="8" class="text-center py-4 text-red-500">❌ ${e.message}</td></tr>`; }
   };
 
   window.generarResultados = function(){
@@ -7079,7 +7128,7 @@
     win.document.write('</body></html>'); win.document.close(); win.print();
   };
 
-  window.ejecutarCambioClave = function(){
+  window.ejecutarCambioClave = async function(){
     const actual=document.getElementById('util-clave-actual').value;
     const nueva=document.getElementById('util-clave-nueva').value;
     const conf=document.getElementById('util-clave-confirm').value;
@@ -7097,7 +7146,10 @@
     if(typeof showToast==='function')showToast('🔐 Clave actualizada','success');
   };
 })();
+
 </script>
+
+
 <!-- FIN REPORTES Y UTILIDADES -->
 
 <!-- ═══════════════════════════════════════════════════
