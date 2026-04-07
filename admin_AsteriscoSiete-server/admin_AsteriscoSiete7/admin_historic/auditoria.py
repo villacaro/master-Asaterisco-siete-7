@@ -225,41 +225,55 @@ def save_audit(kwargs={}, process=None, propiedades=[]):
 
     def get_user_process(instance, process):
         """
-        Obtiene el proceso de usuario invocado en cada accion respectiva
+        Obtiene el proceso de usuario invocado en cada accion respectiva.
+        Robusto: nunca propaga excepcion — devuelve None si no puede obtenerlo.
         """
-
         model = instance.__class__.__name__
         codename = 'model_' + model.lower() + '_' + process
-        try:
-            process = UsersProcesses.get_userprocess_by_codename(codename=codename)
-        except UsersProcesses.DoesNotExist:
-            label = {
-                'create': 'Creación de ',
-                'update': 'Actualización de ',
-                'delete': 'Eliminación de '
-            }
-            if isinstance(instance._meta.verbose_name_plural, str):
-                verbose = instance._meta.verbose_name_plural
-            else:
-                verbose = model
 
+        # Intentar obtener el proceso ya registrado
+        try:
+            return UsersProcesses.get_userprocess_by_codename(codename=codename)
+        except UsersProcesses.DoesNotExist:
+            pass
+        except Exception:
+            return None
+
+        # No existe: intentar crearlo
+        label = {
+            'create': 'Creación de ',
+            'update': 'Actualización de ',
+            'delete': 'Eliminación de '
+        }
+        if isinstance(instance._meta.verbose_name_plural, str):
+            verbose = instance._meta.verbose_name_plural
+        else:
+            verbose = model
+
+        try:
+            # Obtener process_suc de forma segura (puede no existir en BD)
             try:
-                process = UsersProcesses.objects.get_or_create(
-                    name=label[process] + verbose,
-                    codename=codename,
-                    content_type=instance._meta.app_label,
-                    process_suc=UsersProcesses.get_userprocess_by_codename(
-                        codename='process_login'
-                    ),
-                )[0]
+                process_suc = UsersProcesses.get_userprocess_by_codename(
+                    codename='process_login'
+                )
             except Exception:
-                """
-                Aqui podria ir una llamada recursiva a la mia funcion pero
-                es mejor evitar problemas recursivos, y tratarla de obtener
-                de una vez
-                """
-                process = UsersProcesses.get_userprocess_by_codename(codename=codename)
-        return process
+                process_suc = None
+
+            obj, _ = UsersProcesses.objects.get_or_create(
+                codename=codename,
+                defaults={
+                    'name': label.get(process, '') + verbose,
+                    'content_type': instance._meta.app_label,
+                    'process_suc': process_suc,
+                }
+            )
+            return obj
+        except Exception:
+            # Ultimo intento: tal vez ya fue creado por una race condition
+            try:
+                return UsersProcesses.objects.get(codename=codename)
+            except Exception:
+                return None
 
     request = CrequestMiddleware.get_request()
     url_process = ''
@@ -337,10 +351,16 @@ def save_audit(kwargs={}, process=None, propiedades=[]):
         else:
             ref_related = None
 
-        SessionsDetail.objects.create(
-            session_id=session,
-            userprocess=get_user_process(instance, process),
-            json=json_update,
-            ref=instance.get_ref_historic(),
-            ref_related=ref_related
-        )
+        userprocess = get_user_process(instance, process)
+        if userprocess is not None:
+            try:
+                SessionsDetail.objects.create(
+                    session_id=session,
+                    userprocess=userprocess,
+                    json=json_update,
+                    ref=instance.get_ref_historic(),
+                    ref_related=ref_related
+                )
+            except Exception:
+                # Si falla el registro de auditoria, no interrumpir la operacion principal
+                pass
