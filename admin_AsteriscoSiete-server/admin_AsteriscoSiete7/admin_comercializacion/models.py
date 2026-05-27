@@ -3855,6 +3855,151 @@ class Preferences(ProtectDelete, models.Model):
             self.comercializacion.get_object_id()
         )
 
+
+# =============================================================
+# =============================================================
+# ====================Comercializadores========================
+
+
+choices_comercializacion = [
+    ['', 'Escoja un comercializador'],
+    [1, 'Distribuidor'],
+    [2, 'Subdistribuidor'],
+    [3, 'Agencia'],
+]
+
+
+class Comercializadores(models.Model):
+    """Comercializadores: Cadena de comercializacion externa.
+
+    Campos definidos:
+
+        nombre(string): nombre del comercializador (unico)
+
+        rif(string): RIF del comercializador
+
+        telefono(string): numero telefonico del comercializador
+
+        fax(string): numero de fax del comercializador
+
+        email(email): correo electronico del comercializador
+
+        direccion(string): direccion fisica del comercializador
+
+        contacto(string): persona de contacto del comercializador
+
+        zona(foreing): zona geografica a la que pertenece
+
+        comer_suc(foreing): comercializador padre (auto-referencia)
+
+        tipo(entero): tipo de comercializador
+            1 = Distribuidor, 2 = Subdistribuidor, 3 = Agencia
+
+        created_at y updated_at: registros de creacion y actualizacion.
+    """
+    from django.core.validators import RegexValidator
+
+    _validator_rif = RegexValidator(
+        regex=r'^[VEJPG]-?\d{7,9}-?\d$',
+        message='Ingrese un RIF venezolano valido. Ej: J-12345678-9',
+    )
+    _validator_telefono = RegexValidator(
+        regex=r'^\d{10,12}$',
+        message='Ingrese un numero telefonico valido (10 a 12 digitos)',
+    )
+
+    nombre = models.CharField(
+        unique=True,
+        max_length=100,
+        verbose_name='Nombre (*)',
+        help_text='Ingrese el nombre del comercializador',
+    )
+    rif = models.CharField(
+        validators=[_validator_rif],
+        max_length=15,
+        verbose_name='Rif ',
+        help_text='Ingrese el rif del comercializador',
+        null=True,
+        blank=True,
+    )
+    telefono = models.CharField(
+        validators=[_validator_telefono],
+        max_length=12,
+        verbose_name='Número Telefónico ',
+        help_text='Ingrese el número telefónico del comercializador',
+        null=True,
+        blank=True,
+    )
+    fax = models.CharField(
+        validators=[_validator_telefono],
+        max_length=12,
+        verbose_name='Fax ',
+        help_text='Ingrese el fax del comercializador',
+        null=True,
+        blank=True,
+    )
+    email = models.EmailField(
+        max_length=254,
+        verbose_name='Correo electrónico ',
+        help_text='Ingrese el correo electrónico',
+        null=True,
+        blank=True,
+    )
+    direccion = models.CharField(
+        max_length=150,
+        verbose_name='Dirección ',
+        help_text='Ingrese la dirección del comercializador',
+        null=True,
+        blank=True,
+    )
+    contacto = models.CharField(
+        max_length=100,
+        verbose_name='Persona de contacto ',
+        help_text='Ingrese una persona de contacto del comercializador',
+        null=True,
+        blank=True,
+    )
+    zona = models.ForeignKey(
+        'admin_profiles.Direcciones',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Zona ',
+        help_text='Seleccione la zona geográfica del comercializador',
+        related_name='comercializadores_zona',
+    )
+    comer_suc = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Comercializador superior ',
+        help_text='Seleccione el comercializador del cual depende este registro',
+        related_name='sucursales',
+    )
+    tipo = models.IntegerField(
+        choices=choices_comercializacion,
+        verbose_name='Tipo (*)',
+        help_text='Seleccione el tipo de comercializador',
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        editable=False,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        editable=False,
+    )
+
+    class Meta:
+        verbose_name = 'Comercializador'
+        verbose_name_plural = 'Comercializadores'
+        ordering = ['nombre']
+
+    def __str__(self):
+        return self.nombre
+
+
 # =============================================================
 # =============================================================
 # ====================Modelos auditados========================
@@ -3873,6 +4018,7 @@ auditoria.register(
     FactorRiesgo,
     Preferences,
     TypePreferences,
+    Comercializadores,
 )
 # =============================================================
 # =============================================================
