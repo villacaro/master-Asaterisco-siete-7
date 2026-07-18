@@ -34,6 +34,9 @@ ALLOWED_HOSTS = [
     'localhost',
     '.railway.app',     # cubre *.railway.app automáticamente
     '.up.railway.app',
+    '.back4app.run',
+    '.b4a.run',
+    '.back4app.com',
 ]
 # Agrega dominio custom si lo tienes
 _extra = os.environ.get('ALLOWED_HOST_EXTRA', '')
@@ -153,6 +156,7 @@ STATICFILES_FINDERS = (
 )
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# ── Media ───────────────────────────────────────────────────────────────────
 MEDIA_URL  = '/media/'
 MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
 
@@ -206,6 +210,9 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.railway.app',
     'https://*.up.railway.app',
     'https://master-asaterisco-siete-7-production.up.railway.app',
+    'https://*.back4app.run',
+    'https://*.b4a.run',
+    'https://*.back4app.com',
 ]
 
 # ── Logging en producción ─────────────────────────────────────────────────────
