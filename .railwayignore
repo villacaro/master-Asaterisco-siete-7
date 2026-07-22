@@ -1,0 +1,12 @@
+.venv/
+node_modules/
+.git/
+.firebase/
+GoogleCloudSDKInstaller.exe
+*.db
+*.sqlite3
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
