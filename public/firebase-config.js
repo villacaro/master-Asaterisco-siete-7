@@ -11,13 +11,14 @@ import { getMessaging } from "firebase/messaging";
 // Configuración de tu aplicación web de Firebase
 // Para Firebase JS SDK v7.20.0 y posteriores, measurementId es opcional
 const firebaseConfig = {
-  apiKey: "AIzaSyDQs4cEW8JWHxiZqp_MiNojRwuCV_jMtj4",
-  authDomain: "app-asterisco-siete.firebaseapp.com",
-  projectId: "app-asterisco-siete",
-  storageBucket: "app-asterisco-siete.firebasestorage.app",
-  messagingSenderId: "256057006492",
-  appId: "1:256057006492:web:bebf76680c470f3bb41059",
-  measurementId: "G-ZLV057XQHX"
+  apiKey: "AIzaSyB-Zb4ncXbgT0OAo3sN-K9hnAIifNmYMxE",
+  authDomain: "asterisco-siete.firebaseapp.com",
+  databaseURL: "https://asterisco-siete.firebaseio.com",
+  projectId: "asterisco-siete",
+  storageBucket: "asterisco-siete.firebasestorage.app",
+  messagingSenderId: "653707713955",
+  appId: "1:653707713955:web:9d0b5d5d66883cdbfbce16",
+  measurementId: "G-PYTWSFTXW8"
 };
 
 // Inicializar Firebase

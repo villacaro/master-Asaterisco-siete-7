@@ -17,7 +17,7 @@ echo "=== Reset usuario taquilla (garantiza password hasheado) ==="
 python manage.py reset_taquilla_user || echo "⚠ reset_taquilla_user warning"
 
 echo "=== Iniciando Gunicorn en 0.0.0.0:${PORT:-8080} ==="
-exec gunicorn admin_AsteriscoSiete7.wsgi:application \
+exec gunicorn admin_asterisco7.wsgi:application \
     --bind 0.0.0.0:${PORT:-8080} \
     --workers 2 \
     --timeout 120
