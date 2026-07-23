@@ -1172,9 +1172,11 @@ class BaseGenericProcess(models.Model):
 
         kwargs[self.prefix_filter] = self
 
-        comer, create = Comercializadora.objects.get_or_create(
-            **kwargs
-        )
+        comer = Comercializadora.objects.filter(**kwargs).first()
+        create = False
+        if not comer:
+            comer = Comercializadora.objects.create(**kwargs)
+            create = True
         if create:
             comer.saldo_inicial = None
             comer.saldo_fecha = None
@@ -1203,9 +1205,9 @@ class BaseGenericProcess(models.Model):
             from admin_finanzas.models import Comercializadora
             kwargs = {}
             kwargs[self.prefix_filter] = self
-            comercializadora = Comercializadora.objects.get_or_create(
-                **kwargs
-            )[0]
+            comercializadora = Comercializadora.objects.filter(**kwargs).first()
+            if not comercializadora:
+                comercializadora = Comercializadora.objects.create(**kwargs)
             cache.set(
                 'comer_{0}_{1}'.format(self.prefix_filter, self.pk),
                 comercializadora,

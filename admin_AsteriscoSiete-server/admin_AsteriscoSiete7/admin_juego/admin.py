@@ -19,6 +19,7 @@ from django.utils.html import format_html, mark_safe
 from admin_juego.models import (
     SistemaJuego, TipoProducto, Fechas, RestriccionesSorteo,
     ModalidadJuego, ModalidadProducto, ModalidadPeriodo,
+    OperadoraLoteria,
 )
 from admin_juego.models_arrejuntao import (
     # Modelos de Plantilla Arrejuntao
@@ -635,3 +636,9 @@ class ModalidadPeriodoAdmin(admin.ModelAdmin):
     list_filter = ('temporada',)
     search_fields = ('equipo__nombre', 'temporada__nombre')
     ordering = ('temporada', 'equipo')
+
+@admin.register(OperadoraLoteria)
+class OperadoraLoteriaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'nombre', 'created_at')
+    search_fields = ('nombre',)
+    ordering = ('nombre',)

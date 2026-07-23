@@ -1998,20 +1998,17 @@ _CRUD_FIELDS = {
         'model': ('admin_comercializacion', 'Bancas'),
         'fields': [
             'nombre', 'resumen_automatic', 'telefono', 'rif', 'email',
-            'status', 'bloque',
             'is_sistema_juego', 'is_resultados',
             'permissions_create_user',
         ],
         'labels': [
             'Nombre (*)', 'Cierre Administrativo Automático', 'Número Telefónico', 'RIF', 'Correo Electrónico',
-            'Status', 'Multi Banca (*)',
             '¿Administra su propio Sistema de Juego?', '¿Administra sus propios resultados?',
             '¿Tiene permiso de crear usuarios de su mismo nivel?',
         ],
         'required': ['nombre', 'bloque'],
         'types': [
             'text', 'checkbox', 'text', 'text', 'email',
-            'fk', 'fk',
             'checkbox', 'checkbox',
             'checkbox',
         ],
@@ -2025,7 +2022,6 @@ _CRUD_FIELDS = {
         'model': ('admin_comercializacion', 'Agencias'),
         'fields': [
             'nombre', 'codigo', 'rif', 'telefono', 'email',
-            'distribuidores',
             'num_taquillas', 'montomin', 'montomax', 'montomax_ganancia',
             'cantidad_apuesta_min', 'cantidad_apuesta_max',
             'tiempoexpiracion',
@@ -2037,7 +2033,6 @@ _CRUD_FIELDS = {
         ],
         'labels': [
             'Nombre (*)', 'Código (*)', 'RIF', 'Teléfono', 'Email',
-            'Distribuidor (*)',
             'Nro Taquillas', 'Monto Mín', 'Monto Máx', 'Máx Ganancia',
             'Apuesta Mín (cant)', 'Apuesta Máx (cant)',
             'Tiempo Expiración (seg)',
@@ -2050,7 +2045,6 @@ _CRUD_FIELDS = {
         'required': ['nombre', 'codigo', 'distribuidores'],
         'types': [
             'text', 'text', 'text', 'text', 'email',
-            'fk',
             'number', 'number', 'number', 'number',
             'number', 'number',
             'number',
@@ -2079,20 +2073,17 @@ _CRUD_FIELDS = {
         'model': ('admin_comercializacion', 'Bloques'),
         'fields': [
             'nombre', 'resumen_automatic', 'telefono', 'rif', 'email',
-            'status', 'operadora',
             'is_sistema_juego', 'is_resultados',
             'permissions_create_user', 'tipo',
         ],
         'labels': [
             'Nombre (*)', 'Cierre Administrativo Automático', 'Número Telefónico', 'RIF', 'Correo Electrónico',
-            'Status', 'Operadora (*)',
             '¿Administra su propio Sistema de Juego?', '¿Administra sus propios resultados?',
             '¿Tiene permiso de crear usuarios de su mismo nivel?', '¿Para venta web?',
         ],
         'required': ['nombre', 'operadora'],
         'types': [
             'text', 'checkbox', 'text', 'text', 'email',
-            'fk', 'fk',
             'checkbox', 'checkbox',
             'checkbox', 'checkbox',
         ],
@@ -2525,6 +2516,30 @@ _CRUD_FIELDS = {
         'types': ['text', 'text'],
         'fk_fields': {},
     },
+    'permisosventas': {
+        'model': ('admin_permisologia', 'PermissionsSales'),
+        'fields': ['deporte', 'grupo', 'modalidad', 'comercializadora', 'breaking'],
+        'labels': ['Deporte (*)', 'Grupo (*)', 'Modalidad (*)', 'Comercializadora (*)', 'Breaking'],
+        'required': ['deporte', 'grupo', 'modalidad', 'comercializadora'],
+        'types': ['select', 'select', 'select', 'select', 'checkbox'],
+        'fk_fields': {
+            'deporte': {'model': ('admin_juego', 'TipoProducto'), 'label_field': 'nombre'},
+            'grupo': {'model': ('admin_juego', 'GruposSorteo'), 'label_field': 'nombre'},
+            'modalidad': {'model': ('admin_juego', 'ModalidadJuego'), 'label_field': 'nombre'},
+            'comercializadora': {'model': ('admin_finanzas', 'Comercializadora'), 'label_field': 'nombre'},
+        },
+    },
+    'permisosventasrestric': {
+        'model': ('admin_permisologia', 'PermissionsSalesRestrictions'),
+        'fields': ['comercializadora', 'deporte', 'restrictions'],
+        'labels': ['Comercializadora (*)', 'Deporte (*)', 'Restricciones JSON'],
+        'required': ['comercializadora', 'deporte'],
+        'types': ['select', 'select', 'text'],
+        'fk_fields': {
+            'comercializadora': {'model': ('admin_finanzas', 'Comercializadora'), 'label_field': 'nombre'},
+            'deporte': {'model': ('admin_juego', 'TipoProducto'), 'label_field': 'nombre'},
+        },
+    },
 }
 
 
@@ -2615,12 +2630,21 @@ def dashboard_crud(request, modulo):
                 continue
             if field_type == 'BooleanField':
                 val = val in (True, 'true', 'True', '1', 'on')
+            elif field_type in ('IntegerField', 'DecimalField', 'FloatField') and val == '':
+                val = None
             kwargs[f] = val
         for fk_name in cfg.get('fk_fields', {}):
             fk_val = body.get(fk_name)
             if fk_val:
                 kwargs[f'{fk_name}_id'] = fk_val
-        missing = [f for f in cfg['required'] if not kwargs.get(f) and kwargs.get(f) != False]
+        missing = []
+        for f in cfg.get('required', []):
+            if f in fk_fields:
+                if not kwargs.get(f'{f}_id') and kwargs.get(f'{f}_id') != False:
+                    missing.append(f)
+            else:
+                if not kwargs.get(f) and kwargs.get(f) != False:
+                    missing.append(f)
         if missing:
             return JsonResponse({'error': f'Campos requeridos: {missing}'}, status=400)
         try:
@@ -2693,8 +2717,11 @@ def dashboard_crud(request, modulo):
         except Model.DoesNotExist:
             return JsonResponse({'error': 'No encontrado'}, status=404)
         virtual = cfg.get('virtual_fields', [])
+        fk_fields = set(cfg.get('fk_fields', {}).keys())
         for f in cfg['fields']:
             if f in virtual:
+                continue
+            if f in fk_fields:
                 continue
             if f in body:
                 try:
@@ -2704,6 +2731,8 @@ def dashboard_crud(request, modulo):
                 val = body[f]
                 if field_type == 'BooleanField':
                     val = val in (True, 'true', 'True', '1', 'on')
+                elif field_type in ('IntegerField', 'DecimalField', 'FloatField') and val == '':
+                    val = None
                 setattr(obj, f, val)
         # Password virtual
         new_pw = body.get('new_password', '')

@@ -51,8 +51,12 @@ try:
 except ImportError:
     _DJCELERY_AVAILABLE = False
 
+import sys
 try:
-    import redis as _redis_module
+    if sys.platform.startswith("win"):
+        _redis_module = None
+    else:
+        import redis as _redis_module
 except ImportError:
     _redis_module = None
 
@@ -148,16 +152,24 @@ if _redis_module:
         pass
 
 
-CACHES = {
-    'default': {
-        'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': '{0}:6379'.format(os.environ.get('REDIS_PORT_6379_TCP_ADDR')),
-        'OPTIONS': {
-            'DB': 1,
-            'PARSER_CLASS': 'redis.connection.HiredisParser'
+if sys.platform.startswith("win"):
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
         }
     }
-}
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'redis_cache.RedisCache',
+            'LOCATION': '{0}:6379'.format(os.environ.get('REDIS_PORT_6379_TCP_ADDR') or '127.0.0.1'),
+            'OPTIONS': {
+                'DB': 1,
+                'PARSER_CLASS': 'redis.connection.HiredisParser'
+            }
+        }
+    }
 
 
 SECRET_KEY = 'jd7@9#1ls=e8oa&amp;^68p90q!mdju($=r8x68j6q#yfa73$5jpf0'
