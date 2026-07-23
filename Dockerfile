@@ -23,14 +23,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
+# Set environment variable for production settings
+ENV DJANGO_SETTINGS_MODULE=admin_asterisco7.settings_production
+
 # Collect static files (optional, can be done at runtime)
 RUN python admin_AsteriscoSiete-server/admin_AsteriscoSiete7/manage.py collectstatic --noinput
 
 # Expose port used by Cloud Run (default 8080)
 EXPOSE 8080
-
-# Set environment variable for production settings
-ENV DJANGO_SETTINGS_MODULE=admin_asterisco7.settings_production
 
 # Entrypoint: runs migrations + setup + gunicorn
 COPY entrypoint.sh /entrypoint.sh
