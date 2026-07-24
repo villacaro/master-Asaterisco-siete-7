@@ -10114,12 +10114,8 @@ function renderCuadreNivelSuperior(){
 
 
 
-  // Mostrar datos demo de inmediato
-
-  _cnsData = [..._CNS_DEMO];
-
-  _cnsRender('DEMO (datos de muestra)');
-
+  // En vez de mostrar DEMO, llamamos a la API directamente al abrir
+  setTimeout(_cnsConsultar, 100);
 }
 
 
