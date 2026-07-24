@@ -5571,13 +5571,27 @@
                     }
                 }
 
-                // Actualizar valores en el DOM
-                document.getElementById('res-triple-a').textContent = triple_a;
-                document.getElementById('res-triple-b').textContent = triple_b;
-                document.getElementById('res-pegadito').textContent = pegadito;
-                document.getElementById('res-animalito').textContent = animalito;
-                document.getElementById('res-triple-signo').textContent = triple_signo;
-                document.getElementById('res-arrimao').textContent = arrimao;
+                // Actualizar valores en el DOM y ponerlos en verde
+                const updates = [
+                    { id: 'res-triple-a', val: triple_a },
+                    { id: 'res-triple-b', val: triple_b },
+                    { id: 'res-pegadito', val: pegadito },
+                    { id: 'res-animalito', val: animalito },
+                    { id: 'res-triple-signo', val: triple_signo },
+                    { id: 'res-arrimao', val: arrimao }
+                ];
+
+                updates.forEach(item => {
+                    const el = document.getElementById(item.id);
+                    if (el) {
+                        el.textContent = item.val;
+                        if (item.val !== '— —' && item.val !== '— — —') {
+                            el.classList.remove('text-slate-700', 'dark:text-slate-200');
+                            el.classList.add('text-emerald-600', 'dark:text-emerald-400');
+                            el.style.fontSize = '1.1rem'; // Hacerlo un poco más grande para resaltar
+                        }
+                    }
+                });
 
             } catch (err) {
                 // Si falla (offline, timeout, error), mostrar OFFLINE sin romper nada
