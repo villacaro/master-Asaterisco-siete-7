@@ -507,16 +507,30 @@ def api_resumen_admin(request):
     Lista registros de ResumenAdministrativo (admin_finanzas) filtrados por rango de fecha.
     Calcula totales de venta, premio, comision, regalia y queda.
     """
-    from django.apps import apps
-    ResumenAdministrativo = apps.get_model('admin_finanzas', 'ResumenAdministrativo')
+    fecha_inicio_str = request.GET.get('fecha_inicio', '')
+    fecha_fin_str    = request.GET.get('fecha_fin', '')
+    
+    fecha_inicio = _parse_date(fecha_inicio_str)
+    fecha_fin    = _parse_date(fecha_fin_str)
 
-    fecha_inicio = _parse_date(request.GET.get('fecha_inicio'))
-    fecha_fin    = _parse_date(request.GET.get('fecha_fin'))
+    from .dashboard_views import _get_tickets_as_boletos_format
+    
+    try:
+        boletos = _get_tickets_as_boletos_format(fecha_inicio_str, fecha_fin_str, '')
+    except Exception:
+        boletos = []
 
-    qs = ResumenAdministrativo.objects.filter(
-        dia__fecha__gte=fecha_inicio,
-        dia__fecha__lte=fecha_fin,
-    ).select_related('dia').order_by('-dia__fecha')
+    # Agrupar por fecha
+    por_dia = {}
+    for b in boletos:
+        # Extraer la fecha (YYYY-MM-DD) del timestamp "fecha"
+        dia = b['fecha'].split(' ')[0] if ' ' in b['fecha'] else b['fecha'].split('T')[0]
+        if dia not in por_dia:
+            por_dia[dia] = {'venta': 0.0, 'premio': 0.0, 'comision': 0.0}
+        
+        por_dia[dia]['venta'] += float(b['total'])
+        por_dia[dia]['premio'] += float(b['prizeValue'])
+        por_dia[dia]['comision'] += float(b['total']) * 0.15  # 15% comisión estándar
 
     total_venta    = 0.0
     total_premio   = 0.0
@@ -525,12 +539,15 @@ def api_resumen_admin(request):
     total_queda    = 0.0
     resultado      = []
 
-    for r in qs:
-        venta    = _dec(r.venta)
-        premio   = _dec(r.premio)
-        comision = _dec(r.comision)
-        regalia  = _dec(r.regalia)
-        queda    = _dec(r.queda)
+    # Ordenar por fecha descendente
+    dias_ordenados = sorted(por_dia.keys(), reverse=True)
+
+    for idx, dia in enumerate(dias_ordenados):
+        venta    = por_dia[dia]['venta']
+        premio   = por_dia[dia]['premio']
+        comision = por_dia[dia]['comision']
+        regalia  = 0.0  # Asumimos 0% regalía por defecto para taquilla
+        queda    = venta - premio - comision - regalia
 
         total_venta    += venta
         total_premio   += premio
@@ -539,13 +556,13 @@ def api_resumen_admin(request):
         total_queda    += queda
 
         resultado.append({
-            'id':       r.pk,
-            'dia':      str(r.dia.fecha) if r.dia else '—',
-            'venta':    venta,
-            'premio':   premio,
-            'comision': comision,
-            'regalia':  regalia,
-            'queda':    queda,
+            'id':       idx + 1,
+            'dia':      dia,
+            'venta':    round(venta, 2),
+            'premio':   round(premio, 2),
+            'comision': round(comision, 2),
+            'regalia':  round(regalia, 2),
+            'queda':    round(queda, 2),
         })
 
     return JsonResponse({
