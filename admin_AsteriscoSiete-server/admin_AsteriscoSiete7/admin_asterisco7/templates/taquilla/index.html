@@ -7311,10 +7311,9 @@ ${resumenTaq?'<hr style="border:none;border-top:1px dashed #999;margin:8px 0"><d
         const data = await res.json();
         
         if(data.success && data.lotteries) {
-            const requiredLots = ['Triple La Granjita', 'Triple Caracas', 'Triple Zulia', 'Triple Táchira', 'Lotería de Táchira', 'Lotería del Zulia'];
+            const requiredLots = ['Triple La Granjita', 'Triple Zulia', 'Triple Táchira', 'Lotería de Táchira', 'Lotería del Zulia'];
             const mapLots = {
                 'Triple La Granjita': 'LA GRANJITA', // Nota: Tuazar a veces lo separa.
-                'Triple Caracas': 'CHANCE',
                 'Triple Zulia': 'TRIPLE ZULIA',
                 'Triple Táchira': 'TRIPLE TÁCHIRA',
                 'Lotería de Táchira': 'TÁCHIRA ZODIACAL',
