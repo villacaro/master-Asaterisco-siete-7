@@ -2778,3 +2778,60 @@ def taquilla_proxy_resultados(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+@csrf_exempt
+def taquilla_scrape_tuazar(request):
+    """
+    Scrapea los resultados del día directamente desde tuazar.com/loteria/resultados/
+    """
+    import requests
+    from bs4 import BeautifulSoup
+    import json
+    
+    try:
+        url = 'https://www.tuazar.com/loteria/resultados/'
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        response = requests.get(url, headers=headers, timeout=10)
+        
+        if response.status_code != 200:
+            return JsonResponse({'error': f'Error fetching TuAzar: {response.status_code}'}, status=500)
+            
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        lotteries = []
+        
+        # Cada lotería está en un div.lc-section
+        sections = soup.find_all('div', class_='lc-section')
+        for sec in sections:
+            head = sec.find('div', class_='lc-head')
+            if not head:
+                continue
+            title_el = head.find(['h2', 'h3'])
+            if not title_el:
+                continue
+            
+            title = title_el.text.strip().upper()
+            
+            # Extraer tabla de resultados
+            table = sec.find('div', class_='lc-table')
+            draws = []
+            if table:
+                rows = table.find_all('div', class_='lc-row')
+                for row in rows:
+                    cells = row.find_all('div', class_='lc-cell')
+                    if cells and len(cells) >= 2:
+                        time = cells[0].text.strip()
+                        # Si hay valores en las celdas siguientes, los juntamos
+                        vals = [c.text.strip() for c in cells[1:] if c.text.strip() and c.text.strip() != '-']
+                        
+                        if vals:
+                            draws.append(f"{time}: {' / '.join(vals)}")
+            
+            lotteries.append({
+                'nombre': title,
+                'draws': draws if draws else ['Pendiente / Sin resultados']
+            })
+            
+        return JsonResponse({'success': True, 'lotteries': lotteries})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+

@@ -7224,60 +7224,59 @@ ${resumenTaq?'<hr style="border:none;border-top:1px dashed #999;margin:8px 0"><d
       </button>
     </div>
 
-    <!-- Filtros -->
-    <div class="px-5 pt-5 pb-4 grid grid-cols-2 gap-4 border-b border-slate-100 dark:border-slate-800">
+    <!-- Filtros (solo fecha) -->
+    <style>
+      @media print {
+        body * { visibility: hidden !important; }
+        #modal-resultados-sorteos, #modal-resultados-sorteos * { visibility: visible !important; }
+        #modal-resultados-sorteos {
+          position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; height: 100% !important;
+          background: white !important; box-shadow: none !important;
+        }
+        .print-hidden { display: none !important; }
+        .printable-content { padding: 0 !important; }
+      }
+    </style>
+    <div class="px-5 pt-5 pb-4 border-b border-slate-100 dark:border-slate-800 print-hidden">
       <div>
         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Fecha</label>
         <input id="res-sorteo-fecha" type="date"
-          class="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-slate-800 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none transition">
-      </div>
-      <div>
-        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Deporte / Juego</label>
-        <select id="res-sorteo-deporte"
-          class="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-slate-800 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none transition">
-          <option value="todos">Todos</option>
-          <option value="Lotería">Lotería</option>
-          <option value="Triple">Triple Lotería</option>
-          <option value="Beisbol">Béisbol</option>
-          <option value="Futbol">Fútbol</option>
-          <option value="Baloncesto">Baloncesto</option>
-          <option value="Animalitos">Animalitos</option>
-          <option value="Arrejuntao">El Arrejuntao</option>
-        </select>
+          class="w-full sm:w-1/2 px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-slate-800 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none transition">
       </div>
     </div>
 
-    <!-- Área de resultados (estilo terminal) -->
-    <div class="px-5 py-4">
-      <div id="res-sorteo-output"
-        class="w-full font-mono text-xs bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-4 min-h-[220px] max-h-[300px] overflow-y-auto text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
-<span class="text-slate-400 italic">Presiona "Buscar" para consultar los resultados...</span>
+    <!-- Área de resultados (Tarjetas) -->
+    <div class="px-5 py-4 printable-content">
+      <div class="text-center mb-4">
+         <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">RESULTADOS — <span id="res-sorteo-fecha-display"></span></h4>
+      </div>
+      <div id="res-sorteo-output-grid" class="grid grid-cols-2 gap-4 max-h-[350px] overflow-y-auto pr-1 pb-4">
+          <!-- Cards dinámicas -->
       </div>
     </div>
 
     <!-- Botones de acción -->
-    <div class="flex items-center justify-between px-5 pb-5 gap-3">
+    <div class="flex items-center justify-between px-5 pb-5 gap-3 print-hidden">
       <button onclick="buscarResultadosSorteo()"
         class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white transition"
-        style="background:linear-gradient(135deg,#16a34a,#15803d);">
+        style="background:linear-gradient(135deg,#7c3aed,#4f46e5);">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
         </svg>
-        Buscar
+        Recargar
       </button>
       <div class="flex gap-2">
         <button onclick="imprimirResultadosSorteo()"
           class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-white transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
           </svg>
-          Imprimir
+          Imprimir / PDF
         </button>
         <button onclick="closeResultadosModal()"
           class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
           Cerrar
         </button>
@@ -7301,54 +7300,61 @@ ${resumenTaq?'<hr style="border:none;border-top:1px dashed #999;margin:8px 0"><d
     document.getElementById('modal-resultados-sorteos').classList.add('hidden');
   };
 
-  window.buscarResultadosSorteo = function(){
+  window.buscarResultadosSorteo = async function(){
     const fecha  = document.getElementById('res-sorteo-fecha').value || _today();
-    const deporte = document.getElementById('res-sorteo-deporte').value;
-    const out    = document.getElementById('res-sorteo-output');
+    document.getElementById('res-sorteo-fecha-display').textContent = fecha;
+    const grid = document.getElementById('res-sorteo-output-grid');
+    grid.innerHTML = '<div class="col-span-2 text-center text-slate-400 py-10"><svg class="animate-spin h-6 w-6 mx-auto text-purple-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p>Cargando resultados de TuAzar...</p></div>';
 
-    // Catálogo de sorteos por deporte
-    const catalogo = {
-      'Lotería':     [{nombre:'Lotería de Táchira', resultado:'----'},{nombre:'Lotería del Zulia', resultado:'----'},{nombre:'Lotería de Caracas', resultado:'----'}],
-      'Triple':      [{nombre:'Triple La Granjita', resultado:'---'},{nombre:'Triple Caracas', resultado:'---'},{nombre:'Triple Zulia', resultado:'---'},{nombre:'Triple Táchira', resultado:'---'}],
-      'Animalitos':  [{nombre:'Lotto Activo', resultado:'--'},{nombre:'La Granjita', resultado:'--'},{nombre:'Guacharo Activo', resultado:'--'}],
-      'Arrejuntao':  [{nombre:'Animalitos Arrejuntao', resultado:'--'}],
-      'Beisbol':     [{nombre:'Grandes Ligas MLB', resultado:'Pendiente'},{nombre:'Liga Venezolana (LVBP)', resultado:'Pendiente'}],
-      'Futbol':      [{nombre:'Liga Europa', resultado:'Pendiente'},{nombre:'Premier League', resultado:'Pendiente'}],
-      'Baloncesto':  [{nombre:'NBA', resultado:'Pendiente'}],
-    };
-
-    let deportesFiltro = deporte === 'todos' ? Object.keys(catalogo) : [deporte];
-    const taqName = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ast7_taquilla') : null) || 'BANKLOT';
-
-    let texto = '';
-    texto += `${taqName}\n`;
-    texto += `${'*'.repeat(10)} RESULTADOS ${'*'.repeat(10)}\n`;
-    texto += `Del dia ${fecha.split('-').reverse().join('-')}\n`;
-    if(deporte !== 'todos') texto += `Deporte: ${deporte}\n`;
-    texto += '\n';
-
-    deportesFiltro.forEach(dep => {
-      const lista = catalogo[dep];
-      if(!lista) return;
-      lista.forEach(s => {
-        texto += `Liga: ${dep} — ${s.nombre}\n`;
-        texto += `Resultado: ${s.resultado}\n`;
-        texto += `${'─'.repeat(36)}\n`;
-      });
-    });
-
-    if(!texto.trim()){ texto = 'No se encontraron resultados para los filtros seleccionados.'; }
-    out.textContent = texto;
+    try {
+        const res = await fetch('/api/taquilla/scrape-tuazar/');
+        const data = await res.json();
+        
+        if(data.success && data.lotteries) {
+            const requiredLots = ['Triple La Granjita', 'Triple Caracas', 'Triple Zulia', 'Triple Táchira', 'Lotería de Táchira', 'Lotería del Zulia'];
+            const mapLots = {
+                'Triple La Granjita': 'LA GRANJITA',
+                'Triple Caracas': 'CARACAS',
+                'Triple Zulia': 'TRIPLE ZULIA',
+                'Triple Táchira': 'TRIPLE TÁCHIRA',
+                'Lotería de Táchira': 'TÁCHIRA ZODIACAL',
+                'Lotería del Zulia': 'ZODIACO DEL ZULIA'
+            };
+            
+            let html = '';
+            requiredLots.forEach(req => {
+                const searchName = mapLots[req] || req;
+                const found = data.lotteries.find(l => l.nombre.includes(searchName) || searchName.includes(l.nombre));
+                
+                let resultText = '— — —';
+                if(found && found.draws && found.draws.length > 0) {
+                    const lastDraw = found.draws[found.draws.length - 1];
+                    const parts = lastDraw.split(':');
+                    if(parts.length > 1) {
+                        resultText = parts.slice(1).join(':').trim(); // remueve la hora
+                    } else {
+                        resultText = lastDraw;
+                    }
+                }
+                
+                html += `
+                <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-center flex flex-col justify-center min-h-[90px]">
+                    <h5 class="text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-3 tracking-wide">${req}</h5>
+                    <div class="text-indigo-600 dark:text-indigo-400 font-bold text-lg tracking-[0.25em]">${resultText}</div>
+                </div>
+                `;
+            });
+            grid.innerHTML = html;
+        } else {
+            grid.innerHTML = '<div class="col-span-2 text-center text-red-500 py-4">Error al obtener resultados</div>';
+        }
+    } catch(e) {
+        grid.innerHTML = '<div class="col-span-2 text-center text-red-500 py-4">Error de conexión con TuAzar</div>';
+    }
   };
 
   window.imprimirResultadosSorteo = function(){
-    const contenido = document.getElementById('res-sorteo-output').textContent;
-    const win = window.open('','_blank','width=480,height=640');
-    win.document.write(`<html><head><title>Resultados Sorteos</title>
-      <style>body{font-family:'Courier New',monospace;font-size:11px;padding:20px}pre{white-space:pre-wrap}</style>
-      </head><body><pre>${contenido}</pre></body></html>`);
-    win.document.close();
-    win.print();
+    window.print();
   };
 })();
 </script>
