@@ -7015,7 +7015,9 @@
     const el = document.getElementById('rpt-d-body');
     _loading(el);
     try {
-      const r = await fetch(`/taquilla/reportes/analisis-diario/?fecha=${fecha}`);
+      const u = sysConfig.backendUser || '';
+      const t = encodeURIComponent(sysConfig.deviceName || '');
+      const r = await fetch(`/taquilla/reportes/resumen-diario/?fecha=${fecha}&taquilla=${t}&user=${u}`);
       const data = await r.json();
       if(!data.ok) throw new Error(data.error||'Error desconocido');
       if(!data.total_tickets){
@@ -7040,7 +7042,9 @@
     const el = document.getElementById('rpt-p-body');
     _loading(el);
     try {
-      const r = await fetch(`/taquilla/reportes/analisis-periodo/?desde=${desde}&hasta=${hasta}`);
+      const u = sysConfig.backendUser || '';
+      const t = encodeURIComponent(sysConfig.deviceName || '');
+      const r = await fetch(`/taquilla/reportes/resumen-periodo/?desde=${desde}&hasta=${hasta}&taquilla=${t}&user=${u}`);
       const data = await r.json();
       if(!data.ok) throw new Error(data.error||'Error desconocido');
       if(!data.total_tickets){
@@ -7064,7 +7068,9 @@
     const el = document.getElementById('rpt-c-body');
     _loading(el);
     try {
-      const r = await fetch(`/taquilla/reportes/cuadre-caja/?fecha=${fecha}`);
+      const u = sysConfig.backendUser || '';
+      const t = encodeURIComponent(sysConfig.deviceName || '');
+      const r = await fetch(`/taquilla/reportes/cuadre-caja/?fecha=${fecha}&taquilla=${t}&user=${u}`);
       const data = await r.json();
       if(!data.ok) throw new Error(data.error||'Error desconocido');
       if(!data.total_tickets){
@@ -7096,7 +7102,9 @@ ${resumenTaq?'<hr style="border:none;border-top:1px dashed #999;margin:8px 0"><d
     const tbody = document.getElementById('rpt-t-tbody');
     tbody.innerHTML='<tr><td colspan="6" class="text-center py-6 text-slate-400 italic animate-pulse">⏳ Cargando...</td></tr>';
     try {
-      const params = new URLSearchParams({fecha});
+      const u = sysConfig.backendUser || '';
+      const t = encodeURIComponent(sysConfig.deviceName || '');
+      const params = new URLSearchParams({fecha, taquilla: sysConfig.deviceName||'', user: u});
       if(tipo) params.set('status', tipo);
       const r = await fetch(`/taquilla/reportes/tickets/?${params}`);
       const data = await r.json();

@@ -2881,3 +2881,31 @@ def taquilla_scrape_tuazar(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+@csrf_exempt
+def taquilla_ping(request):
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body)
+            user_str = body.get('user', '')
+            if user_str:
+                from admin_comercializacion.models import UsuariosTaquilla
+                taq_user = UsuariosTaquilla.objects.select_related('taquilla').filter(user=user_str).first()
+                if taq_user and taq_user.taquilla:
+                    from django.utils.timezone import now as tz_now
+                    from django.apps import apps
+                    HechoConn = apps.get_model('admin_historic', 'HechoConnectionsComer')
+                    ip = request.META.get('REMOTE_ADDR', '127.0.0.1')
+                    hecho, _ = HechoConn.objects.get_or_create(
+                        taquilla_id=taq_user.taquilla.id,
+                        agencia_id=taq_user.taquilla.agencia_id,
+                        defaults={'ip': ip, 'connection_at': tz_now()}
+                    )
+                    if not _:
+                        hecho.ip = ip
+                        hecho.connection_at = tz_now()
+                        hecho.save()
+            return JsonResponse({'ok': True})
+        except Exception as e:
+            return JsonResponse({'ok': False, 'error': str(e)})
+    return JsonResponse({'ok': False})
+

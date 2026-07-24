@@ -5,7 +5,7 @@ from django.urls import include, re_path, path
 from django.views.static import serve
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from admin_asterisco7.dashboard_views import dashboard, dashboard_stats, dashboard_api, dashboard_crud, taquilla_view, reportes_page, candidatos_page, monitor_api, liquidacion_page, taquilla_login_api, taquilla_venta_api, taquilla_ventas_lista_api, taquilla_scrape_tuazar, liquidaciones_sorteo_api, candidatos_riesgo_api, cuadre_nivel_superior_api, taquilla_resultados_hoy, taquilla_mi_ip, taquilla_cambiar_clave_api, taquilla_reporte_diario, taquilla_reporte_periodo, taquilla_reporte_caja, taquilla_reporte_tickets, taquilla_reporte_ganadores, taquilla_proxy_resultados
+from admin_asterisco7.dashboard_views import dashboard, dashboard_stats, dashboard_api, dashboard_crud, taquilla_view, reportes_page, candidatos_page, monitor_api, liquidacion_page, taquilla_login_api, taquilla_venta_api, taquilla_ventas_lista_api, taquilla_scrape_tuazar, liquidaciones_sorteo_api, candidatos_riesgo_api, cuadre_nivel_superior_api, taquilla_resultados_hoy, taquilla_mi_ip, taquilla_cambiar_clave_api, taquilla_reporte_diario, taquilla_reporte_periodo, taquilla_reporte_caja, taquilla_reporte_tickets, taquilla_reporte_ganadores, taquilla_proxy_resultados, taquilla_ping
 from admin_asterisco7.reportes_views import (
     api_lista_linea, api_por_producto, api_riesgo_venta, api_sorteos_disponibles,
     api_cuadre, api_liquidaciones, api_resumen_admin, api_dias_trabajo,
@@ -28,14 +28,17 @@ urlpatterns = [
     re_path(r'^taquilla/venta/$', taquilla_venta_api, name='taquilla_venta'),
     re_path(r'^api/taquilla/ventas/$', taquilla_ventas_lista_api, name='taquilla_ventas_lista'),
     re_path(r'^api/taquilla/$', taquilla_ventas_lista_api, name='taquilla_ventas_alias'),
+    re_path(r'^api/taquilla/ping/$',                        taquilla_ping,          name='taquilla_ping'),
+    re_path(r'^api/taquilla/scrape-tuazar/$',               taquilla_scrape_tuazar, name='taquilla_scrape'),
+    re_path(r'^api/taquilla/api-resultados/$',              taquilla_proxy_resultados, name='taquilla_proxy_resultados'),
     re_path(r'^api/taquilla/resultados-hoy/$', taquilla_resultados_hoy, name='taquilla_resultados_hoy'),
     path('api/taquilla/api-resultados/', taquilla_proxy_resultados, name='taquilla_proxy_resultados'),
     path('api/taquilla/scrape-tuazar/', taquilla_scrape_tuazar, name='taquilla_scrape_tuazar'),
     re_path(r'^api/taquilla/mi-ip/$', taquilla_mi_ip, name='taquilla_mi_ip'),
     re_path(r'^taquilla/cambiar-clave/$', taquilla_cambiar_clave_api, name='taquilla_cambiar_clave'),
     # ── APIs de Reportes Taquilla → Supabase ───────────────────────────────────
-    re_path(r'^taquilla/reportes/analisis-diario/$',  taquilla_reporte_diario,   name='taquilla_rpt_diario'),
-    re_path(r'^taquilla/reportes/analisis-periodo/$', taquilla_reporte_periodo,  name='taquilla_rpt_periodo'),
+    re_path(r'^taquilla/reportes/resumen-diario/$',  taquilla_reporte_diario,   name='taquilla_rpt_diario'),
+    re_path(r'^taquilla/reportes/resumen-periodo/$', taquilla_reporte_periodo,  name='taquilla_rpt_periodo'),
     re_path(r'^taquilla/reportes/cuadre-caja/$',      taquilla_reporte_caja,     name='taquilla_rpt_caja'),
     re_path(r'^taquilla/reportes/tickets/$',          taquilla_reporte_tickets,  name='taquilla_rpt_tickets'),
     re_path(r'^taquilla/reportes/ganadores/$',        taquilla_reporte_ganadores,name='taquilla_rpt_ganadores'),
