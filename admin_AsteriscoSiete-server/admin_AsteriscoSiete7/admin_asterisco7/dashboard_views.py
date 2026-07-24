@@ -2801,6 +2801,9 @@ def taquilla_scrape_tuazar(request):
         
         # Cada lotería está en un div.lc-section
         sections = soup.find_all('div', class_='lc-section')
+        if not sections:
+            return JsonResponse({'error': 'No se encontraron resultados. TuAzar podría estar bloqueando la petición o cambió su diseño.', 'html_snippet': response.text[:200]}, status=500)
+
         for sec in sections:
             head = sec.find('div', class_='lc-head')
             if not head:

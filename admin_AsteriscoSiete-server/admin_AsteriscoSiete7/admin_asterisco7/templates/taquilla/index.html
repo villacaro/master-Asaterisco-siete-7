@@ -7313,8 +7313,8 @@ ${resumenTaq?'<hr style="border:none;border-top:1px dashed #999;margin:8px 0"><d
         if(data.success && data.lotteries) {
             const requiredLots = ['Triple La Granjita', 'Triple Caracas', 'Triple Zulia', 'Triple Táchira', 'Lotería de Táchira', 'Lotería del Zulia'];
             const mapLots = {
-                'Triple La Granjita': 'LA GRANJITA',
-                'Triple Caracas': 'CARACAS',
+                'Triple La Granjita': 'LA GRANJITA', // Nota: Tuazar a veces lo separa.
+                'Triple Caracas': 'CHANCE',
                 'Triple Zulia': 'TRIPLE ZULIA',
                 'Triple Táchira': 'TRIPLE TÁCHIRA',
                 'Lotería de Táchira': 'TÁCHIRA ZODIACAL',
@@ -7346,10 +7346,10 @@ ${resumenTaq?'<hr style="border:none;border-top:1px dashed #999;margin:8px 0"><d
             });
             grid.innerHTML = html;
         } else {
-            grid.innerHTML = '<div class="col-span-2 text-center text-red-500 py-4">Error al obtener resultados</div>';
+            grid.innerHTML = `<div class="col-span-2 text-center text-red-500 py-4">${data.error || 'Error al obtener resultados (Respuesta vacía)'}</div>`;
         }
     } catch(e) {
-        grid.innerHTML = '<div class="col-span-2 text-center text-red-500 py-4">Error de conexión con TuAzar</div>';
+        grid.innerHTML = '<div class="col-span-2 text-center text-red-500 py-4">Error de conexión o bloqueo por Cloudflare en TuAzar. Intente luego.</div>';
     }
   };
 
