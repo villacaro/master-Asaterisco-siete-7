@@ -6773,7 +6773,7 @@
       <button onclick="closeReportesModal();openRpt('ganadores')" class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-yellow-100 dark:border-yellow-900/40 hover:border-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 transition">
         <span class="text-2xl">🏆</span><span class="text-xs font-bold text-slate-700 dark:text-slate-300 text-center">Tickets Ganadores</span>
       </button>
-      <button onclick="closeReportesModal();openRpt('resultados')" class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-purple-100 dark:border-purple-900/40 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition">
+      <button onclick="closeReportesModal();openResultadosModal()" class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-purple-100 dark:border-purple-900/40 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition">
         <span class="text-2xl">🎱</span><span class="text-xs font-bold text-slate-700 dark:text-slate-300 text-center">Resultados</span>
       </button>
     </div>
@@ -6947,26 +6947,6 @@
 </div>
 
 <!-- ═══════════════════════════ MODAL RESULTADOS ═════════════════════════ -->
-<div id="modal-rpt-resultados" class="fixed inset-0 z-[230] bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeRpt('resultados')">
-  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-    <div class="flex items-center justify-between px-5 py-3" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
-      <div><h2 class="text-white font-bold text-sm">🎱 Resultados de Sorteos</h2><p class="text-purple-200 text-xs">Todos los sorteos autorizados</p></div>
-      <button onclick="closeRpt('resultados')" class="text-white/70 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-    </div>
-    <div class="px-5 pt-4 pb-3 border-b border-slate-100 dark:border-slate-800">
-      <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase">Fecha</label>
-      <input id="rpt-r-fecha" type="date" class="px-3 py-2 text-xs border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-lg text-slate-800 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none">
-    </div>
-    <div id="rpt-r-body" class="p-4 overflow-auto max-h-72 grid grid-cols-2 gap-3">
-      <p class="col-span-2 text-slate-400 italic text-center text-xs pt-8">Presiona Recargar para ver los resultados</p>
-    </div>
-    <div class="flex justify-between px-5 py-3 border-t border-slate-100 dark:border-slate-800">
-      <button onclick="generarResultados()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold text-xs uppercase">🔄 Recargar</button>
-      <button onclick="closeRpt('resultados')" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-xs uppercase">Cerrar</button>
-    </div>
-  </div>
-</div>
-
 <!-- ═══════════════════════ MODAL UTILIDADES ════════════════════════════ -->
 <div id="modal-utilidades" class="fixed inset-0 z-[220] bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4" onclick="if(event.target===this)closeUtilidadesModal()">
   <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
