@@ -2761,3 +2761,20 @@ def dashboard_crud(request, modulo):
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+# Proxy para obviar el error de CORS al pedir resultados del Arrejuntao
+@csrf_exempt
+def taquilla_proxy_resultados(request):
+    import requests
+    date_str = request.GET.get('date', '')
+    if not date_str:
+        import datetime
+        date_str = datetime.date.today().isoformat()
+    
+    url = f"https://backend.serviciosintegradostriple7.com/api/v1/products/el-arrejuntao/results/?date={date_str}"
+    try:
+        response = requests.get(url, timeout=5)
+        return HttpResponse(response.content, content_type='application/json', status=response.status_code)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
