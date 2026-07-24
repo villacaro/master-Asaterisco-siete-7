@@ -2826,57 +2826,46 @@ def taquilla_proxy_resultados(request):
 @csrf_exempt
 def taquilla_scrape_tuazar(request):
     """
-    Scrapea los resultados del día directamente desde tuazar.com/loteria/resultados/
+    Devuelve los resultados cargados por el administrador (desde ResultadoSorteo).
+    Mantiene la misma estructura JSON que esperaba la taquilla del scraper original,
+    para no tener que modificar el frontend.
     """
-    import requests
-    from bs4 import BeautifulSoup
-    import json
+    from admin_juego.models_arrejuntao import ResultadoSorteo
+    import datetime
     
     try:
-        url = 'https://www.tuazar.com/loteria/resultados/'
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        response = requests.get(url, headers=headers, timeout=10)
+        # El frontend envía un parámetro 'date' o asume el día actual.
+        # (Aunque el scraper original de tuazar no recibía fecha y siempre traía hoy,
+        # vamos a soportarlo por si acaso)
+        fecha_str = request.GET.get('date') or datetime.date.today().isoformat()
         
-        if response.status_code != 200:
-            return JsonResponse({'error': f'Error fetching TuAzar: {response.status_code}'}, status=500)
+        resultados = ResultadoSorteo.objects.filter(fecha_sorteo=fecha_str).select_related('producto__loteria', 'sorteo')
+        
+        lotteries_dict = {}
+        
+        for res in resultados:
+            if not res.producto or not res.producto.loteria:
+                continue
+                
+            nombre_loteria = res.producto.loteria.nombre.upper()
+            if nombre_loteria not in lotteries_dict:
+                lotteries_dict[nombre_loteria] = []
+                
+            hora = res.sorteo.hora_sorteo.strftime('%I:%M %p') if res.sorteo else '00:00'
+            vals = []
+            if res.res_triple_a: vals.append(res.res_triple_a)
+            if res.res_triple_b: vals.append(res.res_triple_b)
+            if res.res_signo: vals.append(f"Zodiacal: {res.res_signo}")
             
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
+            val_str = ' / '.join(vals) if vals else 'Pendiente'
+            draw_text = f"{hora}: {val_str}"
+            lotteries_dict[nombre_loteria].append(draw_text)
+            
         lotteries = []
-        
-        # Cada lotería está en un div.lc-section
-        sections = soup.find_all('div', class_='lc-section')
-        if not sections:
-            return JsonResponse({'error': 'No se encontraron resultados. TuAzar podría estar bloqueando la petición o cambió su diseño.', 'html_snippet': response.text[:200]}, status=500)
-
-        for sec in sections:
-            head = sec.find('div', class_='lc-head')
-            if not head:
-                continue
-            title_el = head.find(['h2', 'h3'])
-            if not title_el:
-                continue
-            
-            title = title_el.text.strip().upper()
-            
-            # Extraer tabla de resultados
-            table = sec.find('div', class_='lc-table')
-            draws = []
-            if table:
-                rows = table.find_all('div', class_='lc-row')
-                for row in rows:
-                    cells = row.find_all('div', class_='lc-cell')
-                    if cells and len(cells) >= 2:
-                        time = cells[0].text.strip()
-                        # Si hay valores en las celdas siguientes, los juntamos
-                        vals = [c.text.strip() for c in cells[1:] if c.text.strip() and c.text.strip() != '-']
-                        
-                        if vals:
-                            draws.append(f"{time}: {' / '.join(vals)}")
-            
+        for nombre, draws in lotteries_dict.items():
             lotteries.append({
-                'nombre': title,
-                'draws': draws if draws else ['Pendiente / Sin resultados']
+                'nombre': nombre,
+                'draws': draws
             })
             
         return JsonResponse({'success': True, 'lotteries': lotteries})
