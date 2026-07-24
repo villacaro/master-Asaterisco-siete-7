@@ -7306,30 +7306,29 @@ ${resumenTaq?'<hr style="border:none;border-top:1px dashed #999;margin:8px 0"><d
     grid.innerHTML = '<div class="col-span-2 text-center text-slate-400 py-10"><svg class="animate-spin h-6 w-6 mx-auto text-purple-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p>Cargando resultados de TuAzar...</p></div>';
 
     try {
-        const res = await fetch('/api/taquilla/scrape-tuazar/');
+        const res = await fetch(`/api/taquilla/scrape-tuazar/?date=${fecha}`);
         const data = await res.json();
         
         if(data.success && data.lotteries) {
-            const requiredLots = ['Triple La Granjita', 'Triple Zulia', 'Triple Táchira', 'Lotería de Táchira', 'Lotería del Zulia'];
-            const mapLots = {
-                'Triple La Granjita': 'LA GRANJITA', // Nota: Tuazar a veces lo separa.
-                'Triple Zulia': 'TRIPLE ZULIA',
-                'Triple Táchira': 'TRIPLE TÁCHIRA',
-                'Lotería de Táchira': 'TÁCHIRA ZODIACAL',
-                'Lotería del Zulia': 'ZODIACO DEL ZULIA'
-            };
-            
             let html = '';
-            requiredLots.forEach(req => {
-                const searchName = mapLots[req] || req;
-                const found = data.lotteries.find(l => l.nombre.includes(searchName) || searchName.includes(l.nombre));
-                
+            
+            if (data.lotteries.length === 0) {
+                grid.innerHTML = '<div class="col-span-2 text-center text-slate-500 py-4">No hay resultados registrados para esta fecha en el sistema.</div>';
+                return;
+            }
+            
+            data.lotteries.forEach(lot => {
                 let resultText = '— — —';
-                if(found && found.draws && found.draws.length > 0) {
-                    const lastDraw = found.draws[found.draws.length - 1];
+                let timeText = '';
+                
+                if(lot.draws && lot.draws.length > 0) {
+                    const lastDraw = lot.draws[lot.draws.length - 1];
                     const parts = lastDraw.split(':');
-                    if(parts.length > 1) {
-                        resultText = parts.slice(1).join(':').trim(); // remueve la hora
+                    if(parts.length > 2) {
+                        timeText = parts[0] + ':' + parts[1].split(' ')[0] + ' ' + (parts[1].includes('PM') ? 'PM' : 'AM');
+                        resultText = parts.slice(2).join(':').trim(); // remueve la hora
+                    } else if (parts.length > 1) {
+                        resultText = parts.slice(1).join(':').trim();
                     } else {
                         resultText = lastDraw;
                     }
@@ -7337,14 +7336,15 @@ ${resumenTaq?'<hr style="border:none;border-top:1px dashed #999;margin:8px 0"><d
                 
                 html += `
                 <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-center flex flex-col justify-center min-h-[90px]">
-                    <h5 class="text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-3 tracking-wide">${req}</h5>
+                    <h5 class="text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1 tracking-wide uppercase">${lot.nombre}</h5>
+                    ${timeText ? `<span class="text-[9px] text-slate-400 mb-2">${timeText}</span>` : ''}
                     <div class="text-indigo-600 dark:text-indigo-400 font-bold text-lg tracking-[0.25em]">${resultText}</div>
                 </div>
                 `;
             });
             grid.innerHTML = html;
         } else {
-            grid.innerHTML = `<div class="col-span-2 text-center text-red-500 py-4">${data.error || 'Error al obtener resultados (Respuesta vacía)'}</div>`;
+            grid.innerHTML = `<div class="col-span-2 text-center text-red-500 py-4">${data.error || 'Error al obtener resultados'}</div>`;
         }
     } catch(e) {
         grid.innerHTML = '<div class="col-span-2 text-center text-red-500 py-4">Error de conexión o bloqueo por Cloudflare en TuAzar. Intente luego.</div>';
