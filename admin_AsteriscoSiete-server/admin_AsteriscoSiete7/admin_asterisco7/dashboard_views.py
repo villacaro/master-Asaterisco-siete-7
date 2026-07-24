@@ -311,7 +311,9 @@ def taquilla_venta_api(request):
 
     try:
         from django.utils.timezone import now as tz_now
-        from django.db import connection
+        from django.db import connection, transaction
+        from admin_juego.models_arrejuntao import Ticket, ApuestaDetalle, Loteria, ProductoLoteria, SorteoArrejuntao
+        from admin_comercializacion.models import UsuariosTaquilla
 
         _ensure_taquilla_table()
 
@@ -321,6 +323,7 @@ def taquilla_venta_api(request):
         usuario = body.get('usuario', 'desconocido')
         taquilla_nombre = body.get('taquillaNombre', '')
 
+        # 1. Guardar en taquilla_boleto como respaldo rápido (el original)
         with connection.cursor() as cursor:
             cursor.execute(
                 """INSERT INTO taquilla_boleto (ticket_id, usuario, taquilla, fecha, items_json, total, status)
@@ -328,6 +331,70 @@ def taquilla_venta_api(request):
                 [ticket_id, usuario, taquilla_nombre, tz_now(),
                  json.dumps(items, ensure_ascii=False), float(total), 'activo']
             )
+
+        # 2. Parsear y convertir items a los modelos reales del Dashboard para reportes
+        try:
+            taq_user = UsuariosTaquilla.objects.select_related('taquilla').filter(user=usuario).first()
+            user_id = taq_user.id if taq_user else None
+            agencia_id = taq_user.taquilla.agencia_id if (taq_user and taq_user.taquilla) else None
+
+            # Agrupar jugadas por nombre de lotería para crear los Tickets necesarios
+            groups = {}
+            for item in items:
+                lot_str = str(item.get('lottery', 'General'))
+                if lot_str not in groups:
+                    groups[lot_str] = []
+                groups[lot_str].append(item)
+
+            with transaction.atomic():
+                for lot_str, lot_items in groups.items():
+                    loteria, _ = Loteria.objects.get_or_create(
+                        nombre=lot_str[:100], 
+                        defaults={'activo': True, 'orden': 1}
+                    )
+                    
+                    producto, _ = ProductoLoteria.objects.get_or_create(
+                        loteria=loteria,
+                        nombre_producto=lot_str[:100],
+                        defaults={'tipo': 'NUMERICO', 'activo': True, 'orden': 1, 'multiplicador_pago': 0}
+                    )
+                    
+                    sorteo, _ = SorteoArrejuntao.objects.get_or_create(
+                        producto=producto,
+                        descripcion="Sorteo Automático Taquilla",
+                        defaults={'hora_sorteo': '23:59:00', 'activo': True}
+                    )
+                    
+                    import uuid
+                    short_uuid = str(uuid.uuid4())[:6].upper()
+                    real_serie = f"A7-{tz_now().strftime('%Y%m%d')}-{short_uuid}"
+
+                    t_obj = Ticket.objects.create(
+                        serie=real_serie,
+                        producto=producto,
+                        vendedor_id=user_id,
+                        sorteo_id=sorteo.id,
+                        id_agencia=agencia_id,
+                        total=sum(float(i.get('amount', 0)) for i in lot_items),
+                        tserial_ifa=taquilla_nombre
+                    )
+                    
+                    for i in lot_items:
+                        raw_number = str(i.get('number', ''))
+                        clean_number = raw_number.split(' ')[0][:5] if raw_number else '000'
+                        if clean_number.upper().startswith("MÚLTI"):
+                            clean_number = "MULT"
+
+                        ApuestaDetalle.objects.create(
+                            ticket=t_obj,
+                            tipo_jugada='TRIPLE_A', 
+                            numero_apostado=clean_number,
+                            monto_apostado=float(i.get('amount', 0)),
+                            estatus='P'
+                        )
+        except Exception as parser_ex:
+            # Si el parser falla, la venta original sigue intacta
+            print(f"Error parseando ticket {ticket_id} para Dashboard: {parser_ex}")
 
         return JsonResponse({'ok': True, 'ticket_id': ticket_id})
 

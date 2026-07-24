@@ -134,7 +134,7 @@ if _db_url:
     DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
 
 
-CELERY_RESULT_BACKEND = 'redis://{0}:6379/1'.format(os.environ.get('REDIS_PORT_6379_TCP_ADDR'))
+CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL') or 'redis://{0}:6379/1'.format(os.environ.get('REDIS_PORT_6379_TCP_ADDR') or '127.0.0.1')
 BROKER_URL = 'amqp://{0}:{1}@{2}:5672//'.format(
     os.environ.get('RABBITMQ_DEFAULT_USER'),
     os.environ.get('RABBITMQ_DEFAULT_PASS'),
@@ -144,10 +144,14 @@ BROKER_URL = 'amqp://{0}:{1}@{2}:5672//'.format(
 REDIS_DB = None
 if _redis_module:
     try:
-        REDIS_DB = _redis_module.Redis(
-            host=os.environ.get('REDIS_PORT_6379_TCP_ADDR') or '127.0.0.1',
-            port=6379,
-        )
+        if os.environ.get('REDIS_URL'):
+            REDIS_DB = _redis_module.from_url(os.environ.get('REDIS_URL'))
+        else:
+            REDIS_DB = _redis_module.Redis(
+                host=os.environ.get('REDISHOST') or os.environ.get('REDIS_PORT_6379_TCP_ADDR') or '127.0.0.1',
+                port=int(os.environ.get('REDISPORT') or 6379),
+                password=os.environ.get('REDISPASSWORD') or None
+            )
     except Exception:
         pass
 
@@ -160,16 +164,25 @@ if sys.platform.startswith("win"):
         }
     }
 else:
+    redis_loc = os.environ.get('REDIS_URL')
+    if not redis_loc:
+        redis_loc = '{0}:{1}'.format(
+            os.environ.get('REDISHOST') or os.environ.get('REDIS_PORT_6379_TCP_ADDR') or '127.0.0.1',
+            os.environ.get('REDISPORT') or '6379'
+        )
     CACHES = {
         'default': {
             'BACKEND': 'redis_cache.RedisCache',
-            'LOCATION': '{0}:6379'.format(os.environ.get('REDIS_PORT_6379_TCP_ADDR') or '127.0.0.1'),
+            'LOCATION': redis_loc,
             'OPTIONS': {
                 'DB': 1,
                 'PARSER_CLASS': 'redis.connection.HiredisParser'
             }
         }
     }
+    # If using password in REDISPASSWORD and not REDIS_URL
+    if not os.environ.get('REDIS_URL') and os.environ.get('REDISPASSWORD'):
+        CACHES['default']['OPTIONS']['PASSWORD'] = os.environ.get('REDISPASSWORD')
 
 
 SECRET_KEY = 'jd7@9#1ls=e8oa&amp;^68p90q!mdju($=r8x68j6q#yfa73$5jpf0'
