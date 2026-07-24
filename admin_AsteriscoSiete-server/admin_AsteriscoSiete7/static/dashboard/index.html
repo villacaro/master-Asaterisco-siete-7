@@ -2578,7 +2578,7 @@ const DASH_USER = {
 
       <button class="nav-sub-item" style="color:var(--accent2);font-weight:600" onclick="renderVentasTaquilla()">🎰 Ventas Taquilla</button>
 
-      <a href="/dashboard/candidatos/" class="nav-sub-item" style="display:block;text-decoration:none;color:var(--accent2);font-weight:600">🎯 Selección Candidatos</a>
+      <button class="nav-sub-item" style="color:var(--accent2);font-weight:600" onclick="renderCandidatos()">🎯 Selección Candidatos</button>
 
       <button class="nav-sub-item" style="color:var(--accent2);font-weight:600" onclick="renderLiquidacionesSorteo()">⚖️ Liq. Sorteos</button>
 
@@ -3813,7 +3813,7 @@ async function renderDashboard(){
 
         </div>
 
-                        <a href="/dashboard/candidatos/" style="display:inline-block;text-decoration:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                        <a href="javascript:void(0)" onclick="renderCandidatos(); return false;" style="display:inline-block;text-decoration:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
           🔎 Ver completo
         </a>
 
