@@ -5530,12 +5530,15 @@
         // ✅ FUNCIÓN RESULTADOS DEL DÍA (NUEVO - NO MODIFICA NADA EXISTENTE)
         async function fetchResultadosDelDia() {
             const badge = document.getElementById('resultados-status-badge');
-            const ids = ['res-triple-a', 'res-triple-b', 'res-pegadito', 'res-animalito'];
 
             try {
-                // Intenta obtener resultados del backend Django
-                const response = await fetch('/api/taquilla/resultados-hoy/', {
-                    signal: AbortSignal.timeout(3000)
+                // Obtener fecha actual YYYY-MM-DD
+                const today = new Date();
+                const dateStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+                
+                // Intenta obtener resultados del backend externo
+                const response = await fetch(`https://backend.serviciosintegradostriple7.com/api/v1/products/el-arrejuntao/results/?date=${dateStr}`, {
+                    signal: AbortSignal.timeout(5000)
                 });
 
                 if (!response.ok) throw new Error('Backend no disponible');
@@ -5548,13 +5551,33 @@
                     badge.innerHTML = '<span class="w-1 h-1 rounded-full bg-current"></span> EN LÍNEA';
                 }
 
-                // Actualizar valores si vienen del backend
-                if (data.triple_a !== undefined) document.getElementById('res-triple-a').textContent = data.triple_a || '— —';
-                if (data.triple_b !== undefined) document.getElementById('res-triple-b').textContent = data.triple_b || '— —';
-                if (data.pegadito !== undefined) document.getElementById('res-pegadito').textContent = data.pegadito || '— —';
-                if (data.animalito !== undefined) document.getElementById('res-animalito').textContent = data.animalito || '— — —';
-                if (data.triple_signo !== undefined) document.getElementById('res-triple-signo').textContent = data.triple_signo || '— —';
-                if (data.arrimao !== undefined) document.getElementById('res-arrimao').textContent = data.arrimao || '— —';
+                // Procesar resultados
+                let triple_a = '— —', triple_b = '— —', pegadito = '— —', animalito = '— — —', triple_signo = '— —', arrimao = '— —';
+                
+                if (data && data.draws && data.draws.length > 0) {
+                    // Tomamos el último sorteo disponible del día
+                    const latestDraw = data.draws[data.draws.length - 1];
+                    if (latestDraw && latestDraw.results) {
+                        latestDraw.results.forEach(res => {
+                            const slug = res.game.slug;
+                            const val = res.result_value;
+                            if (slug === 'triple-a') triple_a = val;
+                            if (slug === 'triple-b') triple_b = val;
+                            if (slug === 'el-pegadito') pegadito = val;
+                            if (slug === 'animalito') animalito = val;
+                            if (slug === 'triple-signo') triple_signo = val;
+                            if (slug === 'el-arrimao') arrimao = val;
+                        });
+                    }
+                }
+
+                // Actualizar valores en el DOM
+                document.getElementById('res-triple-a').textContent = triple_a;
+                document.getElementById('res-triple-b').textContent = triple_b;
+                document.getElementById('res-pegadito').textContent = pegadito;
+                document.getElementById('res-animalito').textContent = animalito;
+                document.getElementById('res-triple-signo').textContent = triple_signo;
+                document.getElementById('res-arrimao').textContent = arrimao;
 
             } catch (err) {
                 // Si falla (offline, timeout, error), mostrar OFFLINE sin romper nada
