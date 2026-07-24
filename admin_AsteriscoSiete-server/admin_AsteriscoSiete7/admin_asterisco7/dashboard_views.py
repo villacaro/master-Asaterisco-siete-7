@@ -536,7 +536,11 @@ def _get_tickets_as_boletos_format(desde_str, hasta_str, taquilla_filtro=''):
             if d.estatus in ['G', 'L']:
                 premios_ticket += float(d.monto_premio or 0)
 
-        dt_local = localtime(t.fecha_emision)
+        dt = t.fecha_emision
+        from django.utils.timezone import is_aware, make_aware
+        if not is_aware(dt):
+            dt = make_aware(dt)
+        dt_local = localtime(dt)
         
         status_str = 'anulado' if t.anulado else 'activo'
         
