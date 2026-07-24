@@ -10246,3 +10246,279 @@ function _cnsExportar(){
 
 
 
+
+
+// --- GESTIÓN DE USUARIOS CUSTOM UI ---
+function renderGestionUsuarios(){
+  currentModule = 'gestion-usuarios'; currentTitle = 'Gestión de Usuarios';
+  if(window._monitorTimer){ clearInterval(window._monitorTimer); window._monitorTimer=null; }
+
+  const area = document.getElementById('content-area');
+  
+  area.innerHTML = `
+    <!-- Top Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div style="font-size:22px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:8px;">
+        <span style="font-size:24px;">👥</span> Gestión de Usuarios Visual
+      </div>
+      <button onclick="_guOpenModal()" style="background:var(--accent); color:#fff; font-weight:700; border:none; border-radius:6px; padding:10px 20px; font-size:14px; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition: transform 0.2s;">
+        + Nuevo Usuario
+      </button>
+    </div>
+
+    <!-- Filtros (Pestañas) -->
+    <div style="display:flex; gap:10px; margin-bottom:20px; overflow-x:auto; padding-bottom:8px;">
+      <button onclick="_guFilter('ALL', this)" class="gu-tab" style="background:var(--accent); color:#fff; border:none; padding:8px 16px; border-radius:20px; font-weight:700; cursor:pointer;">Todos</button>
+      <button onclick="_guFilter('userprofile_super_banca', this)" class="gu-tab" style="background:rgba(255,255,255,0.1); color:var(--text); border:1px solid var(--border); padding:8px 16px; border-radius:20px; font-weight:700; cursor:pointer;">Super Bancas</button>
+      <button onclick="_guFilter('userprofile_banca', this)" class="gu-tab" style="background:rgba(255,255,255,0.1); color:var(--text); border:1px solid var(--border); padding:8px 16px; border-radius:20px; font-weight:700; cursor:pointer;">Bancas</button>
+      <button onclick="_guFilter('userprofile_agencia', this)" class="gu-tab" style="background:rgba(255,255,255,0.1); color:var(--text); border:1px solid var(--border); padding:8px 16px; border-radius:20px; font-weight:700; cursor:pointer;">Agencias</button>
+      <button onclick="_guFilter('userprofile_taquilla', this)" class="gu-tab" style="background:rgba(255,255,255,0.1); color:var(--text); border:1px solid var(--border); padding:8px 16px; border-radius:20px; font-weight:700; cursor:pointer;">Taquillas</button>
+      <div style="margin-left:auto; display:flex; gap:10px;">
+        <input type="text" id="gu-search" placeholder="🔍 Buscar usuario..." onkeyup="_guSearch()" style="background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:8px 16px; color:var(--text); outline:none; width:200px;">
+      </div>
+    </div>
+
+    <!-- Cards Container -->
+    <div id="gu-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:20px;">
+      <div style="text-align:center; padding:40px; color:var(--muted); grid-column: 1 / -1;">Cargando usuarios...</div>
+    </div>
+  `;
+
+  _guLoadData();
+}
+
+window._guUsers = [];
+window._guProfiles = [];
+window._guPermissions = [];
+window._guCurrentFilter = 'ALL';
+
+async function _guLoadData(){
+  try {
+    const r = await fetch('/api/gestion-usuarios/');
+    const d = await r.json();
+    if(d.ok){
+      window._guUsers = d.users;
+      window._guProfiles = d.profiles;
+      window._guPermissions = d.permissions;
+      _guRenderCards();
+    } else {
+      document.getElementById('gu-container').innerHTML = '<div style="color:red; padding:20px;">Error al cargar usuarios</div>';
+    }
+  } catch(e) {
+    document.getElementById('gu-container').innerHTML = '<div style="color:red; padding:20px;">Error de conexión</div>';
+  }
+}
+
+function _guGetColor(profile){
+  if(profile.includes('super_banca') || profile.includes('admin')) return '#e74c3c';
+  if(profile.includes('banca')) return '#f39c12';
+  if(profile.includes('agencia')) return '#3498db';
+  if(profile.includes('taquilla')) return '#95a5a6';
+  return '#2ecc71';
+}
+
+function _guFilter(profile, btn){
+  window._guCurrentFilter = profile;
+  document.querySelectorAll('.gu-tab').forEach(el => {
+    el.style.background = 'rgba(255,255,255,0.1)';
+    el.style.color = 'var(--text)';
+    el.style.border = '1px solid var(--border)';
+  });
+  if(btn){
+    btn.style.background = 'var(--accent)';
+    btn.style.color = '#fff';
+    btn.style.border = 'none';
+  }
+  _guSearch();
+}
+
+function _guSearch(){
+  const q = document.getElementById('gu-search').value.toLowerCase();
+  _guRenderCards(q);
+}
+
+function _guRenderCards(query=''){
+  const container = document.getElementById('gu-container');
+  container.innerHTML = '';
+  
+  const filtered = window._guUsers.filter(u => {
+    let matchProfile = (window._guCurrentFilter === 'ALL' || u.profile_codename === window._guCurrentFilter);
+    let matchQuery = u.user.toLowerCase().includes(query) || (u.etiqueta||'').toLowerCase().includes(query);
+    return matchProfile && matchQuery;
+  });
+  
+  if(filtered.length === 0){
+    container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--muted);">No se encontraron usuarios</div>';
+    return;
+  }
+  
+  filtered.forEach(u => {
+    const color = _guGetColor(u.profile_codename);
+    container.innerHTML += `
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; box-shadow:0 4px 15px rgba(0,0,0,0.1); position:relative; overflow:hidden; transition:transform 0.2s; cursor:default;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='none'">
+        <div style="position:absolute; top:0; left:0; width:100%; height:4px; background:${color};"></div>
+        
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:45px; height:45px; border-radius:50%; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:20px; border:2px solid ${color}; color:${color}; font-weight:bold;">
+              ${u.user.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div style="font-size:16px; font-weight:800; color:var(--text);">${u.user}</div>
+              <div style="font-size:11px; color:var(--muted);">${u.etiqueta || 'Sin Etiqueta'}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-bottom:15px;">
+          <span style="display:inline-block; background:${color}33; color:${color}; padding:4px 8px; border-radius:4px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">
+            ${u.profile_name}
+          </span>
+        </div>
+        
+        <div style="display:flex; gap:8px; border-top:1px solid var(--border); padding-top:12px;">
+          <button onclick="_guOpenModal(${u.id})" style="flex:1; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--text); padding:6px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; transition:background 0.2s;" onmouseover="this.style.background='var(--accent)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+            ✏️ Editar
+          </button>
+          <button onclick="_guDelete(${u.id})" style="flex:1; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:#e74c3c; padding:6px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; transition:background 0.2s;" onmouseover="this.style.background='#e74c3c'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#e74c3c';">
+            🗑️ Eliminar
+          </button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function _guOpenModal(id=null){
+  let u = id ? window._guUsers.find(x => x.id === id) : null;
+  
+  // Build profile options
+  let profHtml = window._guProfiles.map(p => `<option value="${p.id}" ${u && u.profile_id === p.id ? 'selected' : ''}>${p.nombre}</option>`).join('');
+  
+  // Build permissions checkboxes
+  // Let's filter some key permissions for reports to not clutter
+  const keyPerms = window._guPermissions.filter(p => p.name.toLowerCase().includes('reporte') || p.name.toLowerCase().includes('cuadre') || p.name.toLowerCase().includes('resumen') || p.name.toLowerCase().includes('cierre') || p.name.toLowerCase().includes('estado de cuenta') || p.name.toLowerCase().includes('monitor'));
+  const permsToShow = keyPerms.length > 0 ? keyPerms : window._guPermissions;
+  
+  let permsHtml = permsToShow.map(p => {
+    let checked = u && u.permissions.includes(p.id) ? 'checked' : '';
+    return `
+      <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text); background:rgba(255,255,255,0.02); padding:8px; border-radius:6px; border:1px solid var(--border); cursor:pointer;">
+        <input type="checkbox" name="gu_perms" value="${p.id}" ${checked} style="accent-color:var(--accent); width:16px; height:16px;">
+        ${p.name}
+      </label>
+    `;
+  }).join('');
+  
+  const modalHtml = `
+    <div id="gu-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:9999; backdrop-filter:blur(5px);">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; width:100%; max-width:600px; box-shadow:0 10px 30px rgba(0,0,0,0.5); display:flex; flex-direction:column; max-height:90vh;">
+        <div style="padding:20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-size:18px; font-weight:800; color:var(--text);">${u ? '✏️ Editar Usuario' : '✨ Nuevo Usuario'}</div>
+          <button onclick="document.getElementById('gu-modal').remove()" style="background:none; border:none; color:var(--muted); font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+        
+        <div style="padding:20px; overflow-y:auto; flex:1;">
+          <input type="hidden" id="gu-id" value="${u ? u.id : ''}">
+          
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+            <div>
+              <label style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:6px; text-transform:uppercase;">Nombre de Usuario (*)</label>
+              <input type="text" id="gu-user" value="${u ? u.user : ''}" style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:10px; color:var(--text); outline:none;">
+            </div>
+            <div>
+              <label style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:6px; text-transform:uppercase;">Contraseña ${u ? '(En blanco = No cambiar)' : '(*)'}</label>
+              <input type="password" id="gu-pass" style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:10px; color:var(--text); outline:none;">
+            </div>
+          </div>
+          
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+            <div>
+              <label style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:6px; text-transform:uppercase;">Etiqueta (Nombre Comercial)</label>
+              <input type="text" id="gu-etiqueta" value="${u ? u.etiqueta : ''}" style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:10px; color:var(--text); outline:none;">
+            </div>
+            <div>
+              <label style="display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:6px; text-transform:uppercase;">Perfil / Rol (*)</label>
+              <select id="gu-profile" style="width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:10px; color:var(--text); outline:none;">
+                ${profHtml}
+              </select>
+            </div>
+          </div>
+          
+          <div style="margin-top:20px; margin-bottom:10px;">
+            <div style="font-size:13px; font-weight:800; color:var(--accent2); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+              🔐 Permisos Especiales (Habilitar Reportes)
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; max-height:200px; overflow-y:auto; padding-right:5px;">
+              ${permsHtml}
+            </div>
+          </div>
+          
+        </div>
+        
+        <div style="padding:20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px;">
+          <button onclick="document.getElementById('gu-modal').remove()" style="background:rgba(255,255,255,0.05); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:10px 20px; font-weight:700; cursor:pointer;">Cancelar</button>
+          <button onclick="_guSave()" style="background:var(--accent); color:#fff; border:none; border-radius:6px; padding:10px 20px; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.2);">Guardar Usuario</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+async function _guSave(){
+  const id = document.getElementById('gu-id').value;
+  const user = document.getElementById('gu-user').value;
+  const pass = document.getElementById('gu-pass').value;
+  const etiq = document.getElementById('gu-etiqueta').value;
+  const prof = document.getElementById('gu-profile').value;
+  
+  const perms = Array.from(document.querySelectorAll('input[name="gu_perms"]:checked')).map(cb => parseInt(cb.value));
+  
+  if(!user || !prof){
+    alert('Usuario y Perfil son obligatorios'); return;
+  }
+  if(!id && !pass){
+    alert('La contraseña es obligatoria para nuevos usuarios'); return;
+  }
+  
+  const payload = {
+    id: id || null,
+    user: user,
+    password: pass,
+    etiqueta: etiq,
+    profile_id: prof,
+    permissions: perms
+  };
+  
+  try {
+    const r = await fetch('/api/gestion-usuarios/', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if(d.ok){
+      document.getElementById('gu-modal').remove();
+      _guLoadData();
+    } else {
+      alert(d.error || 'Error al guardar');
+    }
+  } catch(e){
+    alert('Error de conexión');
+  }
+}
+
+async function _guDelete(id){
+  if(confirm('¿Seguro que deseas eliminar este usuario de forma permanente?')){
+    try {
+      const r = await fetch('/api/gestion-usuarios/?id='+id, {method:'DELETE'});
+      const d = await r.json();
+      if(d.ok) _guLoadData();
+      else alert(d.error);
+    } catch(e){
+      alert('Error de conexión');
+    }
+  }
+}
+

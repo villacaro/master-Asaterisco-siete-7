@@ -1,3 +1,4 @@
+from admin_asterisco7.gestion_usuarios_api import gestion_usuarios_api
 # -*- coding: utf-8 -*-
 
 from django.conf import settings
@@ -67,6 +68,7 @@ urlpatterns = [
     re_path(r'^api/liquidaciones-sorteo/$',                 liquidaciones_sorteo_api,   name='api_liquidaciones_sorteo'),
     re_path(r'^api/candidatos-riesgo/$',                     candidatos_riesgo_api,       name='api_candidatos_riesgo'),
     re_path(r'^api/cuadre-nivel-superior/$',                  cuadre_nivel_superior_api,   name='api_cuadre_nivel_superior'),
+    re_path(r'^api/gestion-usuarios/$', gestion_usuarios_api, name='api_gestion_usuarios'),
 
     # Urls del admin de django
     re_path(r'^' + settings.ADMIN_URL[1:], admin.site.urls),
