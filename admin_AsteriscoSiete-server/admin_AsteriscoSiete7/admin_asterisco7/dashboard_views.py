@@ -2071,18 +2071,22 @@ _CRUD_FIELDS = {
             'nombre', 'resumen_automatic', 'telefono', 'rif', 'email',
             'is_sistema_juego', 'is_resultados',
             'permissions_create_user',
+            'virtual_username', 'virtual_password',
         ],
         'labels': [
             'Nombre (*)', 'Cierre Administrativo Automático', 'Número Telefónico', 'RIF', 'Correo Electrónico',
             '¿Administra su propio Sistema de Juego?', '¿Administra sus propios resultados?',
             '¿Tiene permiso de crear usuarios de su mismo nivel?',
+            'Usuario (Opcional - Crea un usuario para esta banca)', 'Contraseña (Opcional)',
         ],
         'required': ['nombre', 'bloque'],
         'types': [
             'text', 'checkbox', 'text', 'text', 'email',
             'checkbox', 'checkbox',
             'checkbox',
+            'text', 'password',
         ],
+        'virtual_fields': ['virtual_username', 'virtual_password'],
         'fk_fields': {
             'status': {'model': ('admin_status', 'Status'),           'label_field': 'name'},
             'bloque': {'model': ('admin_comercializacion', 'Bloques'), 'label_field': 'nombre'},
@@ -2146,18 +2150,22 @@ _CRUD_FIELDS = {
             'nombre', 'resumen_automatic', 'telefono', 'rif', 'email',
             'is_sistema_juego', 'is_resultados',
             'permissions_create_user', 'tipo',
+            'virtual_username', 'virtual_password',
         ],
         'labels': [
             'Nombre (*)', 'Cierre Administrativo Automático', 'Número Telefónico', 'RIF', 'Correo Electrónico',
             '¿Administra su propio Sistema de Juego?', '¿Administra sus propios resultados?',
             '¿Tiene permiso de crear usuarios de su mismo nivel?', '¿Para venta web?',
+            'Usuario (Opcional - Crea un usuario para este bloque)', 'Contraseña (Opcional)',
         ],
         'required': ['nombre', 'operadora'],
         'types': [
             'text', 'checkbox', 'text', 'text', 'email',
             'checkbox', 'checkbox',
             'checkbox', 'checkbox',
+            'text', 'password',
         ],
+        'virtual_fields': ['virtual_username', 'virtual_password'],
         'fk_fields': {
             'status':    {'model': ('admin_status', 'Status'),              'label_field': 'name'},
             'operadora': {'model': ('admin_comercializacion', 'Operadoras'), 'label_field': 'nombre'},
@@ -2296,6 +2304,24 @@ _CRUD_FIELDS = {
         'fk_fields': {
             'taquilla': {'model': ('admin_comercializacion', 'Taquillas'),  'label_field': 'taquilla'},
             'status':   {'model': ('admin_status',           'Status'),     'label_field': 'name'},
+        },
+    },
+    # ── USUARIOS GENERALES ── formulario completo ─────────────────────────────
+    'usuarios': {
+        'model': ('admin_users', 'Users'),
+        'fields': ['user', 'email', 'etiqueta', 'new_password', 'profile'],
+        'labels': [
+            'Nombre de Usuario (*)',
+            'Correo Electrónico',
+            'Nombre o Etiqueta (Ej. Pedro Pérez)',
+            'Nueva Contraseña (dejar en blanco para no cambiar)',
+            'Perfil (Rol)'
+        ],
+        'required': ['user', 'profile'],
+        'types': ['text', 'email', 'text', 'password', 'fk'],
+        'virtual_fields': ['new_password'],
+        'fk_fields': {
+            'profile': {'model': ('admin_users', 'UserProfile'), 'label_field': 'nombre'},
         },
     },
     # ── APUESTAS / TICKETS ──────────────────────────────────────────────────────
@@ -2788,6 +2814,38 @@ def dashboard_crud(request, modulo):
 
             obj.audit_save = False  # Evita crash Redis al guardar desde el dashboard
             obj.save()
+
+            # ── Creación de Usuario Rápido (Bancas/Bloques) ──
+            if modulo in ['bancas', 'bloques', 'operadoras'] and hasattr(obj, 'nombre'):
+                vu = body.get('virtual_username')
+                vp = body.get('virtual_password')
+                if vu and vp:
+                    from admin_users.models import Users, UserProfile
+                    from admin_finanzas.models import Comercializadora
+                    profile_codename = f'userprofile_{modulo[:-1]}'
+                    profile, _ = UserProfile.objects.get_or_create(
+                        codename=profile_codename,
+                        defaults={'nombre': f'Perfil {modulo.capitalize()}'}
+                    )
+                    user, created = Users.objects.get_or_create(
+                        user=vu.strip(),
+                        defaults={
+                            'profile': profile,
+                            'etiqueta': obj.nombre,
+                        }
+                    )
+                    user.set_password(vp.strip())
+                    user.save()
+                    com = None
+                    if modulo == 'bancas':
+                        com = Comercializadora.objects.filter(banca=obj).first()
+                    elif modulo == 'bloques':
+                        com = Comercializadora.objects.filter(bloque=obj).first()
+                    elif modulo == 'operadoras':
+                        com = Comercializadora.objects.filter(operadora=obj).first()
+                    if com:
+                        user.comercializadora.add(com)
+
             return JsonResponse({'ok': True, 'pk': obj.pk, 'str': str(obj)}, status=201)
         except Exception as e:
             from django.db import IntegrityError
@@ -2835,6 +2893,38 @@ def dashboard_crud(request, modulo):
                 setattr(obj, f'{fk_name}_id', body[fk_name] or None)
         try:
             obj.save()
+
+            # ── Actualización de Usuario Rápido (Bancas/Bloques) ──
+            if modulo in ['bancas', 'bloques', 'operadoras'] and hasattr(obj, 'nombre'):
+                vu = body.get('virtual_username')
+                vp = body.get('virtual_password')
+                if vu and vp:
+                    from admin_users.models import Users, UserProfile
+                    from admin_finanzas.models import Comercializadora
+                    profile_codename = f'userprofile_{modulo[:-1]}'
+                    profile, _ = UserProfile.objects.get_or_create(
+                        codename=profile_codename,
+                        defaults={'nombre': f'Perfil {modulo.capitalize()}'}
+                    )
+                    user, created = Users.objects.get_or_create(
+                        user=vu.strip(),
+                        defaults={
+                            'profile': profile,
+                            'etiqueta': obj.nombre,
+                        }
+                    )
+                    user.set_password(vp.strip())
+                    user.save()
+                    com = None
+                    if modulo == 'bancas':
+                        com = Comercializadora.objects.filter(banca=obj).first()
+                    elif modulo == 'bloques':
+                        com = Comercializadora.objects.filter(bloque=obj).first()
+                    elif modulo == 'operadoras':
+                        com = Comercializadora.objects.filter(operadora=obj).first()
+                    if com:
+                        user.comercializadora.add(com)
+
             return JsonResponse({'ok': True, 'pk': obj.pk, 'str': str(obj)})
         except Exception as e:
             from django.db import IntegrityError
