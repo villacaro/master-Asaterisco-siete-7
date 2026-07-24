@@ -2790,7 +2790,10 @@ def dashboard_crud(request, modulo):
             obj.save()
             return JsonResponse({'ok': True, 'pk': obj.pk, 'str': str(obj)}, status=201)
         except Exception as e:
+            from django.db import IntegrityError
             import traceback
+            if isinstance(e, IntegrityError) and 'UNIQUE constraint failed' in str(e):
+                return JsonResponse({'error': 'Ya existe un registro con estos datos. No se permiten nombres o valores duplicados.'}, status=400)
             return JsonResponse({'error': str(e), 'trace': traceback.format_exc()}, status=500)
 
     # ── PUT: actualizar ────────────────────────────────────────────────────────
@@ -2834,6 +2837,9 @@ def dashboard_crud(request, modulo):
             obj.save()
             return JsonResponse({'ok': True, 'pk': obj.pk, 'str': str(obj)})
         except Exception as e:
+            from django.db import IntegrityError
+            if isinstance(e, IntegrityError) and 'UNIQUE constraint failed' in str(e):
+                return JsonResponse({'error': 'Ya existe un registro con estos datos. No se permiten nombres o valores duplicados.'}, status=400)
             return JsonResponse({'error': str(e)}, status=500)
 
     # ── DELETE ────────────────────────────────────────────────────────────────
