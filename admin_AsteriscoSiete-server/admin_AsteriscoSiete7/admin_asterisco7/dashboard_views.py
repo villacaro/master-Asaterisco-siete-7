@@ -699,7 +699,7 @@ def taquilla_reporte_tickets(request):
             'ok': True, 'fecha': fecha,
             'count': len(filtered),
             'total_venta': round(total_venta, 2),
-            'boletos': filtered,
+            'tickets': filtered,
         }, json_dumps_params={'ensure_ascii': False})
     except Exception as e:
         import traceback
@@ -727,7 +727,7 @@ def taquilla_reporte_ganadores(request):
         return JsonResponse({
             'ok': True, 'fecha': fecha,
             'count': len(ganadores),
-            'boletos': ganadores,
+            'tickets': ganadores,
         }, json_dumps_params={'ensure_ascii': False})
     except Exception as e:
         import traceback
