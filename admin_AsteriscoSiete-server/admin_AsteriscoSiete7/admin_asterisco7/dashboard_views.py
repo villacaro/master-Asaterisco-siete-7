@@ -895,8 +895,6 @@ def cuadre_nivel_superior_api(request):
     Devuelve el cuadre diario con saldo anterior, venta, premios, operador.
     """
     import datetime, calendar
-    from django.db import connection
-
     mes_str  = request.GET.get('mes', '')
     banca_id = request.GET.get('banca', '').strip()
 
@@ -906,31 +904,31 @@ def cuadre_nivel_superior_api(request):
         else:
             hoy = datetime.date.today()
             y, m = hoy.year, hoy.month
+            mes_str = f"{y:04d}-{m:02d}"
+        
         primer_dia = datetime.date(y, m, 1)
         ultimo_dia = datetime.date(y, m, calendar.monthrange(y, m)[1])
     except Exception:
         return JsonResponse({'ok': False, 'error': 'Mes invalido. Use YYYY-MM.'}, status=400)
 
-    DIAS_ES = {0:'Lunes',1:'Martes',2:'Miercoles',3:'Jueves',4:'Viernes',5:'Sabado',6:'Domingo'}
-    _ensure_taquilla_table()
+    DIAS_ES = {0:'Lunes',1:'Martes',2:'Miércoles',3:'Jueves',4:'Viernes',5:'Sábado',6:'Domingo'}
 
     try:
-        with connection.cursor() as cur:
-            cur.execute(
-                "SELECT DATE(fecha), COALESCE(SUM(total),0), COUNT(*) "
-                "FROM taquilla_boleto "
-                "WHERE DATE(fecha) >= %s AND DATE(fecha) <= %s AND status='activo' "
-                "GROUP BY DATE(fecha) ORDER BY DATE(fecha)",
-                [primer_dia.isoformat(), ultimo_dia.isoformat()]
-            )
-            ventas_por_dia = {}
-            for row in cur.fetchall():
-                fd = str(row[0])[:10]
-                ventas_por_dia[fd] = {'venta': float(row[1]), 'tickets': int(row[2])}
+        # Usar la función existente para obtener todos los tickets del mes
+        boletos = _get_tickets_as_boletos_format(primer_dia.isoformat(), ultimo_dia.isoformat(), banca_id)
+        
+        ventas_por_dia = {}
+        for b in boletos:
+            fecha_str = b['fecha'].split(' ')[0] if ' ' in b['fecha'] else b['fecha'].split('T')[0]
+            if fecha_str not in ventas_por_dia:
+                ventas_por_dia[fecha_str] = {'venta': 0.0, 'premios': 0.0}
+            
+            ventas_por_dia[fecha_str]['venta'] += float(b['total'])
+            ventas_por_dia[fecha_str]['premios'] += float(b['prizeValue'])
 
-        FACTOR_PREMIOS = 0.30
-        FACTOR_PCT     = 0.20
-        FACTOR_OP      = 0.10
+        # Porcentajes de ejemplo (ajustables)
+        PCT_BANCA = 0.15
+        PCT_REGALIA = 0.0
 
         rows = []
         saldo_acumulado = 0.0
@@ -938,26 +936,45 @@ def cuadre_nivel_superior_api(request):
 
         while current <= ultimo_dia:
             fs = current.isoformat()
-            dd = ventas_por_dia.get(fs, {'venta': 0, 'tickets': 0})
+            dia_semana = DIAS_ES[current.weekday()]
+            
+            dd = ventas_por_dia.get(fs, {'venta': 0.0, 'premios': 0.0})
             venta    = dd['venta']
-            premios  = round(venta * FACTOR_PREMIOS, 2)
-            pct      = round(venta * FACTOR_PCT, 2)
-            operador = round((venta - premios - pct) * FACTOR_OP, 2)
-            sa_prev  = saldo_acumulado
-            saldo_acumulado = sa_prev + venta - premios + operador
+            premios  = dd['premios']
+            
+            # Si no hay ventas ni es el día actual, podríamos saltarlo, 
+            # pero el reporte de cuadre suele mostrar todos los días del mes o hasta el día actual.
+            # Para no llenar de ceros el futuro:
+            if venta == 0 and current > datetime.date.today():
+                current += datetime.timedelta(days=1)
+                continue
 
-            if venta > 0:
-                rows.append({
-                    'fecha': current.strftime('%d/%m/%Y'),
-                    'dia':   DIAS_ES[current.weekday()],
-                    'sa':    round(sa_prev, 2),
-                    'venta': round(venta, 2),
-                    'premios': premios,
-                    'pct':     pct,
-                    'regalia': 0, 'saldo': 0,
-                    'operador': operador,
-                    'dep': 0, 'pagos': 0, 'ajuste': 0, 'cargos': 0,
-                })
+            pct_banca = round(venta * PCT_BANCA, 2)
+            regalia   = round(venta * PCT_REGALIA, 2)
+            
+            # Saldo del día
+            saldo_dia = venta - premios - pct_banca - regalia
+            operador  = saldo_dia # Asumimos Operador = Saldo del día según ejemplo
+            
+            sa_prev = saldo_acumulado
+            saldo_acumulado = sa_prev + saldo_dia
+
+            rows.append({
+                'fecha': fs,
+                'dia': dia_semana,
+                'sa': round(sa_prev, 2),
+                'venta': round(venta, 2),
+                'premios': round(premios, 2),
+                'pct': round(pct_banca, 2),
+                'regalia': round(regalia, 2),
+                'saldo': round(saldo_dia, 2),
+                'operador': round(operador, 2),
+                'dep': 0.00,
+                'pagos': 0.00,
+                'ajuste': 0.00,
+                'cargos': 0.00,
+            })
+            
             current += datetime.timedelta(days=1)
 
         nombres = {'1':'CARACAS','2':'MIRANDA','3':'MARACAIBO'}
