@@ -3484,20 +3484,13 @@ async function renderDashboard(){
 
   // ── KPI badges config ──────────────────────────────────────────
 
-  const kpis = [
-
-    {icon:'🌐', val:s.operadoras??0,    lbl:'Operadoras activas',  tag:'Red',     tagClr:'kp'},
-
-    {icon:'🏪', val:s.bancas??0,         lbl:'Bancas registradas',  tag:`+${s.bloques??0} MB`, tagClr:'kb'},
-
-    {icon:'🎟️', val:s.taquillas??0,      lbl:'Taquillas en línea',  tag:'Activas', tagClr:'kg'},
-
-    {icon:'🔢', val:s.sorteos_total??0,  lbl:'Sorteos del día',     tag:'Hoy',     tagClr:'ky'},
-
-    {icon:'🎫', val:s.tickets_hoy??0,    lbl:'Tickets emitidos',    tag:'Live',    tagClr:'kr'},
-
-    {icon:'🐾', val:s.animalitos??0,     lbl:'Animalitos registrados',tag:'Catalog',tagClr:'kc'},
-
+      const kpis = [
+    {icon:'🌐', val:s.operadoras??0,    lbl:'Operadoras activas',  tag:'Red',     tagClr:'kp', url:'/operadores', nav:'operadoras', tit:'Operadoras'},
+    {icon:'🏪', val:s.bancas??0,         lbl:'Bancas registradas',  tag:`+${s.bloques??0} MB`, tagClr:'kb', url:'/bancas', nav:'bancas', tit:'Bancas'},
+    {icon:'🎟️', val:s.taquillas??0,      lbl:'Taquillas en línea',  tag:'Activas', tagClr:'kg', url:'/taquillas/en-linea', nav:'taquillas', tit:'Taquillas'},
+    {icon:'🔢', val:s.sorteos_total??0,  lbl:'Sorteos del día',     tag:'Hoy',     tagClr:'ky', url:'/sorteos', nav:'sorteos', tit:'Sorteos'},
+    {icon:'🎫', val:s.tickets_hoy??0,    lbl:'Tickets emitidos',    tag:'Live',    tagClr:'kr', url:'/tickets', nav:'tickets', tit:'Tickets de Apuesta'},
+    {icon:'🐾', val:s.animalitos??0,     lbl:'Animalitos registrados',tag:'Catalog',tagClr:'kc', url:'/catalogos/animalitos', nav:'animalitos', tit:'Animalitos'},
   ];
 
 
@@ -3520,42 +3513,27 @@ async function renderDashboard(){
 
   // ── Jerarquía árbol ────────────────────────────────────────────
 
-  const hier = [
-
-    {icon:'🌐',name:'Operadoras',      key:'operadoras',      cnt:s.operadoras??0,      clr:'#7c3aed',depth:0},
-
-    {icon:'🏗️',name:'Multi Bancas',    key:'bloques',         cnt:s.bloques??0,          clr:'#2563eb',depth:1},
-
-    {icon:'🏪',name:'Bancas',          key:'bancas',          cnt:s.bancas??0,           clr:'#0891b2',depth:2},
-
-    {icon:'🚚',name:'Distribuidores',  key:'distribuidores',  cnt:s.distribuidores??0,   clr:'#d97706',depth:3},
-
-    {icon:'📍',name:'Centros de Apuesta',key:'agencias',      cnt:s.agencias??0,         clr:'#64748b',depth:4},
-
-    {icon:'🎟️',name:'Taquillas',       key:'taquillas',       cnt:s.taquillas??0,        clr:'#64748b',depth:4},
-
-    {icon:'👤',name:'Usuarios Taquilla',key:'unuserid_SKIP',  cnt:s.usuarios_taquilla??0,clr:'#64748b',depth:4},
-
+      const hier = [
+    {icon:'🌐',name:'Operadoras',      key:'operadoras',      url:'/red/operadoras',      nav:'operadoras',      cnt:s.operadoras??0,      clr:'#7c3aed',depth:0},
+    {icon:'🏗️',name:'Multi Bancas',    key:'bloques',         url:'/red/multibancas',     nav:'bloques',         cnt:s.bloques??0,          clr:'#2563eb',depth:1},
+    {icon:'🏪',name:'Bancas',          key:'bancas',          url:'/red/bancas',          nav:'bancas',          cnt:s.bancas??0,           clr:'#0891b2',depth:2},
+    {icon:'🚚',name:'Distribuidores',  key:'distribuidores',  url:'/red/distribuidores',  nav:'distribuidores',  cnt:s.distribuidores??0,   clr:'#d97706',depth:3},
+    {icon:'📍',name:'Centros de Apuesta',key:'agencias',      url:'/red/centros-apuesta', nav:'agencias',        cnt:s.agencias??0,         clr:'#64748b',depth:4},
+    {icon:'🎟️',name:'Taquillas',       key:'taquillas',       url:'/red/taquillas',       nav:'taquillas',       cnt:s.taquillas??0,        clr:'#64748b',depth:4},
+    {icon:'👤',name:'Usuarios Taquilla',key:'usuariostaquilla',url:'/red/usuarios-taquilla', nav:'usuariostaquilla', cnt:s.usuarios_taquilla??0,clr:'#64748b',depth:4},
   ];
 
 
 
   // ── Accesos rápidos ────────────────────────────────────────────
 
-  const rapidos = [
-
-    {icon:'🎯',lbl:'Loterías',    nav:'loterias',    tit:'Loterías'},
-
-    {icon:'🔢',lbl:'Sorteos',     nav:'sorteos',     tit:'Sorteos'},
-
-    {icon:'🐾',lbl:'Animalitos',  nav:'animalitos',  tit:'Animalitos'},
-
-    {icon:'📦',lbl:'Productos',   nav:'tipoproducto',tit:'Tipos de Producto'},
-
-    {icon:'📊',lbl:'Resultados',  nav:'resultados',  tit:'Resultados'},
-
-    {icon:'📑',lbl:'Liquidaciones',nav:'liquidaciones',tit:'Liquidaciones'},
-
+      const rapidos = [
+    {icon:'🎯',lbl:'Loterías',    url:'/modulos/loterias',      nav:'loterias',    tit:'Loterías'},
+    {icon:'🔢',lbl:'Sorteos',     url:'/modulos/sorteos',       nav:'sorteos',     tit:'Sorteos'},
+    {icon:'🐾',lbl:'Animalitos',  url:'/modulos/animalitos',    nav:'animalitos',  tit:'Animalitos'},
+    {icon:'📦',lbl:'Productos',   url:'/modulos/productos',     nav:'tipoproducto',tit:'Tipos de Producto'},
+    {icon:'📊',lbl:'Resultados',  url:'/modulos/resultados',    nav:'resultados',  tit:'Resultados'},
+    {icon:'📑',lbl:'Liquidaciones',url:'/modulos/liquidaciones', nav:'liquidaciones',tit:'Liquidaciones'},
   ];
 
 
@@ -3606,23 +3584,15 @@ async function renderDashboard(){
 
     <div class="kpi-grid">
 
-      ${kpis.map(k=>`
-
-        <div class="kpi ${k.tagClr}" style="padding:18px 16px;position:relative;overflow:hidden;cursor:default">
-
+                  ${kpis.map(k=>`
+        <a href="${k.url}" onclick="navigate('${k.nav}', '${k.tit}'); return false;" class="kpi ${k.tagClr}" style="text-decoration:none;color:inherit;display:block;padding:18px 16px;position:relative;overflow:hidden;cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-
             <span style="font-size:26px">${k.icon}</span>
-
             <span style="font-size:9px;font-weight:600;letter-spacing:.8px;padding:3px 8px;border-radius:20px;background:var(--accent-bg);color:var(--accent2)">${k.tag}</span>
-
           </div>
-
           <div style="font-size:28px;font-weight:700;line-height:1">${k.val.toLocaleString()}</div>
-
           <div style="font-size:11px;color:var(--text2);margin-top:5px">${k.lbl}</div>
-
-        </div>`).join('')}
+        </a>`).join('')}
 
     </div>
 
@@ -3654,23 +3624,15 @@ async function renderDashboard(){
 
         <div style="padding:4px 0">
 
-          ${actData.map(a=>`
-
-            <div style="display:flex;gap:14px;padding:13px 20px;border-bottom:1px solid var(--border);align-items:flex-start">
-
+                    ${actData.map(a=>`
+            <a href="/actividad" onclick="navigate('movimientos', '${escHtml(a.title)}'); return false;" style="text-decoration:none;color:inherit;display:flex;gap:14px;padding:13px 20px;border-bottom:1px solid var(--border);align-items:flex-start;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--accent-bg)'" onmouseout="this.style.background=''">
               <span style="width:9px;height:9px;border-radius:50%;background:${dotColor[a.color]||'var(--muted)'};flex-shrink:0;margin-top:4px"></span>
-
               <div style="flex:1;min-width:0">
-
                 <div style="font-size:12.5px;font-weight:600;color:var(--text)">${escHtml(a.title)}</div>
-
                 <div style="font-size:11px;color:var(--text2);margin-top:2px">${escHtml(a.sub)}</div>
-
               </div>
-
               <span style="font-size:10px;color:var(--muted);white-space:nowrap">${escHtml(a.time)}</span>
-
-            </div>`).join('')}
+            </a>`).join('')}
 
         </div>
 
@@ -3700,21 +3662,13 @@ async function renderDashboard(){
 
           ${hier.map((h,i)=>`
 
-            <div style="display:flex;align-items:center;gap:10px;padding:10px 16px ${i<hier.length-1?';border-bottom:1px solid var(--border)':''};"
-
-              ${h.key!=='unuserid_SKIP'?`onclick="navigate('${h.key}','${h.name}')" style="cursor:pointer;padding-left:${16+h.depth*18}px;transition:background .15s" onmouseover="this.style.background='var(--accent-bg)'" onmouseout="this.style.background=''"`:''}>
-
+                                    <a href="${h.url}" onclick="navigate('${h.nav}', '${h.name}'); return false;" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:10px;padding:10px 16px ${i<hier.length-1?';border-bottom:1px solid var(--border)':''};cursor:pointer;padding-left:${16+h.depth*18}px;transition:background .15s" onmouseover="this.style.background='var(--accent-bg)'" onmouseout="this.style.background=''">
               <span style="font-size:13px;width:18px;text-align:center;flex-shrink:0">${h.icon}</span>
-
               <div style="flex:1">
-
                 <span style="font-size:12px;font-weight:${h.depth<3?'600':'500'};color:${h.depth<3?'var(--text)':'var(--text2)'}">${h.name}</span>
-
               </div>
-
               <span style="font-size:12px;font-weight:700;color:${h.clr};min-width:28px;text-align:right">${h.cnt}</span>
-
-            </div>`).join('')}
+            </a>`).join('')}
 
         </div>
 
@@ -3754,17 +3708,12 @@ async function renderDashboard(){
 
           ${rapidos.map(r=>`
 
-            <button onclick="navigate('${r.nav}','${r.tit}')"
-
-              style="padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card2);color:var(--text);font-size:11.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s"
-
+                                    <a href="${r.url}" onclick="navigate('${r.nav}', '${r.tit}'); return false;"
+              style="text-decoration:none;padding:9px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card2);color:var(--text);font-size:11.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s"
               onmouseover="this.style.background='var(--accent-bg)';this.style.borderColor='var(--accent)'"
-
               onmouseout="this.style.background='var(--card2)';this.style.borderColor='var(--border)'">
-
               <span style="font-size:14px">${r.icon}</span>${r.lbl}
-
-            </button>`).join('')}
+            </a>`).join('')}
 
         </div>
 
@@ -3792,17 +3741,12 @@ async function renderDashboard(){
 
         <div style="padding:6px 0">
 
-          ${sistema.map((srv,i)=>`
-
-            <div style="display:flex;align-items:center;padding:9px 18px;${i<sistema.length-1?'border-bottom:1px solid var(--border)':''}">
-
+                    ${sistema.map((srv,i)=>`
+            <a href="/sistema/estado" onclick="navigate('statuslist', '${escHtml(srv.label)}'); return false;" style="text-decoration:none;color:inherit;display:flex;align-items:center;padding:9px 18px;${i<sistema.length-1?'border-bottom:1px solid var(--border)':''};cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--accent-bg)'" onmouseout="this.style.background=''">
               <span style="width:8px;height:8px;border-radius:50%;background:${statusColor[srv.color]||'var(--muted)'};margin-right:10px;flex-shrink:0"></span>
-
               <span style="flex:1;font-size:12px;color:var(--text2)">${escHtml(srv.label)}</span>
-
               <span style="font-size:12px;font-weight:600;color:${statusColor[srv.color]||'var(--muted)'}">${escHtml(srv.status)}</span>
-
-            </div>`).join('')}
+            </a>`).join('')}
 
         </div>
 
@@ -3830,13 +3774,10 @@ async function renderDashboard(){
 
         <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:7px">
 
-          ${prodsActivos.map(p=>`
-
-            <div style="padding:8px 10px;background:var(--card2);border:1px solid var(--border);border-radius:7px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500">
-
+                              ${prodsActivos.map(p=>`
+            <a href="/productos/configuracion/${p.toLowerCase().replace(/[^a-z0-9]+/g, '-')}" onclick="navigate('productoloteria', '${escHtml(p)}'); return false;" style="text-decoration:none;color:inherit;padding:8px 10px;background:var(--card2);border:1px solid var(--border);border-radius:7px;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;transition:all .15s" onmouseover="this.style.background='var(--accent-bg)';this.style.borderColor='var(--accent)'" onmouseout="this.style.background='var(--card2)';this.style.borderColor='var(--border)'">
               <span style="font-size:13px">🎲</span>${escHtml(p)}
-
-            </div>`).join('')}
+            </a>`).join('')}
 
         </div>
 
@@ -3866,11 +3807,9 @@ async function renderDashboard(){
 
         </div>
 
-        <button onclick="renderCandidatos()" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer">
-
+                        <a href="/analisis/completo" onclick="renderCandidatos(); return false;" style="display:inline-block;text-decoration:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
           🔎 Ver completo
-
-        </button>
+        </a>
 
       </div>
 
