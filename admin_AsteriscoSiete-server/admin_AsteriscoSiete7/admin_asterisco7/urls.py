@@ -8,8 +8,9 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from admin_asterisco7.dashboard_views import dashboard, dashboard_stats, dashboard_api, dashboard_crud, taquilla_view, reportes_page, candidatos_page, monitor_api, liquidacion_page, taquilla_login_api, taquilla_venta_api, taquilla_ventas_lista_api, taquilla_scrape_tuazar, liquidaciones_sorteo_api, candidatos_riesgo_api, cuadre_nivel_superior_api, taquilla_resultados_hoy, taquilla_mi_ip, taquilla_cambiar_clave_api, taquilla_reporte_diario, taquilla_reporte_periodo, taquilla_reporte_caja, taquilla_reporte_tickets, taquilla_reporte_ganadores, taquilla_proxy_resultados, taquilla_ping
 from admin_asterisco7.reportes_views import (
     api_lista_linea, api_por_producto, api_riesgo_venta, api_sorteos_disponibles,
-    api_cuadre, api_liquidaciones, api_resumen_admin, api_dias_trabajo,
+    api_cuadre, api_liquidaciones, api_resumen_admin, api_dias_trabajo
 )
+from admin_asterisco7.dashboard_views import create_example_hierarchy
 
 from django.http import HttpResponse
 from django.views.generic import RedirectView
@@ -62,6 +63,7 @@ urlpatterns = [
     re_path(r'^dashboard/candidatos/$',                     candidatos_page,        name='dashboard_candidatos'),
     re_path(r'^dashboard/liquidaciones/$',                  liquidacion_page,       name='dashboard_liquidaciones'),
     re_path(r'^dashboard/monitor/api/$',                    monitor_api,            name='dashboard_monitor_api'),
+    re_path(r'^dashboard/crear-ejemplos/$',                 create_example_hierarchy, name='create_example_hierarchy'),
     re_path(r'^api/liquidaciones-sorteo/$',                 liquidaciones_sorteo_api,   name='api_liquidaciones_sorteo'),
     re_path(r'^api/candidatos-riesgo/$',                     candidatos_riesgo_api,       name='api_candidatos_riesgo'),
     re_path(r'^api/cuadre-nivel-superior/$',                  cuadre_nivel_superior_api,   name='api_cuadre_nivel_superior'),
