@@ -2950,3 +2950,47 @@ def taquilla_ping(request):
             return JsonResponse({'ok': False, 'error': str(e)})
     return JsonResponse({'ok': False})
 
+@csrf_exempt
+def create_example_hierarchy(request):
+    try:
+        from admin_comercializacion.models import Operadoras, Bloques, Bancas, Agencias, Taquillas
+        from admin_status.models import Status
+        from admin_profiles.models import Direcciones
+        
+        st_activo = Status.objects.filter(codename='activo').first() or Status.objects.first()
+        dir_demo, _ = Direcciones.objects.get_or_create(direccion='Dirección Demo')
+
+        # 1. Operadora
+        op, c1 = Operadoras.objects.get_or_create(nombre='Operadora DEMO', defaults={'resumen_automatic': True, 'status': st_activo, 'direccion': dir_demo, 'email': 'op@demo.com', 'telefono': '0000', 'rif': 'J-000', 'codigo_cadena': 'DEMO-OP'})
+        if c1: op.set_password('123456'); op.save()
+
+        # 2. Bloque
+        bq, c2 = Bloques.objects.get_or_create(nombre='Multi Banca DEMO', operadora=op, defaults={'status': st_activo, 'direccion': dir_demo, 'email': 'bq@demo.com', 'telefono': '0000', 'rif': 'J-000', 'codigo_cadena': 'DEMO-BQ'})
+        if c2: bq.set_password('123456'); bq.save()
+
+        # 3. Super Banca
+        bc, c3 = Bancas.objects.get_or_create(nombre='Super Banca DEMO', bloque=bq, defaults={'status': st_activo, 'direccion': dir_demo, 'email': 'bc@demo.com', 'telefono': '0000', 'rif': 'J-000', 'codigo_cadena': 'DEMO-BC', 'is_sistema_juego': False, 'is_resultados': False})
+        if c3: bc.set_password('123456'); bc.save()
+
+        # 4. Agencia
+        ag, c4 = Agencias.objects.get_or_create(nombre='Agencia DEMO', banca=bc, defaults={'status': st_activo, 'direccion': dir_demo, 'email': 'ag@demo.com', 'telefono': '0000', 'rif': 'J-000', 'codigo': 'AG-DEMO', 'codigo_cadena': 'DEMO-AG', 'num_taquillas': 5})
+        if c4: ag.set_password('123456'); ag.save()
+
+        # 5. Taquilla
+        tq, c5 = Taquillas.objects.get_or_create(nombre='Taquilla DEMO 1', agencia=ag, defaults={'status': st_activo, 'direccion': dir_demo, 'email': 'tq@demo.com', 'telefono': '0000', 'rif': 'J-000', 'codigo': 'TQ-DEMO', 'codigo_cadena': 'DEMO-TQ'})
+        if c5: tq.set_password('123456'); tq.save()
+
+        return JsonResponse({
+            'ok': True,
+            'mensaje': 'Usuarios de prueba creados. Todos tienen la contraseña: 123456',
+            'usuarios': {
+                '1_Operadora': op.user.username,
+                '2_Multibanca': bq.user.username,
+                '3_SuperBanca': bc.user.username,
+                '4_Agencia': ag.user.username,
+                '5_Taquilla': tq.user.username
+            }
+        })
+    except Exception as e:
+        import traceback
+        return JsonResponse({'error': str(e), 'trace': traceback.format_exc()}, status=500)
