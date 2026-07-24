@@ -2961,34 +2961,21 @@ def create_example_hierarchy(request):
         dir_demo, _ = Direcciones.objects.get_or_create(direccion='Dirección Demo')
 
         # 1. Operadora
-        op, c1 = Operadoras.objects.get_or_create(nombre='Operadora DEMO', defaults={'resumen_automatic': True, 'status': st_activo, 'direccion': dir_demo, 'email': 'op@demo.com', 'telefono': '0000', 'rif': 'J-000', 'codigo_cadena': 'DEMO-OP'})
-        if c1: op.set_password('123456'); op.save()
+        op, c1 = Operadoras.objects.get_or_create(nombre='OPERADORA DEMO', defaults={'resumen_automatic': True, 'status': st_activo, 'direccion': dir_demo, 'email': 'op@demo.com', 'telefono': '0000', 'rif': 'J-000'})
 
         # 2. Bloque
-        bq, c2 = Bloques.objects.get_or_create(nombre='Multi Banca DEMO', operadora=op, defaults={'status': st_activo, 'direccion': dir_demo, 'email': 'bq@demo.com', 'telefono': '0000', 'rif': 'J-000', 'codigo_cadena': 'DEMO-BQ'})
-        if c2: bq.set_password('123456'); bq.save()
+        bq, c2 = Bloques.objects.get_or_create(nombre='MULTI BANCA DEMO', operadora=op, defaults={'status': st_activo, 'direccion': dir_demo, 'email': 'bq@demo.com', 'telefono': '0000', 'rif': 'J-000'})
 
         # 3. Super Banca
-        bc, c3 = Bancas.objects.get_or_create(nombre='Super Banca DEMO', bloque=bq, defaults={'status': st_activo, 'direccion': dir_demo, 'email': 'bc@demo.com', 'telefono': '0000', 'rif': 'J-000', 'codigo_cadena': 'DEMO-BC', 'is_sistema_juego': False, 'is_resultados': False})
-        if c3: bc.set_password('123456'); bc.save()
-
-        # 4. Agencia
-        ag, c4 = Agencias.objects.get_or_create(nombre='Agencia DEMO', banca=bc, defaults={'status': st_activo, 'direccion': dir_demo, 'email': 'ag@demo.com', 'telefono': '0000', 'rif': 'J-000', 'codigo': 'AG-DEMO', 'codigo_cadena': 'DEMO-AG', 'num_taquillas': 5})
-        if c4: ag.set_password('123456'); ag.save()
-
-        # 5. Taquilla
-        tq, c5 = Taquillas.objects.get_or_create(nombre='Taquilla DEMO 1', agencia=ag, defaults={'status': st_activo, 'direccion': dir_demo, 'email': 'tq@demo.com', 'telefono': '0000', 'rif': 'J-000', 'codigo': 'TQ-DEMO', 'codigo_cadena': 'DEMO-TQ'})
-        if c5: tq.set_password('123456'); tq.save()
+        bc, c3 = Bancas.objects.get_or_create(nombre='SUPER BANCA DEMO', bloque=bq, defaults={'status': st_activo, 'direccion': dir_demo, 'email': 'bc@demo.com', 'telefono': '0000', 'rif': 'J-000', 'is_sistema_juego': False, 'is_resultados': False})
 
         return JsonResponse({
             'ok': True,
-            'mensaje': 'Usuarios de prueba creados. Todos tienen la contraseña: 123456',
+            'mensaje': 'Usuarios de prueba creados correctamente. Puedes verlos en el listado de cada módulo.',
             'usuarios': {
-                '1_Operadora': op.user.username,
-                '2_Multibanca': bq.user.username,
-                '3_SuperBanca': bc.user.username,
-                '4_Agencia': ag.user.username,
-                '5_Taquilla': tq.user.username
+                '1_Operadora': op.nombre,
+                '2_Multibanca': bq.nombre,
+                '3_SuperBanca': bc.nombre
             }
         })
     except Exception as e:

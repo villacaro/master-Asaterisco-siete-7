@@ -288,7 +288,10 @@ def save_audit(kwargs={}, process=None, propiedades=[]):
     else:
         # REDIS_DB puede ser None en entorno local (sin Redis configurado)
         if REDIS_DB is not None:
-            session = REDIS_DB.get('{0}'.format(thread.get_ident()))
+            try:
+                session = REDIS_DB.get('{0}'.format(thread.get_ident()))
+            except Exception:
+                session = None
 
     json_update = {
         'model': instance._meta.app_label + '.' + instance.__class__.__name__,
