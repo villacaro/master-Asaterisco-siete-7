@@ -1225,10 +1225,16 @@ def monitor_api(request):
         pass
 
     # 3. Construir filas desde HechoConnectionsComer
+    from django.utils.timezone import is_aware, make_aware
     rows = []
     try:
         for c in HechoConn.objects.all().order_by('-connection_at')[:500]:
             conn_at = c.connection_at
+            
+            # Fix para PostgreSQL (Railway) si connection_at es naive
+            if conn_at and not is_aware(conn_at):
+                conn_at = make_aware(conn_at)
+                
             if conn_at >= limite_online:
                 estado = 'online'
             elif conn_at >= limite_reciente:
