@@ -10003,363 +10003,203 @@ function _cnsCalcSaldoActual(row){
 
 
 function renderCuadreNivelSuperior(){
-
   currentModule = 'cuadre-nivel'; currentTitle = 'Cuadre con Nivel Superior';
-
   if(_monitorTimer){ clearInterval(_monitorTimer); _monitorTimer=null; }
 
-
-
   const area = document.getElementById('content-area');
-
   const now  = new Date();
+  const mesActual = now.toISOString().slice(0,7);
 
-  const mesActual = now.toISOString().slice(0,7); // YYYY-MM
-
-
-
+  // Layout structure matching the image
   area.innerHTML = `
+    <!-- Top Header -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div style="font-size:22px; font-weight:800; color:#2c3e50; display:flex; align-items:center; gap:8px;">
+        <span style="font-size:24px;">📊</span> Cuadre con Nivel Superior
+      </div>
+      <button style="background:#ffc107; color:#333; font-weight:700; border:none; border-radius:6px; padding:8px 16px; font-size:12px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
+        + Nuevo Registro
+      </button>
+    </div>
 
-    <div class="page-title">🏛️ Cuadre con Nivel Superior</div>
+    <!-- 4 Totals Cards -->
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:16px;">
+      <div style="background:#fff; border-radius:10px; padding:16px; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+        <div style="font-size:10px; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:4px;">Total Registros</div>
+        <div id="cns-tot-reg" style="font-size:22px; font-weight:800; color:#8e44ad;">0</div>
+      </div>
+      <div style="background:#fff; border-radius:10px; padding:16px; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+        <div style="font-size:10px; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:4px;">Total Venta</div>
+        <div id="cns-tot-venta" style="font-size:22px; font-weight:800; color:#f39c12;">0,00</div>
+      </div>
+      <div style="background:#fff; border-radius:10px; padding:16px; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+        <div style="font-size:10px; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:4px;">Total Premios</div>
+        <div id="cns-tot-premios" style="font-size:22px; font-weight:800; color:#e74c3c;">0,00</div>
+      </div>
+      <div style="background:#fff; border-radius:10px; padding:16px; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+        <div style="font-size:10px; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:4px;">Saldo Actual Últ.</div>
+        <div id="cns-tot-saldo" style="font-size:22px; font-weight:800; color:#2ecc71;">0,00</div>
+      </div>
+    </div>
 
-    <div class="page-sub" style="margin-bottom:16px">Resumen diario de saldos, ventas, premios y movimientos financieros</div>
-
-
-
-    <!-- Filtros -->
-
-    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;
-
-                background:var(--card);border:1px solid var(--border);
-
-                border-radius:var(--r);padding:14px 18px;margin-bottom:16px">
-
-      <div style="display:flex;flex-direction:column;gap:4px">
-
-        <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Banca / Agencia</label>
-
-        <select id="cns-banca"
-
-                style="background:var(--surface);color:var(--text);border:1px solid var(--border);
-
-                       border-radius:6px;padding:7px 12px;font-size:13px;min-width:160px;cursor:pointer">
-
+    <!-- Filters -->
+    <div style="background:#fff; border-radius:10px; padding:16px; margin-bottom:16px; box-shadow:0 2px 6px rgba(0,0,0,0.04); display:flex; gap:16px; align-items:flex-end;">
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <label style="font-size:10px; font-weight:700; color:#888; text-transform:uppercase;">Banca</label>
+        <select id="cns-banca" style="background:#f8f9fa; border:1px solid #ddd; border-radius:6px; padding:8px 12px; font-size:12px; min-width:180px; color:#555;">
           <option value="">Todas</option>
-
           <option value="1">CARACAS</option>
-
           <option value="2">MIRANDA</option>
-
           <option value="3">MARACAIBO</option>
-
         </select>
-
       </div>
-
-      <div style="display:flex;flex-direction:column;gap:4px">
-
-        <label style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Mes del Resumen</label>
-
-        <input type="month" id="cns-mes" value="${mesActual}"
-
-               style="background:var(--surface);color:var(--text);border:1px solid var(--border);
-
-                      border-radius:6px;padding:7px 12px;font-size:13px;min-width:160px">
-
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <label style="font-size:10px; font-weight:700; color:#888; text-transform:uppercase;">Mes</label>
+        <input type="month" id="cns-mes" value="${mesActual}" style="background:#f8f9fa; border:1px solid #ddd; border-radius:6px; padding:8px 12px; font-size:12px; min-width:160px; color:#555;">
       </div>
-
-      <button onclick="_cnsConsultar()"
-
-              style="background:linear-gradient(135deg,var(--accent),var(--accent2));
-
-                     color:#fff;border:none;border-radius:8px;padding:8px 22px;
-
-                     font-size:13px;font-weight:600;cursor:pointer;align-self:flex-end">
-
-        🔍 Consultar
-
+      <button onclick="_cnsConsultar()" style="background:#d2b4de; color:#512e5f; border:none; border-radius:6px; padding:8px 16px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px;">
+        🔍 Filtrar
       </button>
-
-      <button onclick="_cnsExportar()"
-
-              style="background:var(--green);color:#fff;border:none;border-radius:8px;
-
-                     padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;align-self:flex-end"
-
-              title="Exportar a Excel">
-
+      <button onclick="document.getElementById('cns-banca').value=''; document.getElementById('cns-mes').value='${mesActual}'; _cnsConsultar();" style="background:#f2f3f4; color:#7f8c8d; border:none; border-radius:6px; padding:8px 16px; font-size:12px; font-weight:700; cursor:pointer;">
+        ✕ Limpiar
+      </button>
+      <button onclick="_cnsExportar()" style="background:#2ecc71; color:#fff; border:none; border-radius:6px; padding:8px 16px; font-size:12px; font-weight:700; cursor:pointer; margin-left:auto;">
         📊 Excel
-
       </button>
-
     </div>
 
-
-
-    <!-- Info banca seleccionada -->
-
-    <div id="cns-header-info" style="text-align:center;margin-bottom:14px;font-size:14px;font-weight:700;color:var(--accent2)">
-
-      — Seleccione una banca y haga clic en Consultar —
-
+    <!-- Main Table Container -->
+    <div style="background:#fff; border-radius:10px; padding:20px; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+      <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:12px;">
+        <div id="cns-header-info" style="font-weight:700; color:#555;">Banca: Todas</div>
+        <div id="cns-header-count" style="color:#888;">0 registros</div>
+      </div>
+      <div id="cns-tabla" style="overflow-x:auto;"></div>
     </div>
-
-
-
-    <!-- Tabla -->
-
-    <div id="cns-tabla" style="border:1px solid var(--border);border-radius:8px;overflow:hidden;overflow-x:auto"></div>
-
   `;
 
-
-
-  // En vez de mostrar DEMO, llamamos a la API directamente al abrir
   setTimeout(_cnsConsultar, 100);
 }
 
-
-
 let _cnsData = [];
 
-
-
 async function _cnsConsultar(){
-
   const banca = document.getElementById('cns-banca')?.value || '';
-
   const mes   = document.getElementById('cns-mes')?.value   || '';
-
   const wrap  = document.getElementById('cns-tabla');
-
-  if(wrap) wrap.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px"></div>Cargando...</div>';
-
-
+  if(wrap) wrap.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">Cargando...</div>';
 
   try {
-
     const r = await fetch(`/api/cuadre-nivel-superior/?banca=${banca}&mes=${mes}`);
-
     const d = await r.json();
-
     if(d.ok && d.rows && d.rows.length){
-
       _cnsData = d.rows;
-
-      _cnsRender(d.banca_nombre || 'Todos');
-
+      _cnsRender(d.banca_nombre || 'Todas');
     } else {
-
-      _cnsData = [..._CNS_DEMO];
-
-      _cnsRender('DEMO (sin datos para el período)');
-
+      _cnsData = [];
+      _cnsRender(d.banca_nombre || 'Todas');
     }
-
   } catch(e){
-
-    _cnsData = [..._CNS_DEMO];
-
-    _cnsRender('DEMO (error de conexión)');
-
+    _cnsData = [];
+    _cnsRender('Error');
   }
-
 }
 
-
-
 function _cnsRender(bancaNombre){
-
   const wrap = document.getElementById('cns-tabla');
-
   const info = document.getElementById('cns-header-info');
-
-  const mes  = document.getElementById('cns-mes')?.value || '';
-
+  const cnt  = document.getElementById('cns-header-count');
   if(!wrap) return;
 
+  if(info) info.innerHTML = `Banca: <span style="color:#f39c12;">${bancaNombre}</span>`;
+  if(cnt) cnt.innerText = `${_cnsData.length} registros`;
 
-
-  // Actualizar header
-
-  if(info){
-
-    const meses = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-
-    const [y,m] = mes ? mes.split('-') : ['',''];
-
-    const mesNombre = m ? `${meses[parseInt(m)]} ${y}` : '—';
-
-    info.innerHTML = `<span style="color:var(--muted);font-weight:400">Banca:</span> <span style="color:var(--accent2)">${bancaNombre}</span>&nbsp;&nbsp;&nbsp;<span style="color:var(--muted);font-weight:400">Mes del Resumen:</span> <span style="color:var(--text)">${mesNombre}</span>`;
-
-  }
-
-
-
-  const th = (txt, extra='') =>
-
-    `<th style="border:1px solid var(--border);padding:7px 6px;background:#1e2235;
-
-                color:var(--accent2);font-size:10px;font-weight:700;text-align:center;
-
-                white-space:nowrap;${extra}">${txt}</th>`;
+  const th = (txt) => `<th style="padding:12px 8px; font-size:9px; font-weight:800; color:#f1c40f; text-transform:uppercase; text-align:right; border-bottom:1px solid #eee;">${txt}</th>`;
 
 
 
   const fBs = v => {
-
     if(v===null||v===undefined) return '0';
-
     const n = parseFloat(v);
-
     if(isNaN(n)) return '0';
-
-    const color = n < 0 ? 'color:var(--red)' : (n > 0 ? '' : 'color:var(--muted)');
-
     const fmt = Math.abs(n).toLocaleString('es-VE',{minimumFractionDigits:2,maximumFractionDigits:2});
-
-    return `<span style="${color}">${n<0?'-':''}${fmt}</span>`;
-
+    return n < 0 ? `- ${fmt}` : fmt;
   };
-
-
-
-  // Calcular saldo actual para cada fila y acumulados
 
   let totVenta=0, totPremios=0, totPct=0, totReg=0, totOp=0, totDep=0, totPag=0, totAjuste=0, totCargos=0;
 
   const rows = _cnsData.map((r,i) => {
-
     const sa2 = _cnsCalcSaldoActual(r);
-
     totVenta   += r.venta;   totPremios += r.premios; totPct  += r.pct;
-
     totReg     += r.regalia; totOp      += r.operador; totDep += r.dep;
-
     totPag     += r.pagos;   totAjuste  += r.ajuste;  totCargos += r.cargos;
 
-    return `<tr style="${i%2===0?'':'background:rgba(255,255,255,.03)'}">
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:center;color:var(--muted);font-size:11px">${i+1}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:center;font-size:12px;white-space:nowrap">${r.fecha}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:center;font-size:12px">${r.dia}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-size:12px">${fBs(r.sa)}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-size:12px;font-weight:600">${fBs(r.venta)}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-size:12px;color:var(--red)">${fBs(r.premios)}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-size:12px;color:var(--red)">${fBs(r.pct)}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-size:12px">${fBs(r.regalia)}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-size:12px">${fBs(r.saldo)}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-size:12px;color:${r.operador<0?'var(--red)':'var(--green)'}">${fBs(r.operador)}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-size:12px">${fBs(r.dep)}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-size:12px;color:var(--accent)">${fBs(r.pagos)}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-size:12px;color:var(--accent)">${fBs(r.ajuste)}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-size:12px">${fBs(r.cargos)}</td>
-
-      <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-size:12px;font-weight:700;color:var(--accent2)">${fBs(sa2)}</td>
-
+    return `<tr style="border-bottom:1px solid #eee;">
+      <td style="padding:10px 8px; text-align:center; color:#999; font-size:11px; font-weight:700;">${i+1}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:12px; font-weight:700; color:#333;">${r.fecha}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:11px; color:#777;">${r.dia}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:11px; color:#555;">${fBs(r.sa)}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:11px; font-weight:700; color:#2ecc71;">${fBs(r.venta)}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:11px; font-weight:700; color:#e74c3c;">${fBs(r.premios)}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:11px; color:#888;">${fBs(r.pct)}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:11px; color:#888;">${fBs(r.regalia)}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:11px; font-weight:700; color:#333;">${fBs(r.saldo)}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:11px; color:#f39c12;">${fBs(r.operador)}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:11px; color:#2ecc71;">${fBs(r.dep)}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:11px; color:#e74c3c;">${fBs(r.pagos)}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:11px; color:#888;">${fBs(r.ajuste)}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:11px; color:#888;">${fBs(r.cargos)}</td>
+      <td style="padding:10px 8px; text-align:right; font-size:12px; font-weight:800; color:#f39c12;">${fBs(sa2)}</td>
+      <td style="padding:10px 8px; text-align:center;">
+        <button style="background:#fdfae6; border:1px solid #f9e79f; color:#d4ac0d; border-radius:4px; padding:4px 8px; cursor:pointer;">✎</button>
+        <button style="background:#fae5e5; border:1px solid #f5b7b1; color:#c0392b; border-radius:4px; padding:4px 8px; cursor:pointer; margin-left:4px;">🗑</button>
+      </td>
     </tr>`;
-
   }).join('');
 
-
-
-  // Fila "Viene mes anterior"
-
   const saldoInicial = _cnsData.length ? _cnsData[0].sa : 0;
-
   const saldoFinal   = _cnsData.length ? _cnsCalcSaldoActual(_cnsData[_cnsData.length-1]) : 0;
 
-
+  // Update top cards
+  document.getElementById('cns-tot-reg').innerText = _cnsData.length;
+  document.getElementById('cns-tot-venta').innerText = fBs(totVenta);
+  document.getElementById('cns-tot-premios').innerText = fBs(totPremios);
+  document.getElementById('cns-tot-saldo').innerText = fBs(saldoFinal);
 
   wrap.innerHTML = `
-
-    <table id="cns-table-data" style="width:100%;border-collapse:collapse;font-size:12px;background:var(--surface);min-width:1100px">
-
+    <table id="cns-table-data" style="width:100%; border-collapse:collapse; min-width:1100px;">
       <thead>
-
         <tr>
-
-          ${th('Nro.')}${th('Fecha')}${th('Día de la<br>Semana')}
-
-          ${th('Saldo<br>Anterior')}${th('Venta','color:var(--green)')}
-
-          ${th('Premios','color:var(--red)')}${th('% Banca','color:var(--red)')}
-
+          ${th('#')}${th('Fecha')}${th('Día')}
+          ${th('Saldo Ant.')}${th('Venta')}
+          ${th('Premios')}${th('% Banca')}
           ${th('Regalía')}${th('Saldo')}${th('Operador')}
-
-          ${th('Depósitos')}${th('Pagos','color:var(--accent)')}
-
-          ${th('Ajuste','color:var(--accent)')}${th('Cargos')}
-
-          ${th('Saldo<br>Actual','color:var(--accent2);font-size:11px;font-weight:800')}
-
+          ${th('Depósitos')}${th('Pagos')}
+          ${th('Ajuste')}${th('Cargos')}
+          ${th('Saldo Actual')}
+          <th style="padding:12px 8px; border-bottom:1px solid #eee;"></th>
         </tr>
-
       </thead>
-
       <tbody>
-
-        <!-- Fila cabecera: Viene mes anterior -->
-
-        <tr style="background:rgba(255,255,255,.06)">
-
-          <td colspan="14" style="border:1px solid var(--border);padding:5px 12px;font-size:11px;font-style:italic;color:var(--muted);text-align:right">Viene mes anterior</td>
-
-          <td style="border:1px solid var(--border);padding:5px 8px;text-align:right;font-weight:700;color:var(--accent2)">${fBs(saldoInicial)}</td>
-
-        </tr>
-
         ${rows}
-
-        <!-- Fila de totales -->
-
-        <tr style="background:rgba(255,255,255,.08);border-top:2px solid var(--border)">
-
-          <td colspan="3" style="border:1px solid var(--border);padding:6px 12px;font-weight:700;font-size:12px;text-align:right">TOTALES</td>
-
-          <td style="border:1px solid var(--border);padding:6px 8px"></td>
-
-          <td style="border:1px solid var(--border);padding:6px 8px;text-align:right;font-weight:700">${fBs(totVenta)}</td>
-
-          <td style="border:1px solid var(--border);padding:6px 8px;text-align:right;font-weight:700;color:var(--red)">${fBs(totPremios)}</td>
-
-          <td style="border:1px solid var(--border);padding:6px 8px;text-align:right;font-weight:700;color:var(--red)">${fBs(totPct)}</td>
-
-          <td style="border:1px solid var(--border);padding:6px 8px;text-align:right;font-weight:700">${fBs(totReg)}</td>
-
-          <td style="border:1px solid var(--border);padding:6px 8px"></td>
-
-          <td style="border:1px solid var(--border);padding:6px 8px;text-align:right;font-weight:700">${fBs(totOp)}</td>
-
-          <td style="border:1px solid var(--border);padding:6px 8px;text-align:right;font-weight:700">${fBs(totDep)}</td>
-
-          <td style="border:1px solid var(--border);padding:6px 8px;text-align:right;font-weight:700;color:var(--accent)">${fBs(totPag)}</td>
-
-          <td style="border:1px solid var(--border);padding:6px 8px;text-align:right;font-weight:700;color:var(--accent)">${fBs(totAjuste)}</td>
-
-          <td style="border:1px solid var(--border);padding:6px 8px;text-align:right;font-weight:700">${fBs(totCargos)}</td>
-
-          <td style="border:1px solid var(--border);padding:6px 8px;text-align:right;font-weight:700;color:var(--accent2)">${fBs(saldoFinal)}</td>
-
+        <tr style="border-top:2px solid #f1c40f;">
+          <td colspan="4" style="padding:12px 8px; font-weight:800; font-size:11px; text-align:left; color:#f39c12; text-transform:uppercase;">Totales</td>
+          <td style="padding:12px 8px; text-align:right; font-weight:800; font-size:12px; color:#f39c12;">${fBs(totVenta)}</td>
+          <td style="padding:12px 8px; text-align:right; font-weight:800; font-size:12px; color:#f39c12;">${fBs(totPremios)}</td>
+          <td style="padding:12px 8px; text-align:right; font-weight:800; font-size:12px; color:#f39c12;">${fBs(totPct)}</td>
+          <td style="padding:12px 8px; text-align:right; font-weight:800; font-size:12px; color:#f39c12;">${fBs(totReg)}</td>
+          <td style="padding:12px 8px; text-align:right; font-weight:800; font-size:12px; color:#f39c12;"></td>
+          <td style="padding:12px 8px; text-align:right; font-weight:800; font-size:12px; color:#f39c12;">${fBs(totOp)}</td>
+          <td style="padding:12px 8px; text-align:right; font-weight:800; font-size:12px; color:#f39c12;">${fBs(totDep)}</td>
+          <td style="padding:12px 8px; text-align:right; font-weight:800; font-size:12px; color:#f39c12;">${fBs(totPag)}</td>
+          <td style="padding:12px 8px; text-align:right; font-weight:800; font-size:12px; color:#f39c12;">${fBs(totAjuste)}</td>
+          <td style="padding:12px 8px; text-align:right; font-weight:800; font-size:12px; color:#f39c12;">${fBs(totCargos)}</td>
+          <td style="padding:12px 8px; text-align:right; font-weight:800; font-size:12px; color:#f39c12;">${fBs(saldoFinal)}</td>
+          <td></td>
         </tr>
-
       </tbody>
-
-    </table>`;
-
+    </table>
+  `;
 }
 
 
