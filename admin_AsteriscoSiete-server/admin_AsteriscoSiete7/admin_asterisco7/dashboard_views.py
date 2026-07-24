@@ -2428,13 +2428,12 @@ _CRUD_FIELDS = {
         'model': ('admin_finanzas', 'Movimiento'),
         'fields': ['numero', 'monto', 'fecha', 'observacion'],
         'labels': ['Número (*)', 'Monto (*)', 'Fecha (*)', 'Observación'],
-        'required': ['numero', 'monto', 'fecha'],
+        'required': ['numero', 'monto', 'fecha', 'comercializadora', 'cuenta', 'tipo'],
         'types': ['text', 'number', 'date', 'text'],
         'fk_fields': {
             'comercializadora': {'model': ('admin_finanzas', 'Comercializadora'), 'label_field': '__str__'},
             'cuenta':           {'model': ('admin_finanzas', 'Cuenta'),           'label_field': 'numero'},
             'tipo':             {'model': ('admin_finanzas', 'TipoMovimiento'),   'label_field': 'nombre'},
-            'dia':              {'model': ('admin_finanzas', 'Dia'),              'label_field': 'fecha'},
         },
     },
     'diatrabajo': {
@@ -2750,6 +2749,25 @@ def dashboard_crud(request, modulo):
                         obj.status_id = st.pk
                 except Exception:
                     pass
+
+            # ── Auto asignar Dia y User para Movimientos ──
+            if modulo == 'movimientos':
+                from admin_finanzas.models import Comercializadora, Dia
+                from datetime import date
+                obj.user = request.user
+                if getattr(obj, 'comercializadora_id', None):
+                    try:
+                        com = Comercializadora.objects.get(pk=obj.comercializadora_id)
+                        if com.resumen_automatic:
+                            obj.dia, _ = Dia.objects.get_or_create(fecha=date.today())
+                        else:
+                            dt = com.get_dia_trabajo()
+                            if dt:
+                                obj.dia = dt.dia
+                            else:
+                                return JsonResponse({'error': 'Comercializadora sin fecha de trabajo'}, status=400)
+                    except Exception:
+                        pass
 
             # ── Menu.menu_suc es FK a sí mismo y no acepta NULL, se asigna un raíz ──
             if hasattr(obj, 'menu_suc_id') and getattr(obj, 'menu_suc_id', None) is None:
