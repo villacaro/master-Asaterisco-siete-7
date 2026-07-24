@@ -1225,24 +1225,27 @@ def monitor_api(request):
         pass
 
     # 3. Construir filas desde HechoConnectionsComer
-    from django.utils.timezone import is_aware, make_aware
     rows = []
     try:
         for c in HechoConn.objects.all().order_by('-connection_at')[:500]:
             conn_at = c.connection_at
-            
-            # Fix para PostgreSQL (Railway) si connection_at es naive
-            if conn_at and not is_aware(conn_at):
-                conn_at = make_aware(conn_at)
+            if not conn_at:
+                continue
                 
-            if conn_at >= limite_online:
+            # Extraemos la hora ignorando la zona horaria para evitar crashes
+            # tanto en SQLite (naive) como en PostgreSQL (aware)
+            c_naive = conn_at.replace(tzinfo=None)
+            l_online_naive = limite_online.replace(tzinfo=None)
+            l_reciente_naive = limite_reciente.replace(tzinfo=None)
+                
+            if c_naive >= l_online_naive:
                 estado = 'online'
-            elif conn_at >= limite_reciente:
+            elif c_naive >= l_reciente_naive:
                 estado = 'reciente'
             else:
                 estado = 'offline'
 
-            diff = ahora - conn_at
+            diff = ahora.replace(tzinfo=None) - c_naive
             mins = int(diff.total_seconds() // 60)
             if mins < 1:      tiempo_str = 'Ahora'
             elif mins < 60:   tiempo_str = f'{mins} min'
