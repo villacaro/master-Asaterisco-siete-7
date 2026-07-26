@@ -96,6 +96,17 @@ def taquilla_view(request):
     response['Expires']       = '0'
     return response
 
+def taquilla_app_movil_view(request):
+    """Sirve la nueva version app movil de Taquilla."""
+    html_path = os.path.join(settings.BASE_DIR, 'admin_asterisco7', 'templates', 'taquilla', 'taquilla_app_movil.html')
+    with open(html_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    response = HttpResponse(content, content_type='text/html; charset=utf-8')
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response['Pragma']        = 'no-cache'
+    response['Expires']       = '0'
+    return response
+
 
 @csrf_exempt
 def taquilla_login_api(request):

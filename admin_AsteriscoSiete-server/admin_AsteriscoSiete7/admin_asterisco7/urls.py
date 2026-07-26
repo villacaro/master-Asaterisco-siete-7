@@ -6,7 +6,7 @@ from django.urls import include, re_path, path
 from django.views.static import serve
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from admin_asterisco7.dashboard_views import dashboard, dashboard_stats, dashboard_api, dashboard_crud, taquilla_view, reportes_page, candidatos_page, monitor_api, liquidacion_page, taquilla_login_api, taquilla_venta_api, taquilla_ventas_lista_api, taquilla_scrape_tuazar, liquidaciones_sorteo_api, candidatos_riesgo_api, cuadre_nivel_superior_api, taquilla_resultados_hoy, taquilla_mi_ip, taquilla_cambiar_clave_api, taquilla_reporte_diario, taquilla_reporte_periodo, taquilla_reporte_caja, taquilla_reporte_tickets, taquilla_reporte_ganadores, taquilla_proxy_resultados, taquilla_ping
+from admin_asterisco7.dashboard_views import dashboard, dashboard_stats, dashboard_api, dashboard_crud, taquilla_view, taquilla_app_movil_view, reportes_page, candidatos_page, monitor_api, liquidacion_page, taquilla_login_api, taquilla_venta_api, taquilla_ventas_lista_api, taquilla_scrape_tuazar, liquidaciones_sorteo_api, candidatos_riesgo_api, cuadre_nivel_superior_api, taquilla_resultados_hoy, taquilla_mi_ip, taquilla_cambiar_clave_api, taquilla_reporte_diario, taquilla_reporte_periodo, taquilla_reporte_caja, taquilla_reporte_tickets, taquilla_reporte_ganadores, taquilla_proxy_resultados, taquilla_ping
 from admin_asterisco7.reportes_views import (
     api_lista_linea, api_por_producto, api_riesgo_venta, api_sorteos_disponibles,
     api_cuadre, api_liquidaciones, api_resumen_admin, api_dias_trabajo
@@ -26,6 +26,7 @@ urlpatterns = [
     # ── Taquilla Venta en Línea (Asterisco *7) ──────────────────────────────────
     # Accesible en: http://127.0.0.1:8001/taquilla/
     re_path(r'^taquilla/$', taquilla_view, name='taquilla'),
+    re_path(r'^taquilla-app/$', taquilla_app_movil_view, name='taquilla_app_movil'),
     re_path(r'^taquilla/login/$', taquilla_login_api, name='taquilla_login'),
     re_path(r'^taquilla/venta/$', taquilla_venta_api, name='taquilla_venta'),
     re_path(r'^api/taquilla/ventas/$', taquilla_ventas_lista_api, name='taquilla_ventas_lista'),

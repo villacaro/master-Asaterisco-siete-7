@@ -4366,15 +4366,68 @@
             selectedAnimals = [];
         }
 
+        let currentBetTarget = null;
         function toggleAnimal(btn, n, name) {
-            if (btn.classList.contains('selected')) {
-                btn.classList.remove('selected');
-                selectedAnimals = selectedAnimals.filter(a => a.n !== n);
-            } else {
-                btn.classList.add('selected');
-                selectedAnimals.push({ n, name });
+            if (animalBetMode === 'arrejuntao') {
+                if (btn.classList.contains('selected')) {
+                    btn.classList.remove('selected');
+                    selectedAnimals = selectedAnimals.filter(a => a.n !== n);
+                } else {
+                    btn.classList.add('selected');
+                    selectedAnimals.push({ n, name });
+                }
+                return;
             }
+            // Modo normal: Abrir modal de apuesta rápida
+            currentBetTarget = { n, name };
+            document.getElementById('modal-bet-target-name').textContent = name.toUpperCase();
+            document.getElementById('modal-bet-custom-amount').value = '';
+            document.getElementById('bet-selection-modal').classList.remove('hidden');
+            document.getElementById('bet-selection-modal').classList.add('flex');
         }
+        
+        function closeBetSelectionModal() {
+            document.getElementById('bet-selection-modal').classList.add('hidden');
+            document.getElementById('bet-selection-modal').classList.remove('flex');
+            currentBetTarget = null;
+        }
+
+        function processBetFromModal(amount) {
+            const gId = Date.now().toString();
+            if (!amount || amount < 20) {
+                showToast("El monto mínimo de apuesta es 20 Bs", "error");
+                return;
+            }
+            if (selectedAnimalLotteries.length === 0) { showToast("Debe seleccionar al menos una lotería", "error"); return; }
+            if (selectedAnimalTimes.length === 0) { showToast("Debe seleccionar horarios", "error"); return; }
+            
+            selectedAnimalTimes.forEach(lotteryTime => {
+                const parts = lotteryTime.split('|');
+                const lottery = parts[0];
+                const time = parts[1];
+                const validAnimalsForLotto = getAnimalsForLottery(lottery).map(a => a.n);
+
+                if (!validAnimalsForLotto.includes(currentBetTarget.n)) return;
+
+                let animalNumStr = `${currentBetTarget.n} ${currentBetTarget.name} (${time})`;
+                if (!checkTope(currentBetTarget.n, lottery, amount)) {
+                    showToast(`Tope excedido para el ${currentBetTarget.n} en ${lottery} (${time}).`, 'error');
+                } else {
+                    currentTicket.push({
+                        type: 'animal',
+                        lottery: lottery,
+                        number: animalNumStr,
+                        amount: amount,
+                        groupId: gId
+                    });
+                }
+            });
+            
+            renderReceipt();
+            closeBetSelectionModal();
+            showToast("Jugada agregada al ticket", "success");
+        }
+
         function toggleAllAnimals() {
             if (animalBetMode === 'arrejuntao') {
                 showToast('No se puede usar "Todos" en el modo El Arrejuntao.', 'error');
@@ -6670,7 +6723,55 @@
         <div class="divider"></div>
         <div class="bold">TOTAL: Bs ${t.total?.toFixed(2)}</div>
         <div style="text-align:center;margin-top:10px;font-size:9px">--- FIN DE TICKET ANULADO ---</div>
-        </body></html>`);
+        
+    <!-- MODAL SELECCIONA TU APUESTA -->
+    <div id="bet-selection-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-[#242b3d] border border-slate-700 rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative fade-in flex flex-col max-h-[90vh]">
+            <!-- Encabezado -->
+            <div class="p-4 border-b border-slate-700/50 flex justify-between items-center bg-[#1e2532]">
+                <h2 class="text-white font-black text-lg tracking-wide">SELECCIONA TU APUESTA</h2>
+                <button onclick="closeBetSelectionModal()" class="text-slate-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- Cuerpo -->
+            <div class="p-5 flex-1 overflow-y-auto">
+                <div class="mb-5">
+                    <div class="text-slate-400 text-sm">Apostando a: <span id="modal-bet-target-name" class="text-yellow-400 font-bold ml-1">---</span></div>
+                    <div class="text-emerald-400 text-sm mt-1">Cuota: <span class="font-bold">75:1</span></div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-slate-400 text-xs font-bold tracking-widest uppercase mb-3">Montos Rápidos</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="processBetFromModal(50)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 50</button>
+                        <button onclick="processBetFromModal(100)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 100</button>
+                        <button onclick="processBetFromModal(200)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 200</button>
+                        <button onclick="processBetFromModal(500)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 500</button>
+                        <button onclick="processBetFromModal(1000)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 1000</button>
+                        <button onclick="processBetFromModal(2000)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 2000</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 text-xs font-bold tracking-widest uppercase mb-3">Monto Personalizado</label>
+                    <input type="number" id="modal-bet-custom-amount" 
+                        class="w-full bg-[#1e2532] border border-slate-600 text-white text-lg rounded-md p-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        placeholder="Mín: 20 — Máx: 10000">
+                    <div class="text-slate-500 text-xs mt-2">Rango: VES 20 - VES 10000</div>
+                </div>
+            </div>
+
+            <!-- Footer (Botones) -->
+            <div class="p-4 border-t border-slate-700/50 bg-[#1e2532] flex gap-3">
+                <button onclick="closeBetSelectionModal()" class="flex-1 bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3.5 rounded-lg transition-colors">Cancelar</button>
+                <button onclick="processBetFromModal(parseFloat(document.getElementById('modal-bet-custom-amount').value))" class="flex-1 bg-[#333b4f] hover:bg-indigo-600 text-white font-bold py-3.5 rounded-lg transition-colors shadow-lg">Apostar</button>
+            </div>
+        </div>
+    </div>
+
+</body></html>`);
         win.document.close();
         win.print();
     };
@@ -6752,7 +6853,55 @@
         ${(t.items||[]).map(i=>`<div>${i.lottery}: ${i.number} — Bs ${i.amount?.toFixed(2)}</div>`).join('')}
         <div class="divider"></div>
         <div class="bold">TOTAL: Bs ${t.total?.toFixed(2)}</div>
-        </body></html>`);
+        
+    <!-- MODAL SELECCIONA TU APUESTA -->
+    <div id="bet-selection-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-[#242b3d] border border-slate-700 rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative fade-in flex flex-col max-h-[90vh]">
+            <!-- Encabezado -->
+            <div class="p-4 border-b border-slate-700/50 flex justify-between items-center bg-[#1e2532]">
+                <h2 class="text-white font-black text-lg tracking-wide">SELECCIONA TU APUESTA</h2>
+                <button onclick="closeBetSelectionModal()" class="text-slate-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- Cuerpo -->
+            <div class="p-5 flex-1 overflow-y-auto">
+                <div class="mb-5">
+                    <div class="text-slate-400 text-sm">Apostando a: <span id="modal-bet-target-name" class="text-yellow-400 font-bold ml-1">---</span></div>
+                    <div class="text-emerald-400 text-sm mt-1">Cuota: <span class="font-bold">75:1</span></div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-slate-400 text-xs font-bold tracking-widest uppercase mb-3">Montos Rápidos</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="processBetFromModal(50)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 50</button>
+                        <button onclick="processBetFromModal(100)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 100</button>
+                        <button onclick="processBetFromModal(200)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 200</button>
+                        <button onclick="processBetFromModal(500)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 500</button>
+                        <button onclick="processBetFromModal(1000)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 1000</button>
+                        <button onclick="processBetFromModal(2000)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 2000</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 text-xs font-bold tracking-widest uppercase mb-3">Monto Personalizado</label>
+                    <input type="number" id="modal-bet-custom-amount" 
+                        class="w-full bg-[#1e2532] border border-slate-600 text-white text-lg rounded-md p-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        placeholder="Mín: 20 — Máx: 10000">
+                    <div class="text-slate-500 text-xs mt-2">Rango: VES 20 - VES 10000</div>
+                </div>
+            </div>
+
+            <!-- Footer (Botones) -->
+            <div class="p-4 border-t border-slate-700/50 bg-[#1e2532] flex gap-3">
+                <button onclick="closeBetSelectionModal()" class="flex-1 bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3.5 rounded-lg transition-colors">Cancelar</button>
+                <button onclick="processBetFromModal(parseFloat(document.getElementById('modal-bet-custom-amount').value))" class="flex-1 bg-[#333b4f] hover:bg-indigo-600 text-white font-bold py-3.5 rounded-lg transition-colors shadow-lg">Apostar</button>
+            </div>
+        </div>
+    </div>
+
+</body></html>`);
         win.document.close();
         win.print();
     };
@@ -7264,7 +7413,55 @@ ${resumenTaq?'<hr style="border:none;border-top:1px dashed #999;margin:8px 0"><d
       </style></head><body>`);
     if(bodyEl) win.document.write(bodyEl.innerHTML);
     if(tableEl) win.document.write(tableEl.outerHTML);
-    win.document.write('</body></html>'); win.document.close(); win.print();
+    win.document.write('
+    <!-- MODAL SELECCIONA TU APUESTA -->
+    <div id="bet-selection-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-[#242b3d] border border-slate-700 rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative fade-in flex flex-col max-h-[90vh]">
+            <!-- Encabezado -->
+            <div class="p-4 border-b border-slate-700/50 flex justify-between items-center bg-[#1e2532]">
+                <h2 class="text-white font-black text-lg tracking-wide">SELECCIONA TU APUESTA</h2>
+                <button onclick="closeBetSelectionModal()" class="text-slate-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- Cuerpo -->
+            <div class="p-5 flex-1 overflow-y-auto">
+                <div class="mb-5">
+                    <div class="text-slate-400 text-sm">Apostando a: <span id="modal-bet-target-name" class="text-yellow-400 font-bold ml-1">---</span></div>
+                    <div class="text-emerald-400 text-sm mt-1">Cuota: <span class="font-bold">75:1</span></div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-slate-400 text-xs font-bold tracking-widest uppercase mb-3">Montos Rápidos</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="processBetFromModal(50)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 50</button>
+                        <button onclick="processBetFromModal(100)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 100</button>
+                        <button onclick="processBetFromModal(200)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 200</button>
+                        <button onclick="processBetFromModal(500)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 500</button>
+                        <button onclick="processBetFromModal(1000)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 1000</button>
+                        <button onclick="processBetFromModal(2000)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 2000</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 text-xs font-bold tracking-widest uppercase mb-3">Monto Personalizado</label>
+                    <input type="number" id="modal-bet-custom-amount" 
+                        class="w-full bg-[#1e2532] border border-slate-600 text-white text-lg rounded-md p-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        placeholder="Mín: 20 — Máx: 10000">
+                    <div class="text-slate-500 text-xs mt-2">Rango: VES 20 - VES 10000</div>
+                </div>
+            </div>
+
+            <!-- Footer (Botones) -->
+            <div class="p-4 border-t border-slate-700/50 bg-[#1e2532] flex gap-3">
+                <button onclick="closeBetSelectionModal()" class="flex-1 bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3.5 rounded-lg transition-colors">Cancelar</button>
+                <button onclick="processBetFromModal(parseFloat(document.getElementById('modal-bet-custom-amount').value))" class="flex-1 bg-[#333b4f] hover:bg-indigo-600 text-white font-bold py-3.5 rounded-lg transition-colors shadow-lg">Apostar</button>
+            </div>
+        </div>
+    </div>
+
+</body></html>'); win.document.close(); win.print();
   };
 
   window.ejecutarCambioClave = async function(){
@@ -7651,6 +7848,54 @@ function imprimirCierre() {
   <div class="sep2"></div>
   <div class="center" style="font-size:10px;color:#555;margin-top:6px">Documento generado automáticamente</div>
   <div class="center" style="font-size:10px;color:#555">${new Date().toLocaleString('es-VE')}</div>
+
+    <!-- MODAL SELECCIONA TU APUESTA -->
+    <div id="bet-selection-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-[#242b3d] border border-slate-700 rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative fade-in flex flex-col max-h-[90vh]">
+            <!-- Encabezado -->
+            <div class="p-4 border-b border-slate-700/50 flex justify-between items-center bg-[#1e2532]">
+                <h2 class="text-white font-black text-lg tracking-wide">SELECCIONA TU APUESTA</h2>
+                <button onclick="closeBetSelectionModal()" class="text-slate-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- Cuerpo -->
+            <div class="p-5 flex-1 overflow-y-auto">
+                <div class="mb-5">
+                    <div class="text-slate-400 text-sm">Apostando a: <span id="modal-bet-target-name" class="text-yellow-400 font-bold ml-1">---</span></div>
+                    <div class="text-emerald-400 text-sm mt-1">Cuota: <span class="font-bold">75:1</span></div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-slate-400 text-xs font-bold tracking-widest uppercase mb-3">Montos Rápidos</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="processBetFromModal(50)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 50</button>
+                        <button onclick="processBetFromModal(100)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 100</button>
+                        <button onclick="processBetFromModal(200)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 200</button>
+                        <button onclick="processBetFromModal(500)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 500</button>
+                        <button onclick="processBetFromModal(1000)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 1000</button>
+                        <button onclick="processBetFromModal(2000)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 2000</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 text-xs font-bold tracking-widest uppercase mb-3">Monto Personalizado</label>
+                    <input type="number" id="modal-bet-custom-amount" 
+                        class="w-full bg-[#1e2532] border border-slate-600 text-white text-lg rounded-md p-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        placeholder="Mín: 20 — Máx: 10000">
+                    <div class="text-slate-500 text-xs mt-2">Rango: VES 20 - VES 10000</div>
+                </div>
+            </div>
+
+            <!-- Footer (Botones) -->
+            <div class="p-4 border-t border-slate-700/50 bg-[#1e2532] flex gap-3">
+                <button onclick="closeBetSelectionModal()" class="flex-1 bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3.5 rounded-lg transition-colors">Cancelar</button>
+                <button onclick="processBetFromModal(parseFloat(document.getElementById('modal-bet-custom-amount').value))" class="flex-1 bg-[#333b4f] hover:bg-indigo-600 text-white font-bold py-3.5 rounded-lg transition-colors shadow-lg">Apostar</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>`;
 
@@ -7766,5 +8011,53 @@ function imprimirCierre() {
         }
     }, 60000);
 </script>
+
+    <!-- MODAL SELECCIONA TU APUESTA -->
+    <div id="bet-selection-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/80 backdrop-blur-sm px-4">
+        <div class="bg-[#242b3d] border border-slate-700 rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative fade-in flex flex-col max-h-[90vh]">
+            <!-- Encabezado -->
+            <div class="p-4 border-b border-slate-700/50 flex justify-between items-center bg-[#1e2532]">
+                <h2 class="text-white font-black text-lg tracking-wide">SELECCIONA TU APUESTA</h2>
+                <button onclick="closeBetSelectionModal()" class="text-slate-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <!-- Cuerpo -->
+            <div class="p-5 flex-1 overflow-y-auto">
+                <div class="mb-5">
+                    <div class="text-slate-400 text-sm">Apostando a: <span id="modal-bet-target-name" class="text-yellow-400 font-bold ml-1">---</span></div>
+                    <div class="text-emerald-400 text-sm mt-1">Cuota: <span class="font-bold">75:1</span></div>
+                </div>
+
+                <div class="mb-5">
+                    <label class="block text-slate-400 text-xs font-bold tracking-widest uppercase mb-3">Montos Rápidos</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="processBetFromModal(50)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 50</button>
+                        <button onclick="processBetFromModal(100)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 100</button>
+                        <button onclick="processBetFromModal(200)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 200</button>
+                        <button onclick="processBetFromModal(500)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 500</button>
+                        <button onclick="processBetFromModal(1000)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 1000</button>
+                        <button onclick="processBetFromModal(2000)" class="bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3 rounded-md transition-colors shadow-sm">VES 2000</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 text-xs font-bold tracking-widest uppercase mb-3">Monto Personalizado</label>
+                    <input type="number" id="modal-bet-custom-amount" 
+                        class="w-full bg-[#1e2532] border border-slate-600 text-white text-lg rounded-md p-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        placeholder="Mín: 20 — Máx: 10000">
+                    <div class="text-slate-500 text-xs mt-2">Rango: VES 20 - VES 10000</div>
+                </div>
+            </div>
+
+            <!-- Footer (Botones) -->
+            <div class="p-4 border-t border-slate-700/50 bg-[#1e2532] flex gap-3">
+                <button onclick="closeBetSelectionModal()" class="flex-1 bg-[#333b4f] hover:bg-[#3f4a63] text-white font-bold py-3.5 rounded-lg transition-colors">Cancelar</button>
+                <button onclick="processBetFromModal(parseFloat(document.getElementById('modal-bet-custom-amount').value))" class="flex-1 bg-[#333b4f] hover:bg-indigo-600 text-white font-bold py-3.5 rounded-lg transition-colors shadow-lg">Apostar</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
