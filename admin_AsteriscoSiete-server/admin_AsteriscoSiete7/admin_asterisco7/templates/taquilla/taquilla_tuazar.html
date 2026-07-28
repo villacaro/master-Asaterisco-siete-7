@@ -69,6 +69,7 @@
                     <div class="flex bg-gray-100 rounded-full p-1 text-xs">
                         <button id="tab-triples" onclick="switchTab('triples')" class="px-4 py-1 rounded-full bg-white shadow-sm font-medium text-gray-800 transition-colors">Triples</button>
                         <button id="tab-animalitos" onclick="switchTab('animalitos')" class="px-4 py-1 rounded-full text-gray-500 hover:text-gray-800 transition-colors">Animalitos</button>
+                        <button id="tab-extras" onclick="switchTab('extras')" class="px-4 py-1 rounded-full text-gray-500 hover:text-gray-800 transition-colors">Extras</button>
                     </div>
                 </div>
                 
@@ -158,11 +159,28 @@
                     </div>
                 </div>
                 
-                <button onclick="agregarAlTicket()" class="w-full bg-tuazar-purple hover:bg-purple-900 text-white font-medium rounded-lg py-3 flex items-center justify-center gap-2 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    Agregar al ticket
-                    <span class="bg-white/20 px-2 py-0.5 rounded text-xs ml-2">Enter</span>
-                </button>
+                <!-- Botón Animalitos -->
+                <div id="btn-animalitos" class="w-full hidden">
+                    <button onclick="agregarAlTicket('normal')" class="w-full bg-tuazar-purple hover:bg-purple-900 text-white font-medium rounded-lg py-3 flex items-center justify-center gap-2 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Agregar al ticket
+                        <span class="bg-white/20 px-2 py-0.5 rounded text-xs ml-2">Enter</span>
+                    </button>
+                </div>
+                
+                <!-- Botones Triples -->
+                <div id="btn-triples" class="flex flex-col gap-3 w-full">
+                    <button onclick="agregarAlTicket('normal')" class="w-full bg-tuazar-purple hover:bg-purple-900 text-white font-medium rounded-lg py-3 flex items-center justify-center gap-2 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Agregar al ticket
+                        <span class="bg-white/20 px-2 py-0.5 rounded text-xs ml-2">Enter</span>
+                    </button>
+                    <div class="grid grid-cols-3 gap-3 w-full">
+                        <button onclick="agregarAlTicket('permuta')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-xs transition-colors shadow-sm tracking-wide">PERMUTA</button>
+                        <button onclick="agregarAlTicket('serie')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-xs transition-colors shadow-sm tracking-wide">SERIE</button>
+                        <button onclick="agregarAlTicket('corrida')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-xs transition-colors shadow-sm tracking-wide">CORRIDA</button>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -214,6 +232,8 @@
         let lotteries = [
                 // TRIPLES
                 { name: 'El Arrejuntao', short: 'EA', type: ['triples'], sorteos: ['10:00 AM', '1:00 PM', '4:00 PM', '7:00 PM', '11:00 PM'] },
+                { name: 'El Arrejuntao - El Arrimao', short: 'EAR', type: ['extras'], sorteos: ['10:00 AM', '1:00 PM', '4:00 PM', '7:00 PM', '11:00 PM'] },
+                { name: 'El Arrejuntao - El Pegadito', short: 'EAP', type: ['extras'], sorteos: ['10:00 AM', '1:00 PM', '4:00 PM', '7:00 PM', '11:00 PM'] },
                 { name: 'Chance', short: 'CH', type: ['triples'], sorteos: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM', '06:00 PM', '07:00 PM'] },
                 { name: 'Zulia', short: 'ZU', type: ['triples'], sorteos: ['12:45 PM', '4:45 PM', '7:05 PM'] },
                 { name: 'Táchira', short: 'TA', type: ['triples'], sorteos: ['1:15 PM', '4:45 PM', '10:10 PM'] },
@@ -398,6 +418,21 @@
             }).join('');
         }
 
+        function updateExtrasPlaceholder() {
+            if (activeTab === 'extras') {
+                const apInput = document.getElementById('apuesta-input');
+                if (apInput && selectedProduct) {
+                    if (selectedProduct.name.includes('Arrimao')) {
+                        apInput.placeholder = "4 dígitos";
+                    } else if (selectedProduct.name.includes('Pegadito')) {
+                        apInput.placeholder = "5 dígitos";
+                    } else {
+                        apInput.placeholder = "Apuesta extra";
+                    }
+                }
+            }
+        }
+
         function selectProduct(name) {
             selectedProduct = lotteries.find(l => l.name === name);
             selectedSorteos.clear();
@@ -407,6 +442,7 @@
             if (activeTab === 'animalitos') {
                 renderAnimalitos(document.getElementById('search-animalito') ? document.getElementById('search-animalito').value : '');
             }
+            updateExtrasPlaceholder();
         }
 
         function renderSorteos() {
@@ -508,28 +544,52 @@
             activeTab = tab;
             const tbtn = document.getElementById('tab-triples');
             const abtn = document.getElementById('tab-animalitos');
+            const ebtn = document.getElementById('tab-extras');
             const pJuegos = document.getElementById('panel-juegos');
             const pAnims = document.getElementById('panel-animalitos');
+            const pExtras = document.getElementById('panel-extras');
             const pSignos = document.getElementById('panel-signos');
             const apInput = document.getElementById('apuesta-input');
 
-            if(tab === 'triples') {
-                tbtn.className = "px-4 py-1 rounded-full bg-white shadow-sm font-medium text-gray-800 transition-colors";
-                abtn.className = "px-4 py-1 rounded-full text-gray-500 hover:text-gray-800 transition-colors";
-                pJuegos.classList.remove('hidden');
-                pSignos.classList.remove('hidden');
+            // Reset all tabs
+            if (tbtn) tbtn.className = "px-4 py-1 rounded-full text-gray-500 hover:text-gray-800 transition-colors";
+            if (abtn) abtn.className = "px-4 py-1 rounded-full text-gray-500 hover:text-gray-800 transition-colors";
+            if (ebtn) ebtn.className = "px-4 py-1 rounded-full text-gray-500 hover:text-gray-800 transition-colors";
+            
+            // Hide all panels
+            if (pJuegos) pJuegos.classList.add('hidden');
+            if (pSignos) pSignos.classList.add('hidden');
+            if (pAnims) {
                 pAnims.classList.add('hidden');
                 pAnims.classList.remove('flex');
-                apInput.placeholder = "123 · p123 · *23";
-            } else {
-                abtn.className = "px-4 py-1 rounded-full bg-white shadow-sm font-medium text-gray-800 transition-colors";
-                tbtn.className = "px-4 py-1 rounded-full text-gray-500 hover:text-gray-800 transition-colors";
-                pJuegos.classList.add('hidden');
-                pSignos.classList.add('hidden');
-                pAnims.classList.remove('hidden');
-                pAnims.classList.add('flex');
-                apInput.placeholder = "0, 00, 1, 2...";
+            }
+            if (pExtras) pExtras.classList.add('hidden');
+            
+            const btnTriples = document.getElementById('btn-triples');
+            const btnAnimalitos = document.getElementById('btn-animalitos');
+            if (btnTriples) btnTriples.classList.add('hidden');
+            if (btnAnimalitos) btnAnimalitos.classList.add('hidden');
+
+            if(tab === 'triples') {
+                if (tbtn) tbtn.className = "px-4 py-1 rounded-full bg-white shadow-sm font-medium text-gray-800 transition-colors";
+                if (pJuegos) pJuegos.classList.remove('hidden');
+                if (pSignos) pSignos.classList.remove('hidden');
+                if (apInput) apInput.placeholder = "123 · p123 · *23";
+                if (btnTriples) btnTriples.classList.remove('hidden');
+            } else if (tab === 'animalitos') {
+                if (abtn) abtn.className = "px-4 py-1 rounded-full bg-white shadow-sm font-medium text-gray-800 transition-colors";
+                if (pAnims) {
+                    pAnims.classList.remove('hidden');
+                    pAnims.classList.add('flex');
+                }
+                if (apInput) apInput.placeholder = "0, 00, 1, 2...";
+                if (btnAnimalitos) btnAnimalitos.classList.remove('hidden');
                 renderAnimalitos();
+            } else if (tab === 'extras') {
+                if (ebtn) ebtn.className = "px-4 py-1 rounded-full bg-white shadow-sm font-medium text-gray-800 transition-colors";
+                if (pExtras) pExtras.classList.remove('hidden');
+                if (apInput) apInput.placeholder = "Apuesta extra";
+                if (btnAnimalitos) btnAnimalitos.classList.remove('hidden');
             }
             
             renderProducts();
@@ -538,6 +598,8 @@
                 const available = lotteries.filter(l => l.type && l.type.includes(activeTab));
                 if(available.length > 0) selectProduct(available[0].name);
                 else { selectedProduct = null; renderSorteos(); }
+            } else if (selectedProduct) {
+                updateExtrasPlaceholder();
             }
         }
 
@@ -630,7 +692,21 @@
             renderJuegos();
         }
 
-        function agregarAlTicket() {
+        function getPermutations(str) {
+            if (str.length <= 1) return [str];
+            let perms = [];
+            for (let i = 0; i < str.length; i++) {
+                let char = str[i];
+                if (str.indexOf(char) != i) continue; // Skip duplicates
+                let remaining = str.slice(0, i) + str.slice(i + 1, str.length);
+                for (let subPerm of getPermutations(remaining)) {
+                    perms.push(char + subPerm);
+                }
+            }
+            return perms;
+        }
+
+        function agregarAlTicket(modo = 'normal') {
             const apuestaInput = document.getElementById('apuesta-input').value.trim();
             const montoInput = parseFloat(document.getElementById('monto-input').value);
 
@@ -651,34 +727,63 @@
                     return Swal.fire('Falta el Signo', 'Has seleccionado Triple + Signo. Por favor selecciona al menos un signo en la parte de abajo.', 'warning');
                 }
 
+                let jugadasGeneradas = [];
+                const parts = apuestaInput.split(',').map(s => s.trim()).filter(s => s);
+                
+                if (modo === 'permuta') {
+                    parts.forEach(part => {
+                        const perms = getPermutations(part);
+                        jugadasGeneradas.push(...perms);
+                    });
+                } else if (modo === 'serie') {
+                    parts.forEach(part => {
+                        let base = part.replace(/[^0-9]/g, '');
+                        if (base.length > 2) base = base.slice(-2);
+                        for (let i = 0; i <= 9; i++) {
+                            jugadasGeneradas.push(i.toString() + base);
+                        }
+                    });
+                } else if (modo === 'corrida') {
+                    parts.forEach(part => {
+                        let base = part.replace(/[^0-9]/g, '');
+                        if (base.length > 2) base = base.slice(0, 2);
+                        for (let i = 0; i <= 9; i++) {
+                            jugadasGeneradas.push(base + i.toString());
+                        }
+                    });
+                } else {
+                    jugadasGeneradas = parts;
+                }
+
                 sorteosArr.forEach(sorteo => {
                     juegosArr.forEach(juego => {
-                        if (juego.id === 'S') { // Triple + Signo
-                            selectedSignos.forEach(signo => {
+                        jugadasGeneradas.forEach(numGenerado => {
+                            if (juego.id === 'S') {
+                                selectedSignos.forEach(signo => {
+                                    currentTicket.push({
+                                        id: Date.now() + Math.random(),
+                                        lottery: selectedProduct.name,
+                                        sorteo: sorteo,
+                                        juego: juego.name + ' (' + signo + ')',
+                                        numero: numGenerado,
+                                        monto: montoInput
+                                    });
+                                });
+                            } else {
                                 currentTicket.push({
                                     id: Date.now() + Math.random(),
                                     lottery: selectedProduct.name,
                                     sorteo: sorteo,
-                                    juego: juego.name + ' (' + signo + ')',
-                                    numero: apuestaInput,
+                                    juego: juego.name,
+                                    numero: numGenerado,
                                     monto: montoInput
                                 });
-                            });
-                        } else { // Triples normales
-                            currentTicket.push({
-                                id: Date.now() + Math.random(),
-                                lottery: selectedProduct.name,
-                                sorteo: sorteo,
-                                juego: juego.name,
-                                numero: apuestaInput,
-                                monto: montoInput
-                            });
-                        }
+                            }
+                        });
                     });
                 });
-            } else {
+            } else if (activeTab === 'animalitos') {
                 // Animalitos
-                // Separa por comas si hay varios (ej. "0, 1, 2")
                 const anims = apuestaInput.split(',').map(s => s.trim()).filter(s => s);
                 sorteosArr.forEach(sorteo => {
                     anims.forEach(anim => {
@@ -694,6 +799,35 @@
                 });
                 selectedAnimalitos.clear();
                 renderAnimalitos(document.getElementById('search-animalito').value);
+            } else if (activeTab === 'extras') {
+                const nums = apuestaInput.split(',').map(s => s.trim()).filter(s => s);
+                let hasError = false;
+                
+                nums.forEach(num => {
+                    const soloNumeros = num.replace(/[^0-9]/g, '');
+                    if (selectedProduct.name.includes('Pegadito') && soloNumeros.length !== 5) {
+                        hasError = true;
+                        Swal.fire('Error', 'El Pegadito requiere exactamente 5 dígitos', 'warning');
+                    } else if (selectedProduct.name.includes('Arrimao') && soloNumeros.length !== 4) {
+                        hasError = true;
+                        Swal.fire('Error', 'El Arrimao requiere exactamente 4 dígitos', 'warning');
+                    }
+                });
+
+                if(hasError) return;
+
+                sorteosArr.forEach(sorteo => {
+                    nums.forEach(num => {
+                        currentTicket.push({
+                            id: Date.now() + Math.random(),
+                            lottery: selectedProduct.name,
+                            sorteo: sorteo,
+                            juego: 'Extra',
+                            numero: num,
+                            monto: montoInput
+                        });
+                    });
+                });
             }
 
             document.getElementById('apuesta-input').value = '';
