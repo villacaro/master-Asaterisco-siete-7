@@ -707,29 +707,22 @@
             return perms;
         }
 
-        function agregarAlTicket(modo = 'normal') {
-            const apuestaInput = document.getElementById('apuesta-input').value.trim();
-            const montoInput = parseFloat(document.getElementById('monto-input').value);
 
-            if(!selectedProduct) return Swal.fire('Error', 'Selecciona un producto', 'warning');
-            if(selectedSorteos.size === 0) return Swal.fire('Error', 'Selecciona al menos un sorteo', 'warning');
-            if(!apuestaInput) return Swal.fire('Error', 'Ingresa la jugada', 'warning');
-            if(!montoInput || montoInput <= 0) return Swal.fire('Error', 'Ingresa un monto válido', 'warning');
+        function procesarJugada(prod, sorteosElegidos, apuestaVal, montoVal, modo, juegosElegidos, signosElegidos, tabActivo) {
+            let generados = 0;
+            const sorteosArr = sorteosElegidos.filter(s => prod.sorteos.includes(s));
+            if (sorteosArr.length === 0) return 0; // No valid sorteos for this product
 
-            const sorteosArr = Array.from(selectedSorteos);
-            
-            if (activeTab === 'triples') {
-                if(selectedJuegos.size === 0) return Swal.fire('Error', 'Selecciona al menos un juego', 'warning');
-                const juegosArr = Array.from(selectedJuegos).map(id => juegosConfig.find(j => j.id === id));
-                
-                // Validación especial para Triple + Signo
-                const tieneJuegoSigno = juegosArr.some(j => j.id === 'S'); // Asumiendo que 'S' es Triple + Signo
-                if(tieneJuegoSigno && selectedSignos.size === 0) {
-                    return Swal.fire('Falta el Signo', 'Has seleccionado Triple + Signo. Por favor selecciona al menos un signo en la parte de abajo.', 'warning');
+            if (tabActivo === 'triples') {
+                const juegosArr = Array.from(juegosElegidos).map(id => juegosConfig.find(j => j.id === id));
+                const tieneJuegoSigno = juegosArr.some(j => j.id === 'S');
+                if(tieneJuegoSigno && signosElegidos.size === 0) {
+                    Swal.fire('Falta el Signo', 'Has seleccionado Triple + Signo. Por favor selecciona al menos un signo.', 'warning');
+                    return -1;
                 }
 
                 let jugadasGeneradas = [];
-                const parts = apuestaInput.split(',').map(s => s.trim()).filter(s => s);
+                const parts = apuestaVal.split(',').map(s => s.trim()).filter(s => s);
                 
                 if (modo === 'permuta') {
                     parts.forEach(part => {
@@ -752,10 +745,6 @@
                             jugadasGeneradas.push(base + i.toString());
                         }
                     });
-                } else if (modo === 'multiple') {
-                    // Por ahora se comporta igual que normal (parts)
-                    // Hasta que se defina la logica exacta de "multiple"
-                    jugadasGeneradas = parts;
                 } else {
                     jugadasGeneradas = parts;
                 }
@@ -764,75 +753,163 @@
                     juegosArr.forEach(juego => {
                         jugadasGeneradas.forEach(numGenerado => {
                             if (juego.id === 'S') {
-                                selectedSignos.forEach(signo => {
+                                signosElegidos.forEach(signo => {
                                     currentTicket.push({
                                         id: Date.now() + Math.random(),
-                                        lottery: selectedProduct.name,
+                                        lottery: prod.name,
                                         sorteo: sorteo,
                                         juego: juego.name + ' (' + signo + ')',
                                         numero: numGenerado,
-                                        monto: montoInput
+                                        monto: montoVal
                                     });
+                                    generados++;
                                 });
                             } else {
                                 currentTicket.push({
                                     id: Date.now() + Math.random(),
-                                    lottery: selectedProduct.name,
+                                    lottery: prod.name,
                                     sorteo: sorteo,
                                     juego: juego.name,
                                     numero: numGenerado,
-                                    monto: montoInput
+                                    monto: montoVal
                                 });
+                                generados++;
                             }
                         });
                     });
                 });
-            } else if (activeTab === 'animalitos') {
-                // Animalitos
-                const anims = apuestaInput.split(',').map(s => s.trim()).filter(s => s);
+            } else if (tabActivo === 'animalitos') {
+                const anims = apuestaVal.split(',').map(s => s.trim()).filter(s => s);
                 sorteosArr.forEach(sorteo => {
                     anims.forEach(anim => {
                         currentTicket.push({
                             id: Date.now() + Math.random(),
-                            lottery: selectedProduct.name,
+                            lottery: prod.name,
                             sorteo: sorteo,
                             juego: 'Animalito',
                             numero: anim,
-                            monto: montoInput
+                            monto: montoVal
                         });
+                        generados++;
                     });
                 });
-                selectedAnimalitos.clear();
-                renderAnimalitos(document.getElementById('search-animalito').value);
-            } else if (activeTab === 'extras') {
-                const nums = apuestaInput.split(',').map(s => s.trim()).filter(s => s);
+            } else if (tabActivo === 'extras') {
+                const nums = apuestaVal.split(',').map(s => s.trim()).filter(s => s);
                 let hasError = false;
                 
                 nums.forEach(num => {
                     const soloNumeros = num.replace(/[^0-9]/g, '');
-                    if (selectedProduct.name.includes('Pegadito') && soloNumeros.length !== 5) {
+                    if (prod.name.includes('Pegadito') && soloNumeros.length !== 5) {
                         hasError = true;
                         Swal.fire('Error', 'El Pegadito requiere exactamente 5 dígitos', 'warning');
-                    } else if (selectedProduct.name.includes('Arrimao') && soloNumeros.length !== 4) {
+                    } else if (prod.name.includes('Arrimao') && soloNumeros.length !== 4) {
                         hasError = true;
                         Swal.fire('Error', 'El Arrimao requiere exactamente 4 dígitos', 'warning');
                     }
                 });
 
-                if(hasError) return;
+                if(hasError) return -1;
 
                 sorteosArr.forEach(sorteo => {
                     nums.forEach(num => {
                         currentTicket.push({
                             id: Date.now() + Math.random(),
-                            lottery: selectedProduct.name,
+                            lottery: prod.name,
                             sorteo: sorteo,
                             juego: 'Extra',
                             numero: num,
-                            monto: montoInput
+                            monto: montoVal
                         });
+                        generados++;
                     });
                 });
+            }
+            return generados;
+        }
+
+        function agregarAlTicket(modo = 'normal') {
+            const apuestaInput = document.getElementById('apuesta-input').value.trim();
+            const montoInput = parseFloat(document.getElementById('monto-input').value);
+
+            if(!selectedProduct) return Swal.fire('Error', 'Selecciona un producto', 'warning');
+            if(selectedSorteos.size === 0) return Swal.fire('Error', 'Selecciona al menos un sorteo', 'warning');
+            if(!apuestaInput) return Swal.fire('Error', 'Ingresa la jugada', 'warning');
+            if(!montoInput || montoInput <= 0) return Swal.fire('Error', 'Ingresa un monto válido', 'warning');
+
+            if (activeTab === 'triples' && selectedJuegos.size === 0) {
+                return Swal.fire('Error', 'Selecciona al menos un juego', 'warning');
+            }
+
+            if (modo === 'multiple') {
+                const availableProds = lotteries.filter(l => l.type && l.type.includes(activeTab));
+                let htmlOptions = '<div class="grid grid-cols-2 gap-2 text-left mt-4 max-h-60 overflow-y-auto p-2">';
+                availableProds.forEach(p => {
+                    const isChecked = p.name === selectedProduct.name ? 'checked' : '';
+                    htmlOptions += `
+                        <label class="flex items-center gap-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" class="prod-checkbox w-4 h-4 text-tuazar-purple" value="${p.name}" ${isChecked}>
+                            <span class="text-sm font-medium text-gray-700">${p.name}</span>
+                        </label>
+                    `;
+                });
+                htmlOptions += '</div>';
+
+                Swal.fire({
+                    title: 'Jugada Múltiple',
+                    html: `Selecciona las loterías a las que deseas aplicar esta jugada.<br>` + htmlOptions,
+                    showCancelButton: true,
+                    confirmButtonText: 'Jugar Múltiple',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#7c3aed',
+                    width: '600px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const selectedNames = Array.from(document.querySelectorAll('.prod-checkbox:checked')).map(cb => cb.value);
+                        if(selectedNames.length === 0) return Swal.fire('Error', 'Selecciona al menos una lotería', 'error');
+                        
+                        let totalGenerados = 0;
+                        for (const name of selectedNames) {
+                            const prod = lotteries.find(l => l.name === name);
+                            const res = procesarJugada(prod, Array.from(selectedSorteos), apuestaInput, montoInput, 'normal', selectedJuegos, selectedSignos, activeTab);
+                            if (res === -1) return; // Error occurred
+                            totalGenerados += res;
+                        }
+                        
+                        if (totalGenerados > 0) {
+                            document.getElementById('apuesta-input').value = '';
+                            document.getElementById('monto-input').value = '';
+                            document.getElementById('apuesta-input').focus();
+                            if (activeTab === 'animalitos') {
+                                selectedAnimalitos.clear();
+                                renderAnimalitos(document.getElementById('search-animalito') ? document.getElementById('search-animalito').value : '');
+                            }
+                            renderTicket();
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Éxito!',
+                                text: `Se agregaron ${totalGenerados} jugadas al ticket.`,
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire('Aviso', 'Las loterías seleccionadas no tienen sorteos en los horarios que elegiste.', 'info');
+                        }
+                    }
+                });
+                return;
+            }
+
+            // Modo normal / permuta / serie / corrida
+            const res = procesarJugada(selectedProduct, Array.from(selectedSorteos), apuestaInput, montoInput, modo, selectedJuegos, selectedSignos, activeTab);
+            if (res === -1) return;
+
+            if (res === 0) {
+                return Swal.fire('Aviso', 'La lotería seleccionada no tiene sorteos en los horarios que elegiste.', 'info');
+            }
+
+            if (activeTab === 'animalitos') {
+                selectedAnimalitos.clear();
+                renderAnimalitos(document.getElementById('search-animalito') ? document.getElementById('search-animalito').value : '');
             }
 
             document.getElementById('apuesta-input').value = '';
@@ -841,7 +918,6 @@
             
             renderTicket();
         }
-
         function renderTicket() {
             const emptyState = document.getElementById('empty-ticket-state');
             const itemsContainer = document.getElementById('ticket-items');
