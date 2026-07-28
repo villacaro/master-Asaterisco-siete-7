@@ -179,7 +179,7 @@
                         <button onclick="agregarAlTicket('permuta')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-[11px] transition-colors shadow-sm tracking-wide">PERMUTA</button>
                         <button onclick="agregarAlTicket('serie')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-[11px] transition-colors shadow-sm tracking-wide">SERIE</button>
                         <button onclick="agregarAlTicket('corrida')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-[11px] transition-colors shadow-sm tracking-wide">CORRIDA</button>
-                        <button onclick="agregarAlTicket('multiple')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-[11px] transition-colors shadow-sm tracking-wide">MÚLTIPLE</button>
+                        <button onclick="toggleMultipleMode()" id="btn-multiple-mode" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-[11px] transition-colors shadow-sm tracking-wide">MÚLTIPLE</button>
                     </div>
                 </div>
             </div>
@@ -252,7 +252,8 @@
                 { name: 'Guacharito Millonario', short: 'GM', type: ['animalitos'], sorteos: ["08:30 AM", "09:30 AM", "10:30 AM", "11:30 AM", "12:30 PM", "01:30 PM", "02:30 PM", "03:30 PM", "04:30 PM", "05:30 PM", "06:30 PM", "07:30 PM"] },
                 { name: 'Loto Chaima', short: 'LC', type: ['animalitos'], sorteos: ["08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM", "06:00 PM", "07:00 PM"] }
             ];
-        let selectedProduct = null;
+        let selectedProducts = [];
+        let isMultipleMode = false;
         let selectedSorteos = new Set();
         let selectedJuegos = new Set();
         let currentTicket = [];
@@ -422,10 +423,11 @@
         function updateExtrasPlaceholder() {
             if (activeTab === 'extras') {
                 const apInput = document.getElementById('apuesta-input');
-                if (apInput && selectedProduct) {
-                    if (selectedProduct.name.includes('Arrimao')) {
+                if (apInput && selectedProducts.length > 0) {
+                    const firstProd = selectedProducts[0];
+                    if (firstProd.name.includes('Arrimao')) {
                         apInput.placeholder = "4 dígitos";
-                    } else if (selectedProduct.name.includes('Pegadito')) {
+                    } else if (firstProd.name.includes('Pegadito')) {
                         apInput.placeholder = "5 dígitos";
                     } else {
                         apInput.placeholder = "Apuesta extra";
@@ -434,8 +436,36 @@
             }
         }
 
+        
+        function toggleMultipleMode() {
+            isMultipleMode = !isMultipleMode;
+            const btn = document.getElementById('btn-multiple-mode');
+            if (isMultipleMode) {
+                btn.classList.remove('bg-amber-500', 'hover:bg-amber-600');
+                btn.classList.add('bg-red-500', 'hover:bg-red-600', 'ring-2', 'ring-red-300');
+            } else {
+                btn.classList.add('bg-amber-500', 'hover:bg-amber-600');
+                btn.classList.remove('bg-red-500', 'hover:bg-red-600', 'ring-2', 'ring-red-300');
+                // Al apagarlo, dejamos solo el primer producto si hay varios
+                if (selectedProducts.length > 1) {
+                    selectedProducts = [selectedProducts[0]];
+                    selectedSorteos.clear();
+                    renderProducts();
+                    renderSorteos();
+                }
+            }
+        }
+
         function selectProduct(name) {
-            selectedProduct = lotteries.find(l => l.name === name);
+            const prod = lotteries.find(l => l.name === name);
+            if (!prod) return;
+            if (isMultipleMode) {
+                const idx = selectedProducts.findIndex(p => p.name === name);
+                if (idx !== -1) selectedProducts.splice(idx, 1);
+                else selectedProducts.push(prod);
+            } else {
+                selectedProducts = [prod];
+            }
             selectedSorteos.clear();
             selectedAnimalitos.clear();
             renderProducts();
@@ -448,22 +478,30 @@
 
         function renderSorteos() {
             const container = document.getElementById('sorteos-container');
-            if(!selectedProduct) {
+            if(selectedProducts.length === 0) {
                 container.innerHTML = '';
                 document.getElementById('sorteos-count').innerText = '0/0';
                 return;
             }
 
-            document.getElementById('sorteos-count').innerText = `${selectedSorteos.size}/${selectedProduct.sorteos.length}`;
+            let allSorteos = [];
+            selectedProducts.forEach(p => {
+                p.sorteos.forEach(s => {
+                    if (!allSorteos.includes(s)) allSorteos.push(s);
+                });
+            });
+            // Optional: sort them by time if needed, but keeping array order is fine
+
+            document.getElementById('sorteos-count').innerText = `${selectedSorteos.size}/${allSorteos.length}`;
             
             const btnAllS = document.getElementById('btn-select-all-sorteos');
-            if(selectedSorteos.size === selectedProduct.sorteos.length && selectedProduct.sorteos.length > 0) {
+            if(selectedSorteos.size === allSorteos.length && allSorteos.length > 0) {
                 btnAllS.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg><span>Limpiar</span>`;
             } else {
                 btnAllS.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Seleccionar todos</span>`;
             }
             
-            container.innerHTML = selectedProduct.sorteos.map(time => {
+            container.innerHTML = allSorteos.map(time => {
                 const isSelected = selectedSorteos.has(time);
                 const cls = isSelected 
                     ? "border-tuazar-purple bg-tuazar-purple-light/30 text-tuazar-purple font-medium"
@@ -483,11 +521,19 @@
         }
 
         function selectAllSorteos() {
-            if(!selectedProduct) return;
-            if(selectedSorteos.size === selectedProduct.sorteos.length) {
+            if(selectedProducts.length === 0) return;
+            
+            let allSorteos = [];
+            selectedProducts.forEach(p => {
+                p.sorteos.forEach(s => {
+                    if (!allSorteos.includes(s)) allSorteos.push(s);
+                });
+            });
+
+            if(selectedSorteos.size === allSorteos.length) {
                 selectedSorteos.clear();
             } else {
-                selectedProduct.sorteos.forEach(t => selectedSorteos.add(t));
+                allSorteos.forEach(t => selectedSorteos.add(t));
             }
             renderSorteos();
         }
@@ -594,12 +640,16 @@
             }
             
             renderProducts();
-            // Si el producto seleccionado no está en la nueva pestaña, seleccionamos el primero disponible
-            if(selectedProduct && (!selectedProduct.type || !selectedProduct.type.includes(activeTab))) {
+            // Filter selectedProducts to only those valid in the new tab
+            if(selectedProducts.length > 0) {
+                selectedProducts = selectedProducts.filter(p => p.type && p.type.includes(activeTab));
+            }
+            
+            if(selectedProducts.length === 0) {
                 const available = lotteries.filter(l => l.type && l.type.includes(activeTab));
                 if(available.length > 0) selectProduct(available[0].name);
-                else { selectedProduct = null; renderSorteos(); }
-            } else if (selectedProduct) {
+                else { renderSorteos(); }
+            } else {
                 updateExtrasPlaceholder();
             }
         }
@@ -831,7 +881,7 @@
             const apuestaInput = document.getElementById('apuesta-input').value.trim();
             const montoInput = parseFloat(document.getElementById('monto-input').value);
 
-            if(!selectedProduct) return Swal.fire('Error', 'Selecciona un producto', 'warning');
+            if(selectedProducts.length === 0) return Swal.fire('Error', 'Selecciona al menos un producto', 'warning');
             if(selectedSorteos.size === 0) return Swal.fire('Error', 'Selecciona al menos un sorteo', 'warning');
             if(!apuestaInput) return Swal.fire('Error', 'Ingresa la jugada', 'warning');
             if(!montoInput || montoInput <= 0) return Swal.fire('Error', 'Ingresa un monto válido', 'warning');
@@ -840,71 +890,16 @@
                 return Swal.fire('Error', 'Selecciona al menos un juego', 'warning');
             }
 
-            if (modo === 'multiple') {
-                const availableProds = lotteries.filter(l => l.type && l.type.includes(activeTab));
-                let htmlOptions = '<div class="grid grid-cols-2 gap-2 text-left mt-4 max-h-60 overflow-y-auto p-2">';
-                availableProds.forEach(p => {
-                    const isChecked = p.name === selectedProduct.name ? 'checked' : '';
-                    htmlOptions += `
-                        <label class="flex items-center gap-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
-                            <input type="checkbox" class="prod-checkbox w-4 h-4 text-tuazar-purple" value="${p.name}" ${isChecked}>
-                            <span class="text-sm font-medium text-gray-700">${p.name}</span>
-                        </label>
-                    `;
-                });
-                htmlOptions += '</div>';
-
-                Swal.fire({
-                    title: 'Jugada Múltiple',
-                    html: `Selecciona las loterías a las que deseas aplicar esta jugada.<br>` + htmlOptions,
-                    showCancelButton: true,
-                    confirmButtonText: 'Jugar Múltiple',
-                    cancelButtonText: 'Cancelar',
-                    confirmButtonColor: '#7c3aed',
-                    width: '600px'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const selectedNames = Array.from(document.querySelectorAll('.prod-checkbox:checked')).map(cb => cb.value);
-                        if(selectedNames.length === 0) return Swal.fire('Error', 'Selecciona al menos una lotería', 'error');
-                        
-                        let totalGenerados = 0;
-                        for (const name of selectedNames) {
-                            const prod = lotteries.find(l => l.name === name);
-                            const res = procesarJugada(prod, Array.from(selectedSorteos), apuestaInput, montoInput, 'normal', selectedJuegos, selectedSignos, activeTab);
-                            if (res === -1) return; // Error occurred
-                            totalGenerados += res;
-                        }
-                        
-                        if (totalGenerados > 0) {
-                            document.getElementById('apuesta-input').value = '';
-                            document.getElementById('monto-input').value = '';
-                            document.getElementById('apuesta-input').focus();
-                            if (activeTab === 'animalitos') {
-                                selectedAnimalitos.clear();
-                                renderAnimalitos(document.getElementById('search-animalito') ? document.getElementById('search-animalito').value : '');
-                            }
-                            renderTicket();
-                            Swal.fire({
-                                icon: 'success',
-                                title: '¡Éxito!',
-                                text: `Se agregaron ${totalGenerados} jugadas al ticket.`,
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
-                        } else {
-                            Swal.fire('Aviso', 'Las loterías seleccionadas no tienen sorteos en los horarios que elegiste.', 'info');
-                        }
-                    }
-                });
-                return;
+            // Modo normal / permuta / serie / corrida aplicado a TODOS los productos seleccionados
+            let totalGenerados = 0;
+            for (const prod of selectedProducts) {
+                const res = procesarJugada(prod, Array.from(selectedSorteos), apuestaInput, montoInput, modo, selectedJuegos, selectedSignos, activeTab);
+                if (res === -1) return; // Error occurred, usually Swal is already shown
+                totalGenerados += res;
             }
 
-            // Modo normal / permuta / serie / corrida
-            const res = procesarJugada(selectedProduct, Array.from(selectedSorteos), apuestaInput, montoInput, modo, selectedJuegos, selectedSignos, activeTab);
-            if (res === -1) return;
-
-            if (res === 0) {
-                return Swal.fire('Aviso', 'La lotería seleccionada no tiene sorteos en los horarios que elegiste.', 'info');
+            if (totalGenerados === 0) {
+                return Swal.fire('Aviso', 'Las loterías seleccionadas no tienen sorteos en los horarios que elegiste.', 'info');
             }
 
             if (activeTab === 'animalitos') {
@@ -916,7 +911,18 @@
             document.getElementById('monto-input').value = '';
             document.getElementById('apuesta-input').focus();
             
+            // Si estaba en modo múltiple, al generar el ticket podemos dejarlo encendido para que sigan marcados.
             renderTicket();
+            
+            if (selectedProducts.length > 1) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Jugada Múltiple Exitosa!',
+                    text: `Se agregaron ${totalGenerados} jugadas al ticket.`,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
         }
         function renderTicket() {
             const emptyState = document.getElementById('empty-ticket-state');
