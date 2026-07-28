@@ -175,10 +175,11 @@
                         Agregar al ticket
                         <span class="bg-white/20 px-2 py-0.5 rounded text-xs ml-2">Enter</span>
                     </button>
-                    <div class="grid grid-cols-3 gap-3 w-full">
-                        <button onclick="agregarAlTicket('permuta')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-xs transition-colors shadow-sm tracking-wide">PERMUTA</button>
-                        <button onclick="agregarAlTicket('serie')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-xs transition-colors shadow-sm tracking-wide">SERIE</button>
-                        <button onclick="agregarAlTicket('corrida')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-xs transition-colors shadow-sm tracking-wide">CORRIDA</button>
+                    <div class="grid grid-cols-4 gap-2 w-full">
+                        <button onclick="agregarAlTicket('permuta')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-[11px] transition-colors shadow-sm tracking-wide">PERMUTA</button>
+                        <button onclick="agregarAlTicket('serie')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-[11px] transition-colors shadow-sm tracking-wide">SERIE</button>
+                        <button onclick="agregarAlTicket('corrida')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-[11px] transition-colors shadow-sm tracking-wide">CORRIDA</button>
+                        <button onclick="agregarAlTicket('multiple')" class="bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-lg font-bold text-[11px] transition-colors shadow-sm tracking-wide">MÚLTIPLE</button>
                     </div>
                 </div>
             </div>
@@ -751,6 +752,10 @@
                             jugadasGeneradas.push(base + i.toString());
                         }
                     });
+                } else if (modo === 'multiple') {
+                    // Por ahora se comporta igual que normal (parts)
+                    // Hasta que se defina la logica exacta de "multiple"
+                    jugadasGeneradas = parts;
                 } else {
                     jugadasGeneradas = parts;
                 }
