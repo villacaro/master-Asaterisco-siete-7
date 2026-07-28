@@ -987,7 +987,87 @@
             alert('Conectando con impresora...');
         }
         function imprimirTicket() {
-            alert('Imprimiendo ticket...');
+            if (currentTicket.length === 0) {
+                return Swal.fire('Error', 'El ticket está vacío', 'warning');
+            }
+
+            const totalAmount = currentTicket.reduce((acc, curr) => acc + curr.monto, 0);
+            const ticketId = 'T-' + Date.now();
+            const usuario = sessionStorage.getItem('ast7_user') || 'operador_default';
+            const taquillaNombre = sessionStorage.getItem('ast7_taquilla') || 'Taquilla 1';
+
+            const payload = {
+                id: ticketId,
+                usuario: usuario,
+                taquillaNombre: taquillaNombre,
+                total: totalAmount,
+                items: currentTicket.map(t => ({
+                    lottery: t.lottery,
+                    sorteo: t.sorteo,
+                    bet_type: t.juego,
+                    number: t.numero,
+                    amount: t.monto
+                }))
+            };
+
+            Swal.fire({
+                title: 'Procesando Venta...',
+                text: 'Guardando el ticket en la base de datos',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('/taquilla/venta/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') || ''
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.ok || data.ticket_id) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Venta Registrada!',
+                        text: 'El ticket se guardó e imprimió con éxito.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    
+                    // Simular conexión con impresora
+                    connectPrinter();
+
+                    // Limpiar la taquilla
+                    currentTicket = [];
+                    renderTicket();
+                } else {
+                    Swal.fire('Error', data.error || 'No se pudo guardar la venta', 'error');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                Swal.fire('Error de Conexión', 'Ocurrió un problema de red al guardar el ticket. Revisa tu conexión e intenta de nuevo.', 'error');
+            });
+        }
+        
+        // Helper para obtener el token CSRF si se requiere (Django)
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
         }
 
     </script>
