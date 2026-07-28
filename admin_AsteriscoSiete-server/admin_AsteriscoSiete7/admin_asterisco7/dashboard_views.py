@@ -3082,3 +3082,10 @@ def create_example_hierarchy(request):
     except Exception as e:
         import traceback
         return JsonResponse({'error': str(e), 'trace': traceback.format_exc()}, status=500)
+
+def taquilla_tuazar_view(request):
+    html_path = os.path.join(settings.BASE_DIR, 'admin_asterisco7', 'templates', 'taquilla', 'taquilla_tuazar.html')
+    if os.path.exists(html_path):
+        with open(html_path, 'r', encoding='utf-8') as f:
+            return HttpResponse(f.read())
+    return HttpResponse('Plantilla no encontrada: taquilla_tuazar.html', status=404)
