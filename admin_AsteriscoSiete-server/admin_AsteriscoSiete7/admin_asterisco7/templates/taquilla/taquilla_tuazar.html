@@ -398,7 +398,7 @@
             const visibleLotteries = lotteries.filter(l => l.type && l.type.includes(activeTab));
             
             container.innerHTML = visibleLotteries.map(l => {
-                const isSelected = selectedProduct && selectedProduct.name === l.name;
+                const isSelected = selectedProducts.some(sp => sp.name === l.name);
                 const baseClass = isSelected 
                     ? "border-tuazar-purple bg-tuazar-purple-light/20" 
                     : "border-transparent bg-white hover:border-gray-300";
@@ -656,7 +656,7 @@
 
         function renderAnimalitos(filterText = '') {
             const container = document.getElementById('animalitos-container');
-            const currentList = selectedProduct ? getAnimalitosListForProduct(selectedProduct.name) : animalsStandard;
+            const currentList = selectedProducts.length > 0 ? getAnimalitosListForProduct(selectedProducts[0].name) : animalsStandard;
             document.getElementById('animalitos-count').innerText = `${selectedAnimalitos.size}/${currentList.length}`;
             
             const lowerFilter = filterText.toLowerCase();
