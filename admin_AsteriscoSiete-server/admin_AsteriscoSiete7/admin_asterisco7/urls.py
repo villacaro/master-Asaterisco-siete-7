@@ -5,6 +5,88 @@ from django.conf import settings
 from django.urls import include, re_path, path
 from django.views.static import serve
 from django.contrib import admin
+
+# --- Custom Admin App List Injection ---
+from django.contrib import admin
+
+original_get_app_list = admin.AdminSite.get_app_list
+
+def custom_get_app_list(self, request, app_label=None):
+    app_dict = original_get_app_list(self, request, app_label)
+    
+    reportes_app = {
+        'name': 'ADMIN_REPORTES',
+        'app_label': 'admin_reportes',
+        'app_url': '',
+        'has_module_perms': True,
+        'models': [
+            {
+                'name': 'Dashboard (Nuevo)',
+                'object_name': 'ReporteDashboard',
+                'admin_url': '/dashboard/',
+                'view_only': True,
+            },
+            {
+                'name': 'Cuadre General Queda',
+                'object_name': 'ReporteCuadreGeneralQueda',
+                'admin_url': '/reportes/ventas/cuadre-queda/general/',
+                'view_only': True,
+            },
+            {
+                'name': 'Cuadre por Fechas Queda',
+                'object_name': 'ReporteCuadreFechasQueda',
+                'admin_url': '/reportes/ventas/cuadre-queda/fechas/',
+                'view_only': True,
+            },
+            {
+                'name': 'Cuadre Nivel Superior',
+                'object_name': 'ReporteCuadreNivelSuperior',
+                'admin_url': '/reportes/ventas/cuadre-nivel-superior/',
+                'view_only': True,
+            },
+            {
+                'name': 'Ventas en Línea',
+                'object_name': 'ReporteVentaLinea',
+                'admin_url': '/reportes/ventas/ventas-en-linea/',
+                'view_only': True,
+            },
+            {
+                'name': 'Ventas por Producto',
+                'object_name': 'ReporteVentaJuegos',
+                'admin_url': '/reportes/ventas/juegos/',
+                'view_only': True,
+            },
+            {
+                'name': 'Ventas Procesadas',
+                'object_name': 'ReporteVentaProcesadas',
+                'admin_url': '/reportes/ventas/venta-procesadas/',
+                'view_only': True,
+            },
+            {
+                'name': 'Monitor de Ventas',
+                'object_name': 'ReporteMonitorVentas',
+                'admin_url': '/reportes/ventas/monitor-ventas/',
+                'view_only': True,
+            },
+            {
+                'name': 'Listado de Tickets',
+                'object_name': 'ReporteTickets',
+                'admin_url': '/reportes/tickets/listado-tickets/',
+                'view_only': True,
+            }
+        ]
+    }
+    
+    if isinstance(app_dict, list):
+        app_dict.append(reportes_app)
+        # Ordenamos los apps alfabéticamente
+        app_dict.sort(key=lambda x: x['name'].lower())
+        
+    return app_dict
+
+admin.AdminSite.get_app_list = custom_get_app_list
+# ---------------------------------------
+
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from admin_asterisco7.dashboard_views import dashboard, dashboard_stats, dashboard_api, dashboard_crud, taquilla_view, taquilla_app_movil_view, taquilla_tuazar_view, reportes_page, candidatos_page, monitor_api, liquidacion_page, taquilla_login_api, taquilla_venta_api, taquilla_ventas_lista_api, taquilla_scrape_tuazar, liquidaciones_sorteo_api, candidatos_riesgo_api, cuadre_nivel_superior_api, taquilla_resultados_hoy, taquilla_mi_ip, taquilla_cambiar_clave_api, taquilla_reporte_diario, taquilla_reporte_periodo, taquilla_reporte_caja, taquilla_reporte_tickets, taquilla_reporte_ganadores, taquilla_proxy_resultados, taquilla_ping
 from admin_asterisco7.reportes_views import (
