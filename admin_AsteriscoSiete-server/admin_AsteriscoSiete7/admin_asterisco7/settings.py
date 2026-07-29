@@ -367,7 +367,7 @@ CACHES_CONF_TIME = {
 }
 ###########################
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_KEY = 'public_key_admin_asterisco7'
 
 # PREPEND_WWW = True
@@ -672,3 +672,6 @@ if not firebase_admin._apps:
             firebase_admin.initialize_app(cred)
         except Exception as e:
             _fb_logger.warning('[WARN] Firebase App initialization failed: %s', e)
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_AGE = 31536000
