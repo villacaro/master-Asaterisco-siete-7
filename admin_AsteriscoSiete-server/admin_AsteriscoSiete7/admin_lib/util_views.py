@@ -331,7 +331,7 @@ class MyViewBase(object):
         Retorna el profile relacionado con la session instanciada
         """
         if self._profile is None:
-            comercializadora = self.kwargs['object_comercializadora']
+            comercializadora = getattr(self, 'object_comercializadora', None) or self.kwargs.get('object_comercializadora')
             if comercializadora is None:
                 user = self.kwargs['object_user']
                 self._profile = user.profile

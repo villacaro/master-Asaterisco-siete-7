@@ -784,7 +784,6 @@ class UpdateTaquillaForm(WidgetCustomizeForms, forms.ModelForm):
         fields = [
             'user',
             'status',
-            'monto_alquiler',
             'is_taquilla_master',
         ]
 
@@ -799,10 +798,10 @@ class UpdateTaquillaForm(WidgetCustomizeForms, forms.ModelForm):
 
         self.is_taquilla_master = self.instance.is_taquilla_master
         if not self.instance.modo_alquiler:
-            del self.fields['monto_alquiler']
+            pass
         else:
             if self.view.get_profile().codename != 'userprofile_operadora':
-                del self.fields['monto_alquiler']
+                pass
 
     def save(self, commit=True, *args, **kwargs):
         super(UpdateTaquillaForm, self).save(commit=False, *args, **kwargs)

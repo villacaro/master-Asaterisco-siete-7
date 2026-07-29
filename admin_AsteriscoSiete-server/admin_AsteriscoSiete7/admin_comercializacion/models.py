@@ -143,21 +143,6 @@ class AgenciaDataDefault(models.Model):
         verbose_name='Parley: cantidad maxima de ganancia para tickets clonados (*)',
         help_text='Ingrese la cantidad maxima de ganancia para tickets clonados'
     )
-    monto_alquiler = models.DecimalField(
-        max_digits=15,
-        decimal_places=5,
-        default=0.00000,
-        verbose_name='Monto de alquiler por taquilla(*)',
-        help_text='Ingrese el monto por alquier de taquilla'
-    )
-    frecuencia_monto_alquiler = models.CharField(
-        choices=choices_frecuencia_monto_alquiler,
-        null=True,
-        blank=True,
-        max_length=30,
-        verbose_name='Frecuencia de cobro de monto de alquiler (*)',
-        help_text='Seleccione la frecuencia de cobro de monto de alquiler'
-    )
     factor_riesgo = models.IntegerField(
         verbose_name='Factor de riesgo (*)',
         default=1,
@@ -504,21 +489,6 @@ class DataDefault(models.Model):
         default=0.00000,
         verbose_name='Porcentaje de maximo (*)',
         help_text='Ingrese el porcentaje de maximo por tipo de comercializadora'
-    )
-    monto_alquiler = models.DecimalField(
-        max_digits=15,
-        decimal_places=5,
-        default=0.00000,
-        verbose_name='Monto de alquiler por taquilla(*)',
-        help_text='Ingrese el monto por alquier de taquilla'
-    )
-    frecuencia_monto_alquiler = models.CharField(
-        choices=choices_frecuencia_monto_alquiler,
-        null=True,
-        blank=True,
-        max_length=30,
-        verbose_name='Frecuencia de cobro de monto de alquiler (*)',
-        help_text='Seleccione la frecuencia de cobro de monto de alquiler'
     )
     factor_riesgo = models.IntegerField(
         verbose_name='Factor de riesgo (*)',
@@ -2468,24 +2438,7 @@ class Agencias(BaseGenericProcess, BaseModelCadena):
         help_text='Parley: Seleccione el monto mÃ¡ximo para la ganancia de apuestas con '
                   'combinaciones repetidas en los tickets'
     )
-    monto_alquiler = models.DecimalField(
-        max_digits=15,
-        decimal_places=5,
-        default=None,
-        null=True,
-        blank=True,
-        verbose_name='Monto de alquiler por taquilla (*)',
-        help_text='Ingrese el monto por alquier de taquilla'
-    )
 
-    frecuencia_monto_alquiler = models.CharField(
-        choices=choices_frecuencia_monto_alquiler,
-        null=True,
-        blank=True,
-        max_length=30,
-        verbose_name='Frecuencia de cobro de monto de alquiler (*)',
-        help_text='Seleccione la frecuencia de cobro de monto de alquiler'
-    )
     factor_riesgo = models.IntegerField(
         null=True,
         verbose_name='Factor de riesgo (*)',
@@ -2669,13 +2622,6 @@ class Taquillas(ProtectDelete, BaseGenericProcess, models.Model):
     agencia = models.ForeignKey(
         'admin_comercializacion.Agencias',  # TODO: revisar modelo destino
         on_delete=models.CASCADE,
-    )
-    monto_alquiler = models.DecimalField(
-        max_digits=15,
-        decimal_places=5,
-        default=0.00000,
-        verbose_name='Monto de alquiler por taquilla (*)',
-        help_text='Ingrese el monto por alquier de taquilla'
     )
     modo_alquiler = models.BooleanField(
         default=False,

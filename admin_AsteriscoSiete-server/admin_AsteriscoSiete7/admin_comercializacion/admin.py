@@ -187,7 +187,7 @@ class DistribuidoresAdmin(admin.ModelAdmin):
 class TaquillasEnAgenciaInline(admin.TabularInline):
     model = Taquillas
     extra = 0
-    fields          = ('taquilla', 'serial', 'is_taquilla_master', 'monto_alquiler', 'modo_alquiler')
+    fields          = ('taquilla', 'serial', 'is_taquilla_master', 'modo_alquiler')
     readonly_fields = ('modo_alquiler',)   # editable=False en el modelo → solo lectura
     show_change_link = True
 
@@ -196,7 +196,7 @@ class TaquillasEnAgenciaInline(admin.TabularInline):
 class AgenciasAdmin(admin.ModelAdmin):
     list_display  = ('nombre', 'distribuidores', 'codigo', 'num_taquillas',
                      'taquillas_count', 'montomin', 'montomax', 'created_at')
-    list_filter   = ('frecuencia_monto_alquiler',)
+    list_filter   = ()
     search_fields = ('nombre', 'codigo', 'rif')
     raw_id_fields = ('distribuidores',)
     ordering      = ('distribuidores', 'nombre')
@@ -217,7 +217,7 @@ class AgenciasAdmin(admin.ModelAdmin):
         }),
         ('Modelo Financiero', {
             'classes': ('collapse',),
-            'fields': ('monto_alquiler', 'frecuencia_monto_alquiler',
+            'fields': (
                        'factor_riesgo', 'frecuencia_queda',
                        'parley_clonados_maxima_ganancia'),
         }),
@@ -252,8 +252,7 @@ class UsuariosTaquillaInline(admin.TabularInline):
 @admin.register(Taquillas)
 class TaquillasAdmin(admin.ModelAdmin):
     list_display  = ('taquilla', 'serial', 'agencia', 'agencia_banca',
-                     'is_taquilla_master', 'modo_alquiler',
-                     'monto_alquiler', 'usuarios_count')
+                     'is_taquilla_master', 'modo_alquiler', 'usuarios_count')
     list_filter   = ('is_taquilla_master', 'modo_alquiler')
     search_fields = ('taquilla', 'serial')
     raw_id_fields = ('agencia',)
@@ -349,12 +348,10 @@ class DataDefaultAdmin(admin.ModelAdmin):
     list_display  = (
         'pk', 'user_type', 'cupo', 'porcentaje_comision', 'porcentaje_regalia',
         'porcentaje_participacion', 'porcentaje_queda', 'porcentaje_maximo',
-        'monto_alquiler',
     )
     list_editable = (
         'cupo', 'porcentaje_comision', 'porcentaje_regalia',
         'porcentaje_participacion', 'porcentaje_queda', 'porcentaje_maximo',
-        'monto_alquiler',
     )
     list_filter   = ('user_type',)
 
