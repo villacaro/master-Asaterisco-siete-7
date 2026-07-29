@@ -333,7 +333,7 @@ class MyViewBase(object):
         if self._profile is None:
             comercializadora = getattr(self, 'object_comercializadora', None) or self.kwargs.get('object_comercializadora')
             if comercializadora is None:
-                user = self.kwargs['object_user']
+                user = getattr(self, 'object_user', None) or self.kwargs.get('object_user')
                 self._profile = user.profile
             else:
                 self._profile = comercializadora.get_type()
