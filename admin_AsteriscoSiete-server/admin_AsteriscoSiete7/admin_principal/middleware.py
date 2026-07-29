@@ -240,7 +240,7 @@ class AuthenticationAndPermissionsMiddleware(MiddlewareMixin):
         Verifica que la vista ejecutada tenga activa la opcion de mostrar la info del sistema
         """
         if response.context_data and "view" in response.context_data:
-            exits = response.context_data["view"].info_system
+            exits = getattr(response.context_data["view"], "info_system", False)
             if exits is True:
                 response.context_data['info_system'] = {
                     "name": "Matchpoint Parley",
@@ -257,7 +257,7 @@ class AuthenticationAndPermissionsMiddleware(MiddlewareMixin):
         """
         # print(dir(response.context_data["view"]))
         if response.context_data and "view" in response.context_data:
-            exits = response.context_data["view"].info_user
+            exits = getattr(response.context_data["view"], "info_user", False)
             if exits is True:
                 response.context_data['info_user'] = {
                     "user": response.context_data["view"].object_user,
@@ -274,7 +274,7 @@ class AuthenticationAndPermissionsMiddleware(MiddlewareMixin):
         de estar activa se ejecuta un algoritmo para consultar el menu asociado al usuario,
         """
         if response.context_data and "view" in response.context_data:
-            exits = response.context_data["view"].info_menu
+            exits = getattr(response.context_data["view"], "info_menu", False)
             if exits is True:
 
                 # Ejecuta el algoritmo de consulta para de los permisos en el
@@ -296,7 +296,7 @@ class AuthenticationAndPermissionsMiddleware(MiddlewareMixin):
         de estar activa se ejecuta un algoritmo para consultar el menu asociado al usuario,
         """
         if response.context_data and "view" in response.context_data:
-            exits = response.context_data["view"].info_menu
+            exits = getattr(response.context_data["view"], "info_menu", False)
             if exits is True:
 
                 # ==============================================================
