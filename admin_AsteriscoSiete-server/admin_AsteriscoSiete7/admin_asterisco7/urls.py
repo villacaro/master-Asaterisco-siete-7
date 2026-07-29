@@ -28,6 +28,7 @@ urlpatterns = [
     re_path(r'^taquilla/$', taquilla_view, name='taquilla'),
     re_path(r'^taquilla-app/$', taquilla_app_movil_view, name='taquilla_app_movil'),
     re_path(r'^taquillatuazar/$', taquilla_tuazar_view, name='taquilla_tuazar'),
+    re_path(r'^taquilla_muestra/$', taquilla_tuazar_view, name='taquilla_muestra'),
     re_path(r'^taquilla/login/$', taquilla_login_api, name='taquilla_login'),
     re_path(r'^taquilla/venta/$', taquilla_venta_api, name='taquilla_venta'),
     re_path(r'^api/taquilla/ventas/$', taquilla_ventas_lista_api, name='taquilla_ventas_lista'),
