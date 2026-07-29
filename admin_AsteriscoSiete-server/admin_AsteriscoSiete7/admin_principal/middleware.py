@@ -22,7 +22,7 @@ def ignore_links(url):
         except Exception:
             pass
 
-    for key in ("/__debug__/", "/api-auth/", "/api/"):
+    for key in ("/__debug__/", "/api-auth/", "/api/", "/dashboard/", "/taquilla/"):
         try:
             if url.startswith(key):
                 return True
