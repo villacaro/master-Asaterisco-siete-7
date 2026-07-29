@@ -351,7 +351,7 @@ class AuthenticationAndPermissionsMiddleware(MiddlewareMixin):
             themes = {
                 "css": ["css/style.css"]
             }
-            sistema_juego = response.context_data["view"].object_sistema_juego
+            sistema_juego = getattr(response.context_data["view"], "object_sistema_juego", None)
 
             if sistema_juego:
                 theme = sistema_juego.get_theme()
