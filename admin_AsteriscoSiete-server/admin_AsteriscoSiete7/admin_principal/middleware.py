@@ -140,19 +140,22 @@ class AuthenticationAndPermissionsMiddleware(object):
             try:
                 view_kwargs["object_user_ip"] = obj.get_ip(request)
             except Exception:
-                # "Exception obteniendo user_ip")
-                return self._redirect(request.path, '')
+                # Fallback to None
+                view_kwargs["object_user_ip"] = None
 
             # objeto del usuario
             try:
                 view_kwargs["object_user"] = obj.get_user(request)
-                if view_kwargs["object_user"].get_status().codename != "status_activo":
-                    view_kwargs["object_user"].clearSession()
-                    return self._redirect(request.path, '')  # "Inactivo")
+                if getattr(view_kwargs["object_user"], 'get_status', None):
+                    if view_kwargs["object_user"].get_status().codename != "status_activo":
+                        view_kwargs["object_user"].clearSession()
+                        return self._redirect(request.path, '')
             except Exception:
-
-                # "Exception obteniendo user")
-                return self._redirect(request.path, '')
+                # Fallback to standard request.user
+                if getattr(request, 'user', None) and request.user.is_authenticated:
+                    view_kwargs["object_user"] = request.user
+                else:
+                    return self._redirect(request.path, '')
 
             # objeto de la comercializadora
             try:
