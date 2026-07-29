@@ -98,8 +98,8 @@ class AuthenticationAndPermissionsMiddleware(MiddlewareMixin):
 
         if ignore_links(request.path) is False:
             # De estar en un link que no debe ser ingnorado se verifica la
-            # variable de session
-            if settings.SESSION_COOKIE_KEY in request.session:
+            # variable de session o el usuario de django
+            if settings.SESSION_COOKIE_KEY in request.session or (getattr(request, 'user', None) and request.user.is_authenticated):
                 pass
             else:
                 # "No existe la variable de session")

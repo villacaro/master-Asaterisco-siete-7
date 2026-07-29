@@ -4,6 +4,7 @@ import admin_principal.views
 from admin_asterisco7.settings import ACCESO_URL, ADD_MENU, INDEX_URL, LOGOUT_URL
 from admin_permisologia.models import Menu, Permissions
 from django.urls import include, re_path
+from django.views.generic import RedirectView
 
 # ===================================================================#
 urlpatterns = [
@@ -23,7 +24,7 @@ if ADD_MENU:
         is_public=True,
     )
 urlpatterns += [
-re_path(r'^' + ACCESO_URL[1:] + '$', admin_principal.views.PrincipalLoginView.as_view(), name='admin_principal_login'),
+re_path(r'^login/$', RedirectView.as_view(url='/admin/login/', permanent=True), name='old_login_redirect'),
 ]
 # ===================================================================#
 if ADD_MENU:

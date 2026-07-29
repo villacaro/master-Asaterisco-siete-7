@@ -171,7 +171,7 @@ REST_FRAMEWORK = {
 
 # ── Configuraciones del proyecto ─────────────────────────────────────────────
 ADMIN_URL   = '/admin/'
-ACCESO_URL  = '/login/'
+ACCESO_URL  = '/admin/login/'
 LOGOUT_URL  = '/logout/'
 INDEX_URL   = '/'
 

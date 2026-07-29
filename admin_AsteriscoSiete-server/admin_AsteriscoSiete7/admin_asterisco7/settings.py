@@ -425,7 +425,7 @@ MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
 # Examples: 'http://media.lawrence.com/media/', 'http://example.com/media/'
 MEDIA_URL = '/media/'
 ADMIN_URL = '/admin/'
-ACCESO_URL = '/login/'
+ACCESO_URL = '/admin/login/'
 LOGOUT_URL = '/logout/'
 INDEX_URL = '/'
 # Example: 'http://media.lawrence.com/static/'
