@@ -74,7 +74,8 @@ def check_url(url, object_user, object_session, object_comercializadora):
         return settings.MENU_VALID
 
 
-class AuthenticationAndPermissionsMiddleware(object):
+from django.utils.deprecation import MiddlewareMixin
+class AuthenticationAndPermissionsMiddleware(MiddlewareMixin):
     """
     Esta clase que es un middleware de django, gestiona las siguientes tareas:
         1) autenticiacion: verifica que el usuarios este autentificado para poder navegar,
